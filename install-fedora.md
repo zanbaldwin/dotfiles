@@ -13,28 +13,20 @@ Check for any system updates, especially any security advisories.
 rpm-ostree upgrade --check
 ```
 
-Installing the full RPM Fusion repositories, not just the ones that come with Fedora base.
-The non-free nVidia repositories are already enabled so maybe this can be skipped?
-```bash
-rpm-ostree install --idempotent \
-    "https://mirrors.rpmfusion.org/free/fedora/rpmfusion-free-release-$(rpm -E %fedora).noarch.rpm" \
-    "https://mirrors.rpmfusion.org/nonfree/fedora/rpmfusion-nonfree-release-$(rpm -E %fedora).noarch.rpm"
-```
-
 List of software to be installed, and blacklist the _nouveau_ (non-proprietary) graphics drivers:
 - nVidia Graphics Drivers
 - Kernel-based Virtual Machine
 - Other tools I want on my command line as a non-root user
 ```bash
-rpm-ostree install --idempotent --allow-inactive \
-    akmod-nvidia xorg-x11-drv-nvidia xorg-x11-drv-nvidia-cuda \
-    bridge-utils edk2-ovmf guestfs-tools qemu-kvm virt-install virt-manager virt-top \
-    distrobox nss-tools podman-docker tmux
-
 rpm-ostree kargs \
     --append=rd.driver.blacklist=nouveau \
     --append=modprobe.blacklist=nouveau \
     --append=nvidia-drm.modeset=1
+
+rpm-ostree install --idempotent --allow-inactive \
+    akmod-nvidia xorg-x11-drv-nvidia xorg-x11-drv-nvidia-cuda \
+    bridge-utils edk2-ovmf guestfs-tools qemu-kvm virt-install virt-manager virt-top \
+    distrobox nss-tools podman-docker tmux
 ```
 
 Reboot into the new deployment layer.
@@ -67,16 +59,14 @@ bash "./toolbox/install-apps.sh"
 
 Configure GNOME Desktop
 ```bash
-toolbox create dconf
-toolbox enter dconf
-bash "./toolbox/install-dconf.sh"
+bash "./toolbox/setup-gnome.sh"
 ```
 
 Import custom configuration from this repository.
 ```bash
 toolbox create stow
 toolbox enter stow
-bash "./toolbox/install-stow.sh"
+bash "./toolbox/stow-config.sh"
 ```
 
 Install Rust (and Cargo, and awesome command-line tools)

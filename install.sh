@@ -43,11 +43,15 @@ snap install --stable vlc
 
 snap refresh
 
-exit 1
-
 # Install Rust (+ Cargo)
 # Yeah, this is not good. Running an arbitrary script from the internet. Don't do this. Except for this time.
-curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
+command -v "cargo" >/dev/null 2>&1 && { \
+    curl --proto '=https' --tlsv1.2 -sSf "https://sh.rustup.rs" > "/tmp/rustup.sh"; \
+    sh /tmp/rustup.sh -qy; \
+    source "${HOME}/.cargo/env"; \
+} || { \
+    rustup update; \
+}
 
 ### Manual Install
 cargo install bat

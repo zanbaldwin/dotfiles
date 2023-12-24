@@ -9,6 +9,10 @@ git clone "git@github.com:zanbaldwin/dotfiles.git" "${DOTFILES}"
 - Environment setup scripts are stored in [`toolbox/`](./toolbox)
 - Various notes, reminders and archived stuff are in [`notes/`](./notes)
 
+> This project makes no promises regarding backwards-compatibility. There are no
+> stable releases. Things will break simply because I thought I would try
+> something different.
+
 Follow the installation steps in [`install-fedora.md`](install-fedora.md);
 if not using Silverblue, don't use `toolbox` to run scripts.
 

@@ -24,7 +24,7 @@
 	assumed         = "!git ls-files -v | grep ^h | cut -c 3-"
 	# Requires PHPCS, install with "composer global require squizlabs/php_codesniffer"
 	# (or recommended "cgr squizlabs/php_codesniffer", see ".bash_aliases" for details).
-	sniff           = "!git diff --name-only | xargs phpcs -p -v --standard=PSR2"
+	sniff           = "!git diff --name-only | grep \\\\.php\\$ | xargs --no-run-if-empty phpcs -p -v --standard=PSR2"
 	versions        = "!v() { git tag | grep \"^[vV]\\?[0-9.]\\+$\" | sort -V; }; v"
 [user]
 	name            = Zander Baldwin

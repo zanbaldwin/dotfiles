@@ -15,3 +15,9 @@ Not managed by either a packge manager or Cargo.
 - `neofetch`
 - `symfony`
 - `vhs`
+
+# Useful Extensions
+
+- GNOME Shell extension: [`gSnap`](https://extensions.gnome.org/extension/4442/gsnap/)
+- Firefox Extension: [Bitwarden](https://addons.mozilla.org/en-US/firefox/addon/bitwarden-password-manager/)
+- Firefox Extension: [uBlock Origin](https://addons.mozilla.org/en-US/firefox/addon/ublock-origin/)

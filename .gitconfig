@@ -1,7 +1,7 @@
 [alias]
 	st              = status
 	co              = checkout
-	line            = log --oneline --graph
+	line            = log --pretty=format:'%Cred%h%Creset %C(yellow)%d%Creset %s %Cgreen(%cr) %C(bold blue)<%an>%Creset' --abbrev-commit
 	s               = status -s
 	d               = diff
 	prepush         = rebase -i @{u}
@@ -27,7 +27,7 @@
 	sniff           = "!git diff --name-only | grep \\\\.php\\$ | xargs --no-run-if-empty phpcs -p -v --standard=PSR2"
 	versions        = "!v() { git tag | grep \"^[vV]\\?[0-9.]\\+$\" | sort -V; }; v"
 [user]
-	name            = Zan Baldwin
+	name            = Zander Baldwin
 	email           = hello@zanderbaldwin.com
 	signingkey      = 419CB27C
 [push]
@@ -55,3 +55,7 @@
 	autocorrect     = 1
 [core]
 	excludesFile    = ~/.ignore
+# Force Git to always download over SSH to prevent asking for username and password
+# (which is impossible to do on the command-line if 2FA has been enabled).
+[url "git@github.com:"]
+	insteadOf       = https://github.com/

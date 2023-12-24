@@ -14,6 +14,9 @@ if [ -f ~/.bash_prompt ]; then
     . ~/.bash_prompt
 fi
 
+# Do not word wrap
+alias less="less -S"
+
 # ==================== #
 # Directory Management #
 # ==================== #

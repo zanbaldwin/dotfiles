@@ -4,7 +4,6 @@
 
 ### Image Update Settings
 Edit `/etc/rpm-ostreed.conf` to include the following configuration settings. This will automatically pull new/updated images when they are available and apply them to the tree, ready to use when you next reboot the system.
-
 ```conf
 [Daemon]
 AutomaticUpdatePolicy=stage
@@ -14,7 +13,6 @@ StageDeployments=yes
 
 ### Image Layers
 Installing the full RPM Fusion repositories, not just the ones that come with Fedora base.
-
 ```bash
 rpm-ostree install --idempotent \
     "https://mirrors.rpmfusion.org/free/fedora/rpmfusion-free-release-$(rpm -E %fedora).noarch.rpm" \
@@ -22,7 +20,6 @@ rpm-ostree install --idempotent \
 ```
 
 Install nVidia drivers.
-
 ```bash
 rpm-ostree install --idempotent \
     akmod-nvidia \
@@ -31,7 +28,6 @@ rpm-ostree install --idempotent \
 ```
 
 Blacklist the _nouveau_ (non-proprietary) ones.
-
 ```bash
 rpm-ostree kargs \
     --append=rd.driver.blacklist=nouveau \
@@ -44,7 +40,6 @@ List of software to be installed:
 - Kernel-based Virtual Machine
 - PHP & Nginx
 - Other tools I want on my command line as a non-root user
-
 ```bash
 rpm-ostree install --idempotent \
     autoconf automake binutils bison gcc gcc-c++ gdb glibc-devel libtool make pkgconf strace byacc ccache cscope ctags elfutils indent ltrace perf valgrind ElectricFence astyle cbmc check cmake coan cproto insight nasm pscan python3-scons remake scorep splint yasm zzuf \
@@ -56,6 +51,7 @@ rpm-ostree install --idempotent \
 ## User (Mutable) Setup
 Software from official Fedora Repositories:
 - Dconf Editor (`ca.desrt.dconf-editor`)
+
 Software from FlatHub:
 - BitWarden (`com.bitwarden.desktop`)
 - Chromium (`org.chromium.Chromium`)
@@ -77,15 +73,20 @@ Software from FlatHub:
 flatpak remote-add --if-not-exists flathub https://flathub.org/repo/flathub.flatpakrepo
 flatpak install --noninteractive fedora  applications-fedora.list
 flatpak install --noninteractive flathub applications-flathub.list
+```
 
+Configure GNOME Desktop
+```bash
 # Now that Dconf is installed:
 dconf write "/org/gnome/desktop/input-sources/xkb-options" "['caps:swapescape']"
 dconf write "/org/gnome/desktop/calendar/show-weekdate" "false"
 dconf write "/org/gnome/desktop/interface/clock-show-weekday" "true"
 dconf write "/org/gnome/desktop/wm/preferences/button-layout" "appmenu:minimize,maximize,close"
 dconf write "/org/gnome/system/location/enabled" "false"
+```
 
-# Install Rust (+ Cargo)
+Install Rust (and Cargo)
+```bash
 # Yeah, this is not good. Running an arbitrary script from the internet.
 # Only doing this because Rust does not provide signatures for installing Rust in a version-agnostic way.
 command -v "cargo" >/dev/null 2>&1 && { \
@@ -96,7 +97,10 @@ command -v "cargo" >/dev/null 2>&1 && { \
         source "${HOME}/.cargo/env"; \
     } || { echo >&2 "Error downloading Rustlang installation script."; } \
 }
+```
 
+Install Awesome Command-line Tools from Crates
+```bash
 # Install Tools from Rustland/Crates
 # This requires build-essential tools, so must be done after system/rpm-ostree.
 command -v "cargo" >/dev/null 2>&1 && { \
@@ -110,7 +114,6 @@ command -v "cargo" >/dev/null 2>&1 && { \
 
 ### Common Terminal Tools
 Tools that can go in `~/.bin` (the mutable version of `/usr/local/bin`)
-
 - [`btop`](https://github.com/aristocratos/btop)
 - [`composer`](https://getcomposer.org)
 - `duf`
@@ -118,7 +121,6 @@ Tools that can go in `~/.bin` (the mutable version of `/usr/local/bin`)
 ## Toolboxes
 
 ### Tweaks
-
 If something hasn't been configured using Dconf and you don't know the path, use GNOME Tweaks instead.
 Useful for setting system fonts.
 

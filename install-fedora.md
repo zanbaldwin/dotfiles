@@ -91,7 +91,7 @@ Tools that can go in `~/bin` (the mutable version of `/usr/local/bin`)
 - [`glow`](https://github.com/charmbracelet/glow)
 - [`gum`](https://github.com/charmbracelet/gum)
 - [`jq`](https://github.com/stedolan/jq)
-- [`mkcert`](https://github.com/FiloSottile/mkcert) (see [workaround for Silverblue](https://github.com/fedora-silverblue/issue-tracker/issues/397#issuecomment-1372211636))
+- [`mkcert`](https://github.com/FiloSottile/mkcert)
 
 ### Fonts
 Download the following [Nerd Fonts](https://www.nerdfonts.com/font-downloads), extract the Zip files, and move `*Complete.(ttf|otf)` into `~/.local/share/fonts`:

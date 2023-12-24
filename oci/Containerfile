@@ -11,13 +11,17 @@ ARG VERSION="${VERSION:-39}"
 FROM "${IMAGE}:${VERSION}" AS gnome
 MAINTAINER "Zan Baldwin"
 COPY "./usr/" "/usr/"
-# Override OSTree until flatpak/flatpak#5452 is resolved and pushed up to Fedora Rawhide images.
-RUN rpm-ostree override remove firefox firefox-langpacks \
- && rpm-ostree override replace "https://bodhi.fedoraproject.org/updates/FEDORA-2023-cab8a89753" \
- && rpm-ostree install --idempotent --allow-inactive --releasever="39" \
+## I would prefer to keep all software in Flatpaks, but the firefox from Flathub doesn't honour
+## custom certificates from MkCert and the firefox from FedoraProject doesn't have enough codecs
+## to play media on Twitter. So fuck it, back to system package.
+# RUN rpm-ostree override remove firefox firefox-langpacks
+## Override OSTree until flatpak/flatpak#5452 is resolved and pushed up to Fedora Rawhide images.
+RUN rpm-ostree override replace "https://bodhi.fedoraproject.org/updates/FEDORA-2023-cab8a89753" \
+RUN rpm-ostree install --idempotent --allow-inactive --releasever="39" \
         bridge-utils edk2-ovmf guestfs-tools libvirt qemu-kvm virt-install virt-manager \
         podman-docker podman-plugins podman-tui containernetworking-plugins aardvark-dns \
         distrobox make ncdu nss-tools tlp tlp-rdw tmux \
+        ffmpeg-free mozilla-openh264 \
  && systemctl enable "libvirtd" \
  && systemctl enable "podman.service" \
  && systemctl enable "podman.socket" \
@@ -138,7 +142,7 @@ RUN source "${HOME}/.cargo/env" \
 # Layer Hyprland (+ Runtime Dependencies) on Top #
 # ============================================== #
 FROM gnome AS hyprland
-# Runtime dependencies: Hyprland; xdg-desktop-portal-hyprland; Eww; Swww; Alacritty; Anyrun; extra.
+## Runtime dependencies: Hyprland; xdg-desktop-portal-hyprland; Eww; Swww; Alacritty; Anyrun; extra.
 RUN rpm-ostree install --idempotent --allow-inactive \
         atk \
         cairo \

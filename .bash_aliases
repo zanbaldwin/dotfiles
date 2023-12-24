@@ -87,6 +87,8 @@ function whois() {
     fi
 }
 
+alias freenode="irssi --connect=chat.freenode.net --nick=ZanBaldwin"
+
 # ======= #
 # Vagrant #
 # ======= #

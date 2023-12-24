@@ -27,6 +27,11 @@ export PATH="$PATH:$HOME/.config/composer/vendor/bin:$HOME/.composer/vendor/bin"
 # And then initialise them:
 eval "$(symfony-autocomplete)"
 
+# AWS Autocompletion
+if [[ -f /usr/local/bin/aws_completer ]]; then
+    complete -C '/usr/local/bin/aws_completer' aws
+fi
+
 # === #
 # PS1 #
 # === #

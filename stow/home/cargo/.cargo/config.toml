@@ -3,6 +3,7 @@ git-fetch-with-cli = true
 
 [build]
 # ScCache is causing builds to hang inside Toolbox containers on Silverblue?
+# Plus it depends on GLibC which is not installed outside of Toolbox containers by default so Rust Analyzer doesn't work.
 #rustc-wrapper = "sccache"
 
 [registries.crates-io]

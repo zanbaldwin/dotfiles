@@ -120,13 +120,13 @@ alias fucking="sudo"
 # Editors #
 # ======= #
 
-alias m="make"
-NANO="$(command -v nano 2>/dev/null)"
-if [ $? -eq 0 ]; then
-    alias nano="${NANO} -AE --tabsize=4"
-    export EDITOR="nano -AE --tabsize=4"
-    export VISUAL="nano -AE --tabsize=4"
-fi
+command -v nano >/dev/null 2>&1 && {
+    NANO_FLAGS="-AE --tabsize=4"
+    alias nano="nano ${NANO_FLAGS}"
+    export EDITOR="$(command -v nano 2>/dev/null) ${NANO_FLAGS}"
+    export VISUAL="${EDITOR}"
+}
+
 alias vim="vim -N"
 
 # ========== #

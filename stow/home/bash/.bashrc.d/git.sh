@@ -9,5 +9,6 @@ latest_stable_version () {
     git -C "${GIT_DIR}" tag --list --sort="version:refname" \
         | rg -e '\d+\.\d+' \
         | rg -v 'alpha|ALPHA|beta|BETA|rc|RC|-' \
+        | sort -r --version-sort \
         | tail -n1
 }

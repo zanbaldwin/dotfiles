@@ -296,8 +296,11 @@ export PATH="${HOME}/.yarn/bin:${HOME}/.config/yarn/global/node_modules/.bin:${P
 
 which mosh >/dev/null 2>&1
 if [ $? -eq 0 ]; then
-    # Use the same bash-completion rules for Mosh as are registered to SSH.
-    $(complete -p ssh) mosh
+    SSHC="$(complete -p ssh 2>/dev/null)"
+    if [ $? -eq 0 ]; then
+        # Use the same bash-completion rules for Mosh as are registered to SSH.
+        $SSHC mosh
+    fi
 fi
 
 ## These are not meant to be executed every time a new Bash environment is created, instead they

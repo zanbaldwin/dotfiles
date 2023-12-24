@@ -6,15 +6,13 @@ flatpak update --appstream
 flatpak update
 
 # Chromium/Chrome is fucky on Hyprland/Wayland. Firefox is much more stable.
-# Install the Firefox Flatpak from Fedora's repositories, otherwise the system trust
-# store will not be mounted into the Flatpak and Firefox will not trust MkCert
-# certificates for local development.
+# Install the Firefox Flatpak from Fedora's repositories, otherwise the system
+# trust store will not be mounted into the Flatpak and Firefox will not trust
+# MkCert certificates for local development.
 flatpak install --noninteractive --assumeyes --or-update fedora \
-    "org.mozilla.Firefox" \
-    "org.mozilla.Thunderbird"
+    "org.mozilla.Firefox"
 flatpak install --noninteractive --assumeyes --or-update flathub \
     "com.bitwarden.desktop" \
-    "org.chromium.Chromium" \
     "com.github.tchx84.Flatseal" \
     "com.mattjakeman.ExtensionManager" \
     "md.obsidian.Obsidian" \
@@ -32,6 +30,7 @@ flatpak install --noninteractive --assumeyes --or-update flathub \
     "us.zoom.Zoom"
 
 # Notes:
+# ======
 
 # PHPStorm version 2023.1.3 is borked.
 # Disable `ide.browser.jcef.sandbox.enable` in PHPStorm's registry.

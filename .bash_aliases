@@ -254,8 +254,8 @@ function phpenv {
 # ======== #
 
 export GOROOT="/usr/local/go"
-export GOPATH="$HOME/code/golang"
-export PATH="$PATH:$GOROOT/bin:$GOPATH/bin"
+export GOPATH="${HOME}/code/golang"
+export PATH="${PATH}:${GOROOT}/bin:${GOPATH}/bin"
 
 # =============== #
 # Auto-completion #

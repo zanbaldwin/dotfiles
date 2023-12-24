@@ -23,7 +23,7 @@ FROM rust AS alacritty
 # There's absolutely no way I'm settling for Gnome Terminal as my default console.
 RUN source "${HOME}/.cargo/env" \
  && git clone "https://github.com/alacritty/alacritty.git" --branch "v0.12.3" "/tmp/alacritty" \
- && (cd "/tmp/alacritty"; cargo build --release) \
+ && (cd "/tmp/alacritty"; cargo build --release --features "wayland") \
  && mkdir -p "/opt/alacritty/bin" "/opt/alacritty/etc/bash_completion.d" "/opt/alacritty/share/pixmaps" "/opt/alacritty/share/applications" \
  && cp "/tmp/alacritty/target/release/alacritty" "/opt/alacritty/bin/alacritty" \
  && cp "/tmp/alacritty/extra/logo/alacritty-term.svg" "/opt/alacritty/share/pixmaps/Alacritty.svg" \

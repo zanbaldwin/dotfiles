@@ -22,17 +22,19 @@ rpm-ostree upgrade --check
 ### Image Layers
 
 List of software to be installed, and blacklist the _nouveau_ (non-proprietary) graphics drivers:
-- nVidia Graphics Drivers
+- nVidia Graphics Drivers _(not currently needed for any machines I have)_
 - Kernel-based Virtual Machine
 - Docker Compose compatibility for Podman
 - Other tools I want on my command line as a non-root user
+- Runtime dependencies of Hyprland
 
 > Certain software repositories aren't available for ARM64/aarch64 architecture. Go to Software
-> &rarr; Software Repositories, and disable:
+> → Software Repositories, and disable:
 > - `phracek-PyCharm`
 > - `rpmfusion-nonfree-steam`
 
 ```bash
+# Run this first if you want to install the nVidia drivers.
 rpm-ostree kargs \
     --append=rd.driver.blacklist=nouveau \
     --append=modprobe.blacklist=nouveau \
@@ -41,8 +43,9 @@ rpm-ostree kargs \
     --append=nvidia-drm.modeset=1
 systemctl reboot
 
+# If you need nVidia support, install these additional packages:
+# akmod-nvidia xorg-x11-drv-nvidia xorg-x11-drv-nvidia-cuda
 rpm-ostree install --idempotent --allow-inactive \
-    akmod-nvidia xorg-x11-drv-nvidia xorg-x11-drv-nvidia-cuda \
     bridge-utils edk2-ovmf guestfs-tools qemu-kvm virt-install virt-manager virt-top \
     podman-docker \
     distrobox ncdu nss-tools tlp tlp-rdw tmux \

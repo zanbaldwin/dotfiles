@@ -144,7 +144,7 @@ install_as_user() {
 
     # Pre-create some directories so that GNU stash symlinks the files that go in them rather
     # than symlinking the directories themselves.
-    mkdir -p "${HOME}/.bin"
+    mkdir -p "${HOME}/bin"
     mkdir -p "${HOME}/.config"
     mkdir -p "${HOME}/.gnupg"
     mkdir -p "${HOME}/.ssh"

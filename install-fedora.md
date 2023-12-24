@@ -2,16 +2,12 @@
 
 ## System (Immutable) Setup
 
-### Image Update Settings
-Edit `/etc/rpm-ostreed.conf` to include the following configuration settings. This will automatically pull new/updated images when they are available and apply them to the tree, ready to use when you next reboot the system.
-```conf
-[Daemon]
-AutomaticUpdatePolicy=stage
-[Experimental]
-StageDeployments=yes
+### Image Layers
+Check for any system updates, especially any security advisories.
+```bash
+rpm-ostree upgrade --check
 ```
 
-### Image Layers
 Installing the full RPM Fusion repositories, not just the ones that come with Fedora base.
 ```bash
 rpm-ostree install --idempotent \
@@ -21,17 +17,15 @@ rpm-ostree install --idempotent \
 
 List of software to be installed:
 - nVidia Graphics Drivers
-- Build Essential (Development Tool & Libraries)
 - Kernel-based Virtual Machine
-- PHP & Nginx
+- PHP & Nginx (so that the system libraries are accessible from Flatpak containers such as PHPStorm)
 - Other tools I want on my command line as a non-root user
 ```bash
 rpm-ostree install --idempotent --allow-inactive \
     akmod-nvidia xorg-x11-drv-nvidia xorg-x11-drv-nvidia-cuda \
-    autoconf automake binutils bison gcc gcc-c++ gdb glibc-devel libtool make pkgconf strace byacc ccache cscope ctags elfutils indent ltrace perf valgrind ElectricFence astyle cbmc check cmake coan cproto insight nasm pscan python3-scons remake scorep splint yasm zzuf \
-    virt-install libvirt-daemon-config-network libvirt-daemon-kvm qemu-kvm virt-manager virt-viewer guestfs-tools libguestfs-tools python3-libguestfs virt-top bridge-utils libvirt-devel edk2-ovmf \
+    bridge-utils edk2-ovmf guestfs-tools libguestfs-tools libvirt-daemon-config-network libvirt-daemon-kvm libvirt-devel qemu-kvm virt-install virt-manager virt-top virt-viewer \
     php php-bcmath php-devel php-fpm php-gd php-mbstring php-mysqlnd php-pdo php-pear php-pgsql php-pecl-amqp php-pecl-apcu php-pecl-redis5 php-pecl-xdebug3 php-pecl-zip php-pgsql php-process php-soap php-xml nginx \
-    distrobox neofetch ncdu shellcheck stow tmux
+    distrobox nss-tools podman-docker tmux
 ```
 
 Blacklist the _nouveau_ (non-proprietary) graphics drivers.
@@ -40,6 +34,13 @@ rpm-ostree kargs \
     --append=rd.driver.blacklist=nouveau \
     --append=modprobe.blacklist=nouveau \
     --append=nvidia-drm.modeset=1
+```
+
+### Image Update Settings
+Edit `/etc/rpm-ostreed.conf` to make sure that Silverblue will automatically check for new updates.
+```conf
+[Daemon]
+AutomaticUpdatePolicy=check
 ```
 
 ## User (Mutable) Setup
@@ -67,6 +68,7 @@ Software from FlatHub:
 flatpak remote-add --if-not-exists flathub https://flathub.org/repo/flathub.flatpakrepo
 flatpak remote-modify --enable flathub
 
+# Might not need this? Is dconf-cli already installed?
 flatpak install --noninteractive --assumeyes --or-update fedora \
     ca.desrt.dconf-editor
 
@@ -90,16 +92,24 @@ flatpak install --noninteractive --assumeyes --or-update flathub \
 
 Configure GNOME Desktop
 ```bash
-# Now that Dconf is installed:
 dconf write "/org/gnome/desktop/input-sources/xkb-options" "['caps:swapescape']"
 dconf write "/org/gnome/desktop/calendar/show-weekdate" "false"
 dconf write "/org/gnome/desktop/interface/clock-show-weekday" "true"
-dconf write "/org/gnome/desktop/wm/preferences/button-layout" "appmenu:minimize,maximize,close"
+# Following is a string and must be quoted as such.
+dconf write "/org/gnome/desktop/wm/preferences/button-layout" "'appmenu:minimize,maximize,close'"
 dconf write "/org/gnome/system/location/enabled" "false"
 ```
 
 Install Rust (and Cargo)
 ```bash
+toolbox create rust
+toolbox enter rust
+
+sudo dnf group install \
+    "C Development Tools and Libraries" \
+    "Development Libraries" \
+    "Development Tools"
+
 # Yeah, this is not good. Running an arbitrary script from the internet.
 # Only doing this because Rust does not provide signatures for installing Rust in a version-agnostic way.
 command -v "cargo" >"/dev/null" 2>&1 && { \
@@ -114,8 +124,10 @@ command -v "cargo" >"/dev/null" 2>&1 && { \
 
 Install Awesome Command-line Tools from Crates
 ```bash
+toolbox enter rust
+
 # Install Tools from Rustland/Crates
-# This requires build-essential tools, so must be done after system/rpm-ostree.
+# This requires build-essential tools, so make sure you're inside the rust toolbox.
 command -v "cargo" >"/dev/null" 2>&1 && { \
     cargo install bat; \
     cargo install exa; \
@@ -128,13 +140,18 @@ command -v "cargo" >"/dev/null" 2>&1 && { \
 Explicitly create directories that shouldn't be made into symbolic links:
 ```bash
 mkdir -p \
-    "${HOME}/.bin" \
+    "${HOME}/bin" \
     "${HOME}/.config" \
     "${HOME}/.ssh"
 ```
 
 From the root of this repository, import custom configuration files.
 ```bash
+toolbox create stow
+toolbox enter stow
+
+sudo dnf install stow
+
 stow --target="${HOME}" --stow \
     bash \
     cargo \
@@ -146,25 +163,12 @@ stow --target="${HOME}" --stow \
 ```
 
 ### Common Terminal Tools
-Tools that can go in `~/.bin` (the mutable version of `/usr/local/bin`)
+Tools that can go in `~/bin` (the mutable version of `/usr/local/bin`)
 - [`btop`](https://github.com/aristocratos/btop)
-- [`composer`](https://getcomposer.org)
-- [`duf`](https://github.com/muesli/duf)
+- [`composer`](https://getcomposer.org) (may be moved to `php` toolbox if I can get PHPStorm working with Flatpak)
 - [`docker-compose`](https://github.com/docker/compose)
-- `mkcert`
-- `box`
-
-## Toolboxes
-
-### Tweaks
-If something hasn't been configured using Dconf and you don't know the path, use GNOME Tweaks instead.
-Useful for setting system fonts.
-
-```bash
-toolbox create tweaks
-toolbox enter tweaks
-sudo dnf install gnome-tweaks
-gnome-tweaks
-```
-
-
+- [`duf`](https://github.com/muesli/duf)
+- [`glow`](https://github.com/charmbracelet/glow)
+- [`gum`](https://github.com/charmbracelet/gum)
+- [`jq`](https://github.com/stedolan/jq)
+- [`mkcert`](https://github.com/FiloSottile/mkcert) (see [workaround for Silverblue](https://github.com/fedora-silverblue/issue-tracker/issues/397#issuecomment-1372211636))

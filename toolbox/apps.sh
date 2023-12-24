@@ -17,7 +17,6 @@ flatpak install --noninteractive --assumeyes --or-update flathub \
     "com.github.tchx84.Flatseal" \
     "com.mattjakeman.ExtensionManager" \
     "org.freedesktop.Platform.ffmpeg-full" \
-    "md.obsidian.Obsidian" \
     "org.videolan.VLC" \
     "com.visualstudio.code"
 

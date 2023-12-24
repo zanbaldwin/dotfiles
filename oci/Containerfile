@@ -4,15 +4,38 @@ ARG IMAGE="${IMAGE:-quay.io/fedora/fedora-${VARIANT}}"
 # Fedora 39 is the first to officially ship as an OCI image.
 ARG VERSION="${VERSION:-39}"
 
-# ============================= #
-# Build Hyprland Window Manager #
-# ============================= #
-FROM "fedora:${VERSION}" AS hyprland-build
+# ================================= #
+# Build Base GNOME Silverblue Image #
+# ================================= #
+FROM "${IMAGE}:${VERSION}" AS gnome
+MAINTAINER "Zan Baldwin"
+# Override OSTree until flatpak/flatpak#5452 is resolved and pushed up to Fedora Rawhide images.
+RUN rpm-ostree override remove firefox firefox-langpacks \
+ && rpm-ostree override replace "https://bodhi.fedoraproject.org/updates/FEDORA-2023-cab8a89753" \
+ && rpm-ostree install --idempotent --allow-inactive --releasever="39" \
+        bridge-utils edk2-ovmf guestfs-tools libvirt qemu-kvm virt-install virt-manager \
+        podman-docker podman-plugins podman-tui \
+        distrobox make ncdu nss-tools tlp tlp-rdw tmux \
+ && sed -i 's/#AutomaticUpdatePolicy.*/AutomaticUpdatePolicy=check/' "/etc/rpm-ostreed.conf" \
+ && systemctl enable "podman" \
+ && systemctl enable  "podman.socket" \
+ && (systemctl enable "tlp.service" || true) \
+ && cat "/etc/sudoers" | grep -v "secure_path" | tee "/etc/sudoers" >"/dev/null" \
+ && rm -rf /tmp/* /var/* \
+ && ostree container commit
+
+# =============C/C++============ #
+# Build Hyprland Desktop Portal  #
+# Build Hyprland Window Manager  #
+# Build Mako Notification Daemon #
+# ============================== #
+FROM "fedora:${VERSION}" AS c-build
 RUN dnf upgrade --assumeyes && dnf install --assumeyes \
         cairo-devel \
         cmake \
         cpio \
         gcc-c++ \
+        gdk-pixbuf2-devel \
         git \
         hwdata-devel \
         inih-devel \
@@ -43,75 +66,102 @@ RUN dnf upgrade --assumeyes && dnf install --assumeyes \
         xcb-util-renderutil-devel \
         xcb-util-wm-devel \
         xorg-x11-server-Xwayland-devel
-RUN    git clone --recursive "https://github.com/hyprwm/xdg-desktop-portal-hyprland" --branch "v0.4.0" "/tmp/xdg-desktop-portal-hyprland" \
-    && meson setup "/tmp/xdg-desktop-portal-hyprland/build" "/tmp/xdg-desktop-portal-hyprland" --prefix="/opt/xdg-desktop-portal-hyprland" \
-    && ninja -C "/tmp/xdg-desktop-portal-hyprland/build" install \
-    && (cd "/tmp/xdg-desktop-portal-hyprland/hyprland-share-picker" && make all) \
-    && rm -rf "/tmp/xdg-desktop-portal-hyprland"
-RUN    git clone --recursive "https://github.com/hyprwm/Hyprland.git" --branch="v0.26.0" "/tmp/hyprland" \
-    && make -C "/tmp/hyprland" install PREFIX="/opt/hyprland" \
-    && rm -rf "/tmp/hyprland"
+RUN git clone --recursive "https://github.com/hyprwm/xdg-desktop-portal-hyprland" --branch "v0.4.0" "/tmp/xdg-desktop-portal-hyprland" \
+ && meson setup "/tmp/xdg-desktop-portal-hyprland/build" "/tmp/xdg-desktop-portal-hyprland" --prefix="/opt/xdg-desktop-portal-hyprland" \
+ && ninja -C "/tmp/xdg-desktop-portal-hyprland/build" install \
+ && (cd "/tmp/xdg-desktop-portal-hyprland/hyprland-share-picker" && make all) \
+ && rm -rf "/tmp/xdg-desktop-portal-hyprland"
+RUN git clone --recursive "https://github.com/hyprwm/Hyprland.git" --branch="v0.26.0" "/tmp/hyprland" \
+ && make -C "/tmp/hyprland" install PREFIX="/opt/hyprland" \
+ && rm -rf "/tmp/hyprland"
+RUN git clone --recursive "https://github.com/emersion/mako.git" --branch="v1.8.0" "/tmp/mako" \
+ && meson setup "/tmp/mako/build" "/tmp/mako" --prefix="/opt/mako" \
+ && sudo ninja -C "/tmp/mako/build" install \
+ && mkdir -p "/opt/mako/etc/bash_completion.d" \
+ && cp "/tmp/mako/contrib/completions/bash/mako" "/opt/mako/etc/bash_completion.d/mako" \
+ && cp "/tmp/mako/contrib/completions/bash/makoctl" "/opt/mako/etc/bash_completion.d/makoctl" \
+ && rm -rf "/tmp/mako"
 
-# ====================================== #
-# Build Eww (Elkowars Wacky Widgets) Bar #
-# ====================================== #
+# ========================RUST======================== #
+# Build Eww (Elkowars Wacky Widgets) Bar               #
+# Build Swww (Solution to your Wayland Wallpaper Woes) #
+# Build Alacritty terminal emulator.                   #
+# Build Anyrun Application Launcher                    #
+# ==================================================== #
 FROM "fedora:${VERSION}" AS rust-build
-RUN    sudo dnf install --assumeyes \
-        atk-devel \
-        cairo-devel \
-        cairo-gobject-devel \
-        gcc \
-        gdk-pixbuf2-devel \
-        git \
-        gtk3-devel \
-        pango-devel \
-    && curl --proto "=https" --tlsv1.2 -sSf "https://sh.rustup.rs" >"/tmp/rustup.sh" \
-    && sh /tmp/rustup.sh -qy
-RUN    source "${HOME}/.cargo/env" \
-    && git clone "https://github.com/elkowar/eww.git" --branch "v0.4.0" "/tmp/eww" \
-    && (cd "/tmp/eww"; cargo build --release) \
-    && mkdir -p "/opt/eww" \
-    && cp "/tmp/eww/target/release/eww" "/opt/eww/eww" \
-    && rm -rf "/tmp/eww"
-RUN    source "${HOME}/.cargo/env" \
-    && git clone "https://github.com/Horus645/swww.git" --branch "v0.7.3" "/tmp/swww" \
-    && (cd "/tmp/swww"; cargo build --release) \
-    && mkdir -p "/opt/swww" \
-    && cp "/tmp/swww/target/release/swww" "/opt/swww/swww" \
-    && cp "/tmp/swww/target/release/swww-daemon" "/opt/swww/swww-daemon" \
-    && rm -rf "/tmp/swww"
+RUN dnf install --assumeyes \
+        curl git \
+        atk-devel cairo-devel cairo-gobject-devel gcc gdk-pixbuf2-devel gtk3-devel pango-devel \
+        cmake freetype-devel fontconfig-devel libxcb-devel libxkbcommon-devel g++ \
+        gtk-layer-shell-devel \
+ && curl --proto "=https" --tlsv1.2 -sSf "https://sh.rustup.rs" >"/tmp/rustup.sh" \
+ && sh /tmp/rustup.sh -qy
+RUN source "${HOME}/.cargo/env" \
+ && git clone "https://github.com/elkowar/eww.git" --branch "v0.4.0" "/tmp/eww" \
+ && (cd "/tmp/eww"; cargo build --release --no-default-features --features="wayland") \
+ && mkdir -p "/opt/eww/bin" \
+ && cp "/tmp/eww/target/release/eww" "/opt/eww/bin/eww" \
+ && rm -rf "/tmp/eww"
+RUN source "${HOME}/.cargo/env" \
+ && git clone "https://github.com/Horus645/swww.git" --branch "v0.7.3" "/tmp/swww" \
+ && (cd "/tmp/swww"; cargo build --release) \
+ && mkdir -p "/opt/swww/bin" "/opt/swww/etc/bash_completion.d" \
+ && cp "/tmp/swww/target/release/swww" "/opt/swww/bin/swww" \
+ && cp "/tmp/swww/target/release/swww-daemon" "/opt/swww/bin/swww-daemon" \
+ && cp "/tmp/swww/completions/swww.bash" "/opt/swww/etc/bash_completion.d/swww" \
+ && rm -rf "/tmp/swww"
+RUN source "${HOME}/.cargo/env" \
+ && git clone "https://github.com/alacritty/alacritty.git" --branch "v0.12.1" "/tmp/alacritty" \
+ && (cd "/tmp/alacritty"; cargo build --release) \
+ && mkdir -p "/opt/alacritty/bin" "/opt/alacritty/etc/bash_completion.d" "/opt/alacritty/share/pixmaps" "/opt/alacritty/share/applications" \
+ && cp "/tmp/alacritty/target/release/alacritty" "/opt/alacritty/bin/alacritty" \
+ && cp "/tmp/alacritty/extra/logo/alacritty-term.svg" "/opt/alacritty/share/pixmaps/Alacritty.svg" \
+ && cp "/tmp/alacritty/extra/linux/Alacritty.desktop" "/opt/alacritty/share/applications/alacritty.desktop" \
+ && cp "/tmp/alacritty/extra/completions/alacritty.bash" "/opt/alacritty/etc/bash_completion.d/alacritty" \
+ && rm -rf "/tmp/alacritty"
+# Anyrun hasn't released any stable versions/tags; checkout a known commit instead.
+RUN source "${HOME}/.cargo/env" \
+ && git clone "https://github.com/Kirottu/anyrun.git" "/tmp/anyrun" \
+ && git -C "/tmp/anyrun" fetch --all \
+ && git -C "/tmp/anyrun" reset --hard "9ad3af89c0d92fbfdaa1f79bf7f93c60200f3831" \
+ && (cd "/tmp/anyrun"; cargo build --release) \
+ && mkdir -p "/opt/anyrun/bin" "/opt/anyrun/etc/anyrun/plugins" \
+ && cp "/tmp/anyrun/target/release/anyrun" "/opt/anyrun/bin/anyrun" \
+ && cp /tmp/anyrun/target/release/*.so "/opt/anyrun/etc/anyrun/plugins/" \
+ && rm -rf "/tmp/anyrun"
 
-# ================================= #
-# Build Base GNOME Silverblue Image #
-# ================================= #
-FROM "${IMAGE}:${VERSION}" AS gnome
-MAINTAINER "Zan Baldwin"
-# Override OSTree until flatpak/flatpak#5452 is resolved and pushed up to Fedora Rawhide images.
-RUN    rpm-ostree override remove firefox firefox-langpacks \
-    && rpm-ostree override replace "https://bodhi.fedoraproject.org/updates/FEDORA-2023-cab8a89753" \
-    && rpm-ostree install --idempotent --allow-inactive \
-        bridge-utils edk2-ovmf guestfs-tools libvirt qemu-kvm virt-install virt-manager virt-top \
-        podman-docker podman-plugins podman-tui \
-        distrobox ncdu nss-tools tlp tlp-rdw tmux \
-    && sed -i 's/#AutomaticUpdatePolicy.*/AutomaticUpdatePolicy=check/' "/etc/rpm-ostreed.conf" \
-    && systemctl enable "podman" \
-    && systemctl enable  "podman.socket" \
-    && (systemctl enable "tlp.service" || true) \
-    && cat "/etc/sudoers" | grep -v "secure_path" | tee "/etc/sudoers" >"/dev/null" \
-    && rm -rf /tmp/* /var/* \
-    && ostree container commit
-
-# ====================================== #
-# Layer Hyprland (+ Dependencies) on Top #
-# ====================================== #
+# ============================================== #
+# Layer Hyprland (+ Runtime Dependencies) on Top #
+# ============================================== #
 FROM gnome AS hyprland
-COPY --from="hyprland-build" "/opt/hyprland/" "/usr/"
-COPY --from="hyprland-build" "/opt/xdg-desktop-portal-hyprland/" "/usr/"
-COPY --from="rust-build" "/opt/eww/eww" "/usr/bin/eww"
-COPY --from="rust-build" "/opt/swww/" "/usr/bin/"
+# Runtime dependencies: Hyprland; xdg-desktop-portal-hyprland; Eww; Swww; Alacritty; Anyrun; extra.
 RUN rpm-ostree install --idempotent --allow-inactive \
-        inih libdisplay-info libseat pipewire-libs qt6-qtwayland \
-        atk cairo cairo-gobject gdk-pixbuf2 gtk3 libuuid pango \
-        waybar \
-    && rm -rf /tmp/* /var/* \
-    && ostree container commit
+        atk \
+        cairo \
+        cairo-gobject \
+        dbus \
+        fontconfig \
+        gdk-pixbuf2 \
+        gtk3 \
+        gtk-layer-shell \
+        inih \
+        jq \
+        libdisplay-info \
+        libseat \
+        libuuid \
+        pango \
+        pipewire-libs \
+        polkit-gnome \
+        qt5-qtwayland \
+        qt6-qtwayland \
+        socat \
+ && rm -rf /tmp/* /var/* \
+ && ostree container commit
+# Tools built in previous steps.
+COPY --from="c-build" "/opt/hyprland/" "/usr/"
+COPY --from="c-build" "/opt/xdg-desktop-portal-hyprland/" "/usr/"
+COPY --from="c-build" "/opt/mako/" "/usr/"
+COPY --from="rust-build" "/opt/eww/" "/usr/"
+COPY --from="rust-build" "/opt/swww/" "/usr/"
+COPY --from="rust-build" "/opt/alacritty/" "/usr/"
+COPY --from="rust-build" "/opt/anyrun/" "/usr/"

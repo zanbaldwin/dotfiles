@@ -141,7 +141,7 @@ if [ $? -eq 0 ]; then
     alias vld='php -d vld.active=1 -d vld.execute=0 -d vld.dump_paths=1 -d vld.save_paths=1 -d vld.verbosity=0'
 
     # Add global Composer package binaries to $PATH.
-    export PATH="$PATH:$HOME/.config/composer/vendor/bin:$HOME/.composer/vendor/bin"
+    export PATH="$PATH:$HOME/.composer/vendor/bin"
 
     # For parallel package downloading in Composer (!!!) install the following global package:
     #     $ composer global require hirak/prestissimo

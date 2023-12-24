@@ -37,6 +37,7 @@ install_as_sudo() {
         neofetch \
         rsync \
         scdaemon \
+        shellcheck \
         sl \
         stow \
         tmux \
@@ -138,6 +139,7 @@ install_as_user() {
         cargo install exa; \
         cargo install git-delta; \
         cargo install starship; \
+        cargo install onefetch; \
     }
 
     # Pre-create some directories so that GNU stash symlinks the files that go in them rather

@@ -52,7 +52,6 @@ cargo install "spotifyd" --features "dbus_keyring"
 cargo install "spotify-tui"
 
 # The following need more testing on Linux. See `stow/bash/.bashrc.d/directories.sh`.
-cargo install "broot"     # Terminal directory browser
 cargo install "zoxide"    # `cd` alternative
 
 # Specifically for Rust development instead of general tools

@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 # Some systems have a version of "ls" that does not have the
 # "--group-directories-first" or "-G" command-line flags,
@@ -11,12 +11,12 @@ if ls --group-directories-first >"/dev/null" 2>&1; then
     LL_OPTIONS="${LL_OPTIONS} --group-directories-first"
 fi
 
-command -v "exa" >"/dev/null" 2>&1 && {
+if command -v "exa" >"/dev/null" 2>&1; then
     alias ll="exa -labUh --git --group-directories-first --icons";
-} || {
+else
     # shellcheck disable=SC2139
     alias ll="ls -lAhHp${LL_OPTIONS}";
-};
+fi
 
 # Try it out on Linux first before putting in install-rust.sh
 command -v "zoxide" >"/dev/null" 2>&1 && {
@@ -59,22 +59,3 @@ alias cd..="cd .."
 alias back="cd -"
 alias cdgit='cd $(git rev-parse --show-toplevel)'
 alias mkdir="mkdir -pv"
-
-command -v "broot" >"/dev/null" 2>&1 && {
-    # This function starts broot and executes the command it produces, if any.
-    # It's needed because some shell commands, like `cd`, have no useful effect if executed in a subshell.
-    # More information can be found in https://github.com/Canop/broot
-    function dir {
-        local cmd cmd_file code
-        cmd_file="$(mktemp)"
-        if broot --outcmd "${cmd_file}" "$@"; then
-            cmd=$(<"${cmd_file}")
-            command rm -f "${cmd_file}"
-            eval "${cmd}"
-        else
-            code=$?
-            command rm -f "${cmd_file}"
-            return "${code}"
-        fi
-    }
-}

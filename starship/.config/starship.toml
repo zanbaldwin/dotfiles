@@ -4,6 +4,7 @@
 add_newline = true
 format = """
 $status\
+$container\
 $os\
 $username\
 $hostname\
@@ -32,7 +33,6 @@ $sudo\
 $cmd_duration\
 $line_break\
 $jobs\
-$container\
 $shell\
 $character"""
 continuation_prompt = "[↳ ](bold white)"
@@ -48,12 +48,12 @@ style = 'bold red'
 disabled = false
 
 [os]
-disabled = false
+disabled = true
 format = "[$symbol ]($style)"
 style = "gray"
 [os.symbols]
 Debian = '󰣚'
-Fedora = '󰣛'
+Fedora = ''
 Linux = ''
 Macos = '󰘳'
 Raspbian = ''
@@ -97,4 +97,6 @@ disabled = true
 [jobs]
 disabled = true
 [container]
-disabled = true
+disabled = false
+symbol = '󰡨'
+format = '[\[$name\] ]($style)'

@@ -21,6 +21,9 @@ command -v "cargo" >"/dev/null" 2>&1 && { \
     } || { echo >&2 "Error downloading RustLang installation script."; } \
 }
 
+# Run separately instead of one command so that Cargo cleans up build files between each one.
+# Kept running into /tmp ramfs running out of space on small VMs.
+
 # Important Rust binaries I want for *every* installation.
 cargo install "sccache"                                      # Build Artifact Cache
 cargo install --config="rustc-wrapper='sccache'" "bat"       # `cat` but better
@@ -34,8 +37,6 @@ cargo install --config="rustc-wrapper='sccache'" "mprocs"    # Multi Process Run
 cargo install --config="rustc-wrapper='sccache'" "onefetch"  # Git Repository Overview
 cargo install --config="rustc-wrapper='sccache'" "ripgrep"   # It's just fast
 cargo install --config="rustc-wrapper='sccache'" "zellij"    # Terminal Multiplexer (tmux replacement)
-# Run separately instead of one command so that Cargo cleans up build files between each one.
-# Kept running into /tmp ramfs running out of space on small VMs.
 if [[ "${OSTYPE}" == "linux-gnu"* ]]; then
     # Alacritty on macOS is poopy. Only install on Linux.
     # iTerm2 is the best you're going to get for macOS and that's still shit.

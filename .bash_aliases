@@ -2,6 +2,9 @@
 # To use this file, symlink it to ~/.bash_aliases (it should already be included
 # in ~/.bashrc).
 
+# Problems with common *nix PATHs on macOS.
+export PATH="${PATH}:${HOME}/.bin"
+
 # ============= #
 # Bash-specific #
 # ============= #
@@ -19,7 +22,7 @@ if [ -f ~/.bash_prompt ]; then
 fi
 
 # Do not word wrap
-alias less="less -S -R"
+alias less="less -S -R -N"
 alias tmux="tmux attach || tmux new"
 
 # Watch the output of the last command instead of having to
@@ -29,6 +32,10 @@ alias follow='watch $(history -p !!)'
 alias xx="exit"
 
 title() { print -Pn "\e]2;$@\a"; }
+
+# Speedup "ls" command by specifying we don't care about the colour
+# output based on file permissions.
+export LS_COLORS='ex=00:su=00:sg=00:ca=00:'
 
 # ============================= #
 # Directory and File Management #
@@ -134,7 +141,10 @@ alias v="vim -N"
 # ========== #
 
 # See https://github.com/denilsonsa/prettyping
-alias ping="prettyping --nolegend"
+which prettyping >dev/null 2>&1
+if [ $? -eq 0 ]; then
+    alias ping="prettyping --nolegend"
+fi
 alias wget="wget -c"
 alias mitm="mitmproxy --transparent --host"
 alias dig="dig +nocmd any +multiline +noall +answer"
@@ -182,6 +192,9 @@ if [ $? -eq 0 ]; then
     export SSH_AUTH_SOCK=$(gpgconf --list-dirs agent-ssh-socket)
     gpgconf --launch gpg-agent
 fi
+# Sometimes the GPG agent get in a weird state that means that using GPG
+# for Git Clone/Push/Pull over SSH stops working.
+echo UPDATESTARTUPTTY | gpg-connect-agent
 
 # ======= #
 # Vagrant #

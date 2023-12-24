@@ -71,6 +71,16 @@ alias fzf="fzf-tmux"
 # apt install ncdu
 alias du="ncdu"
 
+function create_secure() {
+    FOLDER=${1:-"/tmp/secure"}
+    sudo mount -t ramfs -o size=1M ramfs "${FOLDER}"
+    sudo chown "$(logname):$(logname)" "${FOLDER}"
+}
+function destroy_secure() {
+    FOLDER=${1:-"/tmp/secure"}
+    sudo umount "${FOLDER}"
+}
+
 # ================ #
 # Anger Management #
 # ================ #

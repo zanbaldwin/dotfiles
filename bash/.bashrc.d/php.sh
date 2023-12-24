@@ -9,6 +9,7 @@ command -v "php" >"/dev/null" 2>&1 && {
     # To install: `pecl install vld` (currently in beta only, so install vld-beta instead).
     alias vld='php -d vld.active=1 -d vld.execute=0 -d vld.dump_paths=1 -d vld.save_paths=1 -d vld.verbosity=1'
 
-    # Add global Composer package binaries to $PATH (but last since PHP scripts shouldn't override binaries).
-    command -v "composer" >"/dev/null" 2>&1 && { export PATH="${PATH}:$(composer global config bin-dir --absolute 2>/dev/null)"; }
+    command -v "composer" >"/dev/null" 2>&1 && {
+        add_to_path "$(composer global config bin-dir --absolute 2>/dev/null)"
+    }
 }

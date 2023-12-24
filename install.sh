@@ -25,10 +25,18 @@ toolbox create php \
 toolbox create stow \
     && toolbox run --container="stow" bash "${THIS_DIR}/toolbox/stow.sh"
 
-podman build --target="gnome" --tag="localhost:5000/zanbaldwin/silverblue:39" "${THIS_DIR}/oci" \
+if [ -f "/etc/os-release" ]; then
+    # shellcheck source="/dev/null"
+    source "/etc/os-release"
+fi
+
+# For installation on a new machine, always use the same version of Fedora as is
+# currently running. Can upgrade to `latest` at the later date if need be.
+VERSION="${VERSION_ID:-latest}"
+podman build --target="gnome" --build-arg="VERSION=${VERSION}" --tag="localhost:5000/zanbaldwin/silverblue:${VERSION}" "${THIS_DIR}/oci" \
     && podman run -d --name="registry" --publish="5000:5000" "docker.io/library/registry:2" \
     && podman push "localhost:5000/zanbaldwin/silverblue:39" \
-    && rpm-ostree rebase "ostree-unverified-registry:localhost:5000/zanbaldwin/silverblue:39"
+    && rpm-ostree rebase "ostree-unverified-registry:localhost:5000/zanbaldwin/silverblue:${VERSION}"
 
 systemctl reboot
 

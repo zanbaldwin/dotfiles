@@ -197,47 +197,47 @@ if [ $? -eq 0 ]; then
         alias puli='set -f;puli';puli(){ command puli "$@";set +f;}
     fi
 
-    # PHP Environment.
-    # Use this to provision a PHP environment (useful when current OS does not support a high
-    # enough version of PHP for the project). Defaults to the latest PHP version using Alpine
-    # Linux (checks for new versions on each run). Specify the VERSION environment variable
-    # for a different PHP version (eg: `VERSION=5.6 phpenv`). Can also be used to
-    # provision other environments like Ruby or NodeJS (eg: `IMAGE=node phpenv`).
-    function phpenv {
-        local DOCKER=${DOCKER:-"docker"}
-        command -v "${DOCKER}" >/dev/null 2>&1 || { echo >&2 "$(tput setaf 1)Docker Client \"${DOCKER}\" not installed.$(tput sgr0)"; return 1; }
-
-        local INFO=$("${DOCKER}" info >/dev/null 2>&1)
-        if [ $? -ne 0 ]; then
-            echo >&2 "$(tput setaf 1)Docker Daemon unavailable. Aborting!$(tput sgr0)"
-            if [ "$(id -u 2>/dev/null)" -ne "0" ]; then
-                echo >&2 "$(tput setaf 1)Perhaps retry as root?$(tput sgr0)"
-            fi
-            return 1
-        fi
-
-        local IMAGE=${IMAGE:-"php"}
-        local VERSION=${VERSION:-"alpine"}
-
-        local COMPOSER="$(which composer 2>/dev/null)"
-        local CACHE=""
-        if [ $? -eq 0 ]; then
-            local COMPOSER="-v \"${COMPOSER}:/bin/composer\""
-            local COMPOSER_HOME_DIR="$(composer global config home 2>/dev/null)"
-            if [ $? -eq 0 ] && [ -d "${COMPOSER_HOME_DIR}" ]; then
-                local CACHE="-v \"${COMPOSER_HOME_DIR}:/.composer\" -e \"COMPOSER_HOME=/.composer\""
-            fi
-        fi
-
-        echo "$(tput setaf 2)Checking for newer version of \"${IMAGE}:${VERSION}\" on Docker Hub.$(tput setaf 6)"
-        docker pull "${IMAGE}:${VERSION}" 2>/dev/null || echo >&2 "$(tput setaf 1)Could not connect to Docker Hub. Skipping update."
-        echo "$(tput sgr0)"
-
-        local PHPENV="docker run -it --rm -v \"$(pwd):$(pwd)\" -w \"$(pwd)\" $CACHE $COMPOSER -u \"$(id -u):$(id -g)\" -e \"TERM=xterm\" \"${IMAGE}:${VERSION}\""
-        $SHELL -c "${PHPENV} sh"
-    }
-
 fi
+
+# PHP Environment.
+# Use this to provision a PHP environment (useful when current OS does not support a high
+# enough version of PHP for the project). Defaults to the latest PHP version using Alpine
+# Linux (checks for new versions on each run). Specify the VERSION environment variable
+# for a different PHP version (eg: `VERSION=5.6 phpenv`). Can also be used to
+# provision other environments like Ruby or NodeJS (eg: `IMAGE=node phpenv`).
+function phpenv {
+    local DOCKER=${DOCKER:-"docker"}
+    command -v "${DOCKER}" >/dev/null 2>&1 || { echo >&2 "$(tput setaf 1)Docker Client \"${DOCKER}\" not installed.$(tput sgr0)"; return 1; }
+
+    local INFO=$("${DOCKER}" info >/dev/null 2>&1)
+    if [ $? -ne 0 ]; then
+        echo >&2 "$(tput setaf 1)Docker Daemon unavailable. Aborting!$(tput sgr0)"
+        if [ "$(id -u 2>/dev/null)" -ne "0" ]; then
+            echo >&2 "$(tput setaf 1)Perhaps retry as root?$(tput sgr0)"
+        fi
+        return 1
+    fi
+
+    local IMAGE=${IMAGE:-"php"}
+    local VERSION=${VERSION:-"alpine"}
+
+    local CACHE=""
+    local COMPOSER="$(which composer 2>/dev/null)"
+    if [ "${COMPOSER}" != "" ]; then
+        local COMPOSER="-v \"${COMPOSER}:/bin/composer\""
+        local COMPOSER_HOME_DIR="$(composer global config home 2>/dev/null)"
+        if [ $? -eq 0 ] && [ -d "${COMPOSER_HOME_DIR}" ]; then
+            local CACHE="-v \"${COMPOSER_HOME_DIR}:/.composer\" -e \"COMPOSER_HOME=/.composer\""
+        fi
+    fi
+
+    echo "$(tput setaf 2)Checking for newer version of \"${IMAGE}:${VERSION}\" on Docker Hub.$(tput setaf 6)"
+    docker pull "${IMAGE}:${VERSION}" 2>/dev/null || echo >&2 "$(tput setaf 1)Could not connect to Docker Hub. Skipping update."
+    echo "$(tput sgr0)"
+
+    local PHPENV="docker run -it --rm -v \"$(pwd):$(pwd)\" -w \"$(pwd)\" $CACHE $COMPOSER -u \"$(id -u):$(id -g)\" -e \"TERM=xterm\" \"${IMAGE}:${VERSION}\""
+    $SHELL -c "${PHPENV} sh"
+}
 
 # ======== #
 # Go! Lang #

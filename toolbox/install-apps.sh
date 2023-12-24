@@ -6,16 +6,19 @@ flatpak remote-modify --enable flathub
 flatpak install --noninteractive --assumeyes --or-update flathub \
     "com.bitwarden.desktop" \
     "org.chromium.Chromium" \
-    "com.jetbrains.CLion" \
-    "com.discordapp.Discord" \
     "com.github.tchx84.Flatseal" \
     "com.mattjakeman.ExtensionManager" \
     "md.obsidian.Obsidian" \
+    "org.videolan.VLC" \
+    "com.visualstudio.code" \
+    "us.zoom.Zoom"
+
+# The following Flatpaks are not available on the ARM64/aarch64 architecture, as of 2023-06-02.
+flatpak install --noninteractive --assumeyes --or-update flathub \
+    "com.jetbrains.CLion" \
+    "com.discordapp.Discord" \
     "com.jetbrains.PhpStorm" \
     "com.skype.Client" \
     "com.slack.Slack" \
     "com.syntevo.SmartGit" \
     "com.spotify.Client" \
-    "org.videolan.VLC" \
-    "com.visualstudio.code" \
-    "us.zoom.Zoom"

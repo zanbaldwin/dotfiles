@@ -25,6 +25,7 @@
 	# Requires PHPCS, install with "composer global require squizlabs/php_codesniffer"
 	# (or recommended "cgr squizlabs/php_codesniffer", see ".bash_aliases" for details).
 	sniff           = "!git diff --name-only | xargs phpcs -p -v --standard=PSR2"
+	versions        = "!v() { git tag | grep \"^[vV]\\?[0-9.]\\+$\" | sort -V; }; v"
 [user]
 	name            = Zander Baldwin
 	email           = hello@zanderbaldwin.com

@@ -28,17 +28,17 @@ List of software to be installed, and blacklist the _nouveau_ (non-proprietary) 
 rpm-ostree kargs \
     --append=rd.driver.blacklist=nouveau \
     --append=modprobe.blacklist=nouveau \
+    --append=nouveau.modeset=0 \
+    --append=nvidia.modeset=1 \
     --append=nvidia-drm.modeset=1
 systemctl reboot
 
 rpm-ostree install --idempotent --allow-inactive \
     akmod-nvidia xorg-x11-drv-nvidia xorg-x11-drv-nvidia-cuda \
     bridge-utils edk2-ovmf guestfs-tools qemu-kvm virt-install virt-manager virt-top \
-    distrobox ncdu nss-tools podman-docker tlp tlp-rdw tmux
+    distrobox ncdu nss-tools podman-docker tlp tlp-rdw tmux \
+    libdisplay-info
 systemctl reboot
-
-# The following is only if you want the runtime-dependencies of Hyprland WM.
-rpm-ostree install --idempotent --allow-inactive
 ```
 
 Enable services and modify user groups.
@@ -94,8 +94,12 @@ Setup Hyprland WM
 ```bash
 toolbox create hyprland
 toolbox run --container="hyprland" bash "./toolbox/build-hyprland.sh"
-rsync --archive --whole-file "${HOME}/.hyprland-build/" "/usr/local/"
+toolbox rm -f hyprland
+sudo rsync --archive --whole-file "${HOME}/.hyprland-build/" "/usr/local/"
 rm -rf "${HOME}/.hyprland-build"
+# Instruct Fedora to load dynamically-linked libraries from "/usr/local/lib".
+echo "/usr/local/lib" | sudo tee "/etc/ld.so.conf.d/libwlroots.conf"
+sudo ldconfig
 ```
 
 ### Common Terminal Tools

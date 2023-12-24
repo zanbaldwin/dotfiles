@@ -12,8 +12,7 @@ flatpak install --noninteractive --assumeyes --or-update flathub \
     "com.mattjakeman.ExtensionManager" \
     "md.obsidian.Obsidian" \
     "org.videolan.VLC" \
-    "com.visualstudio.code" \
-    "us.zoom.Zoom"
+    "com.visualstudio.code"
 
 if [ "$(uname -i)" == "x86_64" ]; then
     # The following Flatpaks are not available on ARM64/aarch64 architecture, as of 2023-06-02.
@@ -24,5 +23,6 @@ if [ "$(uname -i)" == "x86_64" ]; then
         "com.skype.Client" \
         "com.slack.Slack" \
         "com.syntevo.SmartGit" \
-        "com.spotify.Client"
+        "com.spotify.Client" \
+        "us.zoom.Zoom"
 fi

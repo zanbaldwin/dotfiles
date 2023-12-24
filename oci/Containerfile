@@ -4,6 +4,9 @@ ARG IMAGE="${IMAGE:-quay.io/fedora/fedora-${VARIANT}}"
 # Fedora 39 is the first to officially ship as an OCI image.
 ARG VERSION="${VERSION:-39}"
 
+# ============================= #
+# Build Hyprland Window Manager #
+# ============================= #
 FROM "fedora:${VERSION}" AS hyprland-build
 RUN dnf upgrade --assumeyes && dnf install --assumeyes \
         cairo-devel \
@@ -49,6 +52,9 @@ RUN    git clone --recursive "https://github.com/hyprwm/Hyprland.git" --branch="
     && make -C "/tmp/hyprland" install PREFIX="/opt/hyprland" \
     && rm -rf "/tmp/hyprland"
 
+# ================================= #
+# Build Base GNOME Silverblue Image #
+# ================================= #
 FROM "${IMAGE}:${VERSION}" AS gnome
 MAINTAINER "Zan Baldwin"
 # Override OSTree until flatpak/flatpak#5452 is resolved and pushed up to Fedora Rawhide images.
@@ -68,6 +74,9 @@ RUN    rpm-ostree override remove firefox firefox-langpacks \
     && rm -rf /tmp/* /var/* \
     && ostree container commit
 
+# ====================================== #
+# Layer Hyprland (+ Dependencies) on Top #
+# ====================================== #
 FROM gnome AS hyprland
 COPY --from="hyprland-build" "/opt/hyprland/" "/usr/"
 RUN rpm-ostree install --idempotent --allow-inactive \

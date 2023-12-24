@@ -30,6 +30,13 @@ sudo dnf install --assumeyes \
     echo "xdebug.log_level = 0"; \
 } | sudo tee "/etc/php.d/99-xdebug.ini"
 
+{ \
+    echo "[PHP]"; \
+    echo "error_reporting = -1"; \
+    echo "display_errors = On"; \
+    echo "date.timezone = UTC"; \
+} | sudo tee "/etc/php.d/99-php.ini"
+
 if ! command -v "composer" >"/dev/null" 2>&1; then
     curl -fsSL "https://getcomposer.org/installer" >"/tmp/composer-setup.php"
 

@@ -30,6 +30,25 @@ Alternatively, you can use the `dconf-editor` GUI once DConf tools are installed
 
 Edit files found in `/usr/share/X11/xkb/keycodes/evdev`.
 
+#### Changing Screenshot Save Directory
+
+Change the screenshot save directory using either `dconf-editor` or one of the following commands:
+
+```
+gsettings set org.gnome.gnome-screenshot auto-save-directory "/home/${USER}/Pictures/Screenshots"
+dconf write /org/gnome/gnome-screenshot/auto-save-directory "/home/${USER}/Pictures/Screenshots"
+```
+
+This will **not** change the behaviour of the PrtScr button:
+
+1. Go to **Settings > Keyboard Shortcuts**.
+2. Disable the keyboard shortcut for the current PrtScr action (Save a screenshot to Pictures).
+3. Add a new keyboard shortcut for PrtScr with the command `gnome-screenshot`.
+4. Optionall, do the same for _Save a screenshot of an area to Pictures_ with `gnome-screenshot -a`.
+5. Optionall, do the same for _Save a screenshot of an window to Pictures_ with `gnome-screenshot -wb`.
+
+<!-- See: https://blog.aamnah.com/ubuntu/change-default-screenshot-save-location -->
+
 #### Ubuntu Crashes/Freezes During Installation
 
 > For problems with nVidia drivers: `nomodeset` instructs the kernel to load the

@@ -5,6 +5,9 @@ sudo dnf group install --assumeyes \
     "Development Libraries" \
     "Development Tools"
 
+sudo dnf install --assumeyes \
+    "cmake"
+
 # Yeah, this is not good. Running an arbitrary script from the internet.
 # Only doing this because Rust does not provide signatures for installing Rust in a version-agnostic way.
 command -v "cargo" >"/dev/null" 2>&1 && { \
@@ -16,9 +19,10 @@ command -v "cargo" >"/dev/null" 2>&1 && { \
     } || { echo >&2 "Error downloading RustLang installation script."; } \
 }
 
-cargo install \
-    "bat" \
-    "exa" \
-    "git-delta" \
-    "onefetch" \
-    "starship"
+# Run separately instead of one command so that Cargo cleans up build files between each one.
+# Kept running into /tmp ramfs running out of space on small VMs.
+cargo install "bat"
+cargo install "exa"
+cargo install "git-delta"
+cargo install "onefetch"
+cargo install "starship"

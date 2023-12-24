@@ -26,7 +26,7 @@ rpm-ostree kargs \
 rpm-ostree install --idempotent --allow-inactive \
     akmod-nvidia xorg-x11-drv-nvidia xorg-x11-drv-nvidia-cuda \
     bridge-utils edk2-ovmf guestfs-tools qemu-kvm virt-install virt-manager virt-top \
-    distrobox nss-tools podman-docker tmux
+    distrobox ncdu nss-tools podman-docker tmux
 ```
 
 Reboot into the new deployment layer.

@@ -15,55 +15,43 @@ alias sq="bin/sq-cli/sq"
 # Bash-specific #
 # ============= #
 
+alias xx="exit"
 alias reload=". ~/.bashrc"
 alias sudo="sudo --preserve-env"
-
 # Up & down map to history search once a command has been started.
 bind '"\e[A":history-search-backward'
 bind '"\e[B":history-search-forward'
-
 # If a file specifying a custom prompt exists, include it.
 if [ -f ~/.bash_prompt ]; then
     . ~/.bash_prompt
 fi
-
-# Do not word wrap
-alias less="less -S -R -N"
 alias tmux="tmux attach || tmux new"
-
 # Watch the output of the last command instead of having to
 # execute it constantly whilst waiting for a different output.
 alias follow='watch $(history -p !!)'
 
-alias xx="exit"
-alias hosts="cat '${HOME}/.ssh/config' | grep 'Host ' | cut -d' ' -f2 | sort"
-alias ssh-config="nano ${HOME}/.ssh/config"
-
 title() { print -Pn "\e]2;$@\a"; }
-
-# Speedup "ls" command by specifying we don't care about the colour
-# output based on file permissions.
-export LS_COLORS='ex=00:su=00:sg=00:ca=00:'
 
 # ============================= #
 # Directory and File Management #
 # ============================= #
 
+# Speedup "ls" command by specifying we don't care about the colour
+# output based on file permissions.
+export LS_COLORS='ex=00:su=00:sg=00:ca=00:'
+
 # Some systems have a version of "ls" that does not have the
 # "--group-directories-first" or "-G" command-line flags,
 # check for them here before setting the alias.
 LL_OPTIONS=""
-ls -G 1>/dev/null 2>&1
-if [ $? -eq 0 ]; then
+if ls -G 1>/dev/null 2>&1; then
     LL_OPTIONS="${LL_OPTIONS}G"
 fi
-ls --group-directories-first 1>/dev/null 2>&1
-if [ $? -eq 0 ]; then
+if ls --group-directories-first 1>/dev/null 2>&1; then
     LL_OPTIONS="${LL_OPTIONS} --group-directories-first"
 fi
 alias ll="ls -lAhHp${LL_OPTIONS}"
 
-# https://github.com/ogham/exa/releases
 command -v exa >/dev/null 2>&1 && { alias ll="exa -labUh --git --group-directories-first"; }
 
 alias cp="cp -riv"
@@ -95,18 +83,12 @@ command -v bat >/dev/null 2>&1 && {
     alias less="bat --theme=DarkNeon";
 }
 
-command -v trash >/dev/null 2>&1 && { alias rm="trash -v"; }
-
-# Fuzzy Finder
-# (git clone --depth 1 https://github.com/junegunn/fzf.git /opt/fzf && /opt/fzf/install)
-#   - CTRL-R: Search through command history.
-#   - CTRL-T: Search and insert filename at cursor
-#   - ALT-C:  Search and change to directory.
-[ -f ~/.fzf.bash ] && source ~/.fzf.bash
-alias fzf="fzf-tmux"
-
 # apt install ncdu
-command -v ncdu >/dev/null 2>&1 && { alias du="ncdu"; }
+command -v "ncdu" >/dev/null 2>&1 && { alias du="ncdu"; }
+command -v "duf" >/dev/null 2>&1 && { alias df="duf"; } || {
+    command -v df >/dev/null 2>&1 && { alias df="df -h | grep -v snap"; };
+}
+
 
 function create_secure() {
     FOLDER=${1:-"/tmp/secure"}
@@ -130,48 +112,31 @@ alias fucking="sudo"
 # ======= #
 
 command -v nano >/dev/null 2>&1 && {
-    NANO_ALIAS="$(which nano) -AE --tabsize=4"
-    NANO_FLAGS="-AE --tabsize=4"
-    alias nano="${NANO_ALIAS}"
+    # Already know that nano is on the PATH. Do not use command -v inside the
+    # alias because otherwise recursion hell will occur every time this script
+    # is loaded.
+    NANO_ALIAS="nano -AE --tabsize=4"
     export EDITOR="${NANO_ALIAS}"
     export VISUAL="${NANO_ALIAS}"
+    alias nano="${NANO_ALIAS}"
 }
+
+# Do not word wrap
+alias less="less -S -R -N"
 
 # ========== #
 # Networking #
 # ========== #
 
 alias utc='date -u "+%Y%m%dT%H%M%SZ"'
-
-# See https://github.com/denilsonsa/prettyping
-command -v prettyping >/dev/null 2>&1 && { alias ping="prettyping --nolegend"; }
+## SSH
+alias hosts="cat \"\${HOME}/.ssh/config\" | grep 'Host ' | cut -d' ' -f2 | sort"
+alias ssh-config="${EDITOR} \"\${HOME}/.ssh/config\""
+## HTTP/S
 alias wget="wget -c"
 alias mitm="mitmproxy --transparent --host"
-alias dig="dig +nocmd any +multiline +noall +answer"
-# One of @janmoesen’s ProTip™s
-for method in GET HEAD POST PUT DELETE TRACE OPTIONS; do
-    alias "$method"="lwp-request -m '$method'"
-done
-function whois() {
-    local WHOIS=$(which whois)
-    if [ $WHOIS != "" ]; then
-        # Get domain from URL
-        local DOMAIN=$(echo "$1" | awk -F/ '{print $3}')
-        if [ -z $DOMAIN ]; then DOMAIN=$1; fi
-        echo "Getting whois record for: $DOMAIN …"
-        $WHOIS -h whois.internic.net $DOMAIN | sed '/NOTICE:/q'
-    fi
-}
-
-alias freenode="irssi --connect=chat.freenode.net --nick=ZanBaldwin"
-alias fx="firefox --new-instance --profile $(mktemp -d)"
-
-command -v mycli >/dev/null 2>&1 && { alias mysql="mycli"; }
-command -v pgcli >/dev/null 2>&1 && {
-    alias psql="pgcli";
-    alias pgsql="pgcli";
-}
-
+command -v "firefox" >/dev/null 2>&1 && { alias fx="firefox --new-instance --profile \"\$(mktemp -d)\""; }
+## VPN
 alias nord="nordvpn"
 
 # ========================================================= #
@@ -184,23 +149,16 @@ alias nord="nordvpn"
 # - Add appropriate keygrips to "~/.gnupg/sshcontrol"       #
 # ========================================================= #
 
-command -v gpgconf >/dev/null 2>&1 && {
+command -v "gpgconf" >/dev/null 2>&1 && {
     export SSH_AUTH_SOCK="$(gpgconf --list-dirs agent-ssh-socket)";
     gpgconf --launch gpg-agent;
 }
 
 # Sometimes the GPG agent get in a weird state that means that using GPG
 # for Git Clone/Push/Pull over SSH stops working.
-command -v gpg-connect-agent >/dev/null 2>&1 && {
-    echo UPDATESTARTUPTTY | gpg-connect-agent >/dev/null 2>&1;
+command -v "gpg-connect-agent" >/dev/null 2>&1 && {
+    echo "UPDATESTARTUPTTY" | gpg-connect-agent >/dev/null 2>&1;
 }
-
-# ======= #
-# Vagrant #
-# ======= #
-
-alias vssh="vagrant ssh"
-alias vsync="vagrant rsync"
 
 # ====== #
 # Docker #
@@ -220,50 +178,25 @@ docker() {
     fi
 }
 
-alias dterm="echo -it -e COLUMNS=$(tput cols) -e LINES=$(tput lines) -e TERM=xterm"
-alias alpine="docker run --rm $(dterm) -v \"$(pwd):$(pwd)\" -w \"$(pwd)\" alpine:latest sh"
+alias dterm="echo -it -e \"COLUMNS=\$(tput cols)\" -e \"LINES=\$(tput lines)\" -e TERM=xterm"
+alias alpine="docker run --rm \$(dterm) -v \"\$(pwd):\$(pwd)\" -w \"\$(pwd)\" alpine:latest sh"
 
 # === #
 # PHP #
 # === #
 
-command -v php >/dev/null 2>&1 && {
-
-    # Make sure that XDebug is installed but not enabled in the CLI configuration. This will make
-    # sure that running commands like "composer" will NOT use XDebug.
-    # If you wish to enable XDebug while using PHP's CLI SAPI, use the command alias "xdebug" instead.
-    # You need the php-dev package (php5-dev, php7.0-dev, etc) installed to use "php-config".
-    if command -v php-config >/dev/null 2>&1 && [ -f "$(php-config --extension-dir)/xdebug.so" ]; then
-        alias xdebug="php -dzend_extension=xdebug.so"
-    fi
+command -v "php" >/dev/null 2>&1 && {
+    # Make sure that XDebug is either not enabled or not in mode "debug" in the CLI configuration. If you wish to enable
+    # debugging via XDebug while using PHP's CLI SAPI, use the command alias "xdebug" instead.
+    alias xdebug='php -dzend_extension=xdebug.so -dxdebug.mode=debug,develop'
 
     # Vulcan Logic Disassembler
     # To install: `pecl install vld` (currently in beta only, so install vld-beta instead).
-    alias vld='php -d vld.active=1 -d vld.execute=0 -d vld.dump_paths=1 -d vld.save_paths=1 -d vld.verbosity=0'
+    alias vld='php -d vld.active=1 -d vld.execute=0 -d vld.dump_paths=1 -d vld.save_paths=1 -d vld.verbosity=1'
 
     # Add global Composer package binaries to $PATH.
-    command -v composer >/dev/null 2>&1 && { export PATH="${PATH}:$(composer global config bin-dir --absolute 2>/dev/null)"; }
-
-    SYMAUTOPATH="$(command -v symfony-autocomplete 2>/dev/null)"
-    if [ $? -eq 0 ]; then
-        eval "$(${SYMAUTOPATH})"
-    fi
-
+    command -v "composer" >/dev/null 2>&1 && { export PATH="${PATH}:$(composer global config bin-dir --absolute 2>/dev/null)"; }
 }
-
-# ======== #
-# Go! Lang #
-# ======== #
-
-export GOROOT="/usr/local/go"
-export GOPATH="${HOME}/code/golang"
-export PATH="${PATH}:${GOROOT}/bin:${GOPATH}/bin"
-
-# ====== #
-# NodeJS #
-# ====== #
-
-export PATH="${HOME}/.yarn/bin:${HOME}/.config/yarn/global/node_modules/.bin:${PATH}"
 
 # ========= #
 # Rust Lang #
@@ -275,27 +208,13 @@ export PATH="${HOME}/.yarn/bin:${HOME}/.config/yarn/global/node_modules/.bin:${P
 # Auto-completion #
 # =============== #
 
-which mosh >/dev/null 2>&1
-if [ $? -eq 0 ]; then
-    SSHC="$(complete -p ssh 2>/dev/null)"
-    if [ $? -eq 0 ]; then
+## AWS
+command -v "aws_completer" >/dev/null 2>&1 && { complete -C "$(command -v aws_completer 2>/dev/null)" aws; }
+
+## Mobile Secure Shell
+command -v "mosh" >/dev/null 2>&1 && {
+    SSHC="$(complete -p ssh 2>/dev/null)" && {
         # Use the same bash-completion rules for Mosh as are registered to SSH.
         $SSHC mosh
-    fi
-fi
-
-## These are not meant to be executed every time a new Bash environment is created, instead they
-## are helpful reminders to set up autocompletion on a new system. Most assume that the associated
-## tool has already been installed.
-
-## Kubernetes Autocompletion
-# kubectl copmletion bash | sudo tee /etc/bash_completion.d/kubectl
-
-## Docker Compose
-# sudo curl -L https://raw.githubusercontent.com/docker/compose/$(docker-compose version --short)/contrib/completion/bash/docker-compose -o /etc/bash_completion.d/docker-compose
-
-## Kompose
-# sudo "$SHELL" -c "kompose completion bash > /etc/bash_completion.d/kompose"
-
-## AWS (might take a while to complete)
-# sudo cp -s $(find / -name aws_completer 2>/dev/null | head -n1) /etc/bash_completion.d/aws
+    }
+}

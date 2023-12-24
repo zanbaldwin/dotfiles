@@ -11,7 +11,8 @@ install_as_sudo() {
 
     apt update
     apt dist-upgrade -y
-    apt install -y \
+    ## Standard Repository Software
+    apt install -y --no-install-recommends --no-install-suggests \
         bash \
         bash-completion \
         build-essential \
@@ -36,21 +37,7 @@ install_as_sudo() {
         sl \
         stow \
         tmux
-
-    # Docker Engine
-    curl -fsSL "https://download.docker.com/linux/ubuntu/gpg" \
-        | gpg --dearmor >"/usr/share/keyrings/docker-archive-keyring.gpg"
-    echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/docker-archive-keyring.gpg] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable" >"/etc/apt/sources.list.d/docker.list"
-    # Symfony CLI (not happy about the lack of signed packages there, Fabien)
-    echo "deb [arch=$(dpkg --print-architecture) trusted=yes] https://repo.symfony.com/apt/ /" >"/etc/apt/sources.list.d/symfony-cli.list"
-    apt update
-    apt install -y \
-        docker-ce \
-        docker-ce-cli \
-        containerd.io \
-        symfony-cli
-    usermod -aG "docker" "${ORIGINAL_USER}"
-
+    ## Snap Repository Software
     snap install --stable --classic aws-cli
     snap install --stable --classic phpstorm
     snap install --stable --classic code
@@ -63,10 +50,38 @@ install_as_sudo() {
     snap install --stable vlc
     snap refresh
 
-    # Other
-    if [ ! -f "/etc/bash_completion.d/exa" ]; then
-        curl -fsSL "https://raw.githubusercontent.com/ogham/exa/master/completions/bash/exa" >"/etc/bash_completion.d/exa"
-    fi
+    ## Custom Software
+
+    # Docker Engine
+    curl -fsSL "https://download.docker.com/linux/ubuntu/gpg" \
+        | gpg --dearmor >"/usr/share/keyrings/docker-archive-keyring.gpg"
+    echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/docker-archive-keyring.gpg] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable" >"/etc/apt/sources.list.d/docker.list"
+    # Hashicorp
+    curl -fsSL "https://apt.releases.hashicorp.com/gpg" \
+        | gpg --dearmor >"/usr/share/keyrings/hashicorp-archive-keyring.gpg"
+    echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/hashicorp-archive-keyring.gpg] https://apt.releases.hashicorp.com $(lsb_release -cs) main" >"/etc/apt/sources.list.d/hashicorp.list"
+    # Symfony CLI (not happy about the lack of signed packages there, Fabien)
+    echo "deb [arch=$(dpkg --print-architecture) trusted=yes] https://repo.symfony.com/apt/ /" >"/etc/apt/sources.list.d/symfony-cli.list"
+    apt update
+    apt install -y --no-install-recommends --no-install-suggests \
+        docker-ce \
+        docker-ce-cli \
+        containerd.io \
+        symfony-cli \
+        terraform
+    usermod -aG "docker" "${ORIGINAL_USER}"
+
+    ## Docker Compose
+    COMPOSE_VERSION="$(curl -fsSL "https://api.github.com/repos/docker/compose/releases/latest" | jq -r ".tag_name")"
+    curl -fsSL "https://github.com/docker/compose/releases/download/${COMPOSE_VERSION}/docker-compose-$(uname -s)-$(uname -m)" -o "/usr/local/bin/docker-compose"
+    curl -fsSL "https://raw.githubusercontent.com/docker/compose/${COMPOSE_VERSION}/contrib/completion/bash/docker-compose" >"/etc/bash_completion.d/docker-compose"
+    chmod +x "/usr/local/bin/docker-compose"
+
+    ## Exa (ll-alias) Auto-completion
+    EXA_VERSION="$(curl -fsSL "https://api.github.com/repos/ogham/exa/releases/latest" | jq -r ".tag_name")"
+    # Unreleased Bash completion is better, remove following line whenever a version is released after v0.10.1
+    EXA_VERSION="master"
+    curl -fsSL "https://raw.githubusercontent.com/ogham/exa/${EXA_VERSION}/completions/bash/exa" >"/etc/bash_completion.d/exa"
 
     # Force Chromium to always allow Unsecured HTTP for Localhost, without force
     # redirecting to HTTPS. Add the string "localhost" to the HSTSPolicyBypassList
@@ -78,6 +93,24 @@ install_as_sudo() {
         | (jq 2>/dev/null || echo '{}') \
         | jq '.HSTSPolicyBypassList|=(.+["localhost"]|unique)' >"${TEMPFILE}" \
         && mv "${TEMPFILE}" "/etc/opt/chrome/policies/managed/policies.json"
+
+    PHP_VERSION="8.1"
+    apt install -y --no-install-recommends --no-install-suggests \
+        "php${PHP_VERSION}-cli" \
+        "php${PHP_VERSION}-curl" \
+        "php${PHP_VERSION}-dev" \
+        "php${PHP_VERSION}-intl" \
+        "php${PHP_VERSION}-mbstring" \
+        "php${PHP_VERSION}-mysql" \
+        "php${PHP_VERSION}-opcache" \
+        "php${PHP_VERSION}-readline" \
+        "php${PHP_VERSION}-sqlite3" \
+        "php${PHP_VERSION}-xdebug" \
+        "php${PHP_VERSION}-xml" \
+        "php${PHP_VERSION}-zip"
+    echo "xdebug.log_level=0" >>"$(php-config --ini-dir)/20-xdebug.ini"
+    # Vulcan Logic Disassembler is in constant beta because the ever-changing internal API.
+    pecl install "vld-beta" && { echo "extension=vld.so" >"$(php-config --ini-dir)/vld.ini"; }
 }
 
 install_as_user() {
@@ -134,3 +167,6 @@ install_as_user
 
 # - VirtualBox (use deb file instead of repository)
 #   https://www.virtualbox.org/wiki/Linux_Downloads
+
+# - Disk Usage/Free Utility
+#   https://github.com/muesli/duf

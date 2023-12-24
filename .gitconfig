@@ -8,26 +8,22 @@
 	ft = fetch --tags
 	push = push --force-with-lease
 	appraise = !/home/zander/Golang/bin/git-appraise
+	snapshot = !git stash save "snapshot: $(date)" && git stash apply "stash@{0}"
+	snapshots = !git stash list --grep snapshot
+	recent-branches = !git for-each-ref --count=15 --sort=-committerdate refs/heads/ --format='%(refname:short)'
+	amend = commit --amend
+	recommit = commit --amend --no-edit
+	continue = rebase --continue
+	skip = rebase --skip
+	abort = rebase --abort
+	uncommit = reset --soft HEAD^
+	assume   = update-index --assume-unchanged
+	unassume = update-index --no-assume-unchanged
+	assumed  = "!git ls-files -v | grep ^h | cut -c 3-"
 [user]
 	name = Zander Baldwin
 	email = hello@zanderbaldwin.com
 	signingkey = 419CB27C
-[url "git@github.com:"]
-	insteadOf = "gh:"
-	insteadOf = "git://github.com"
-    insteadOf = "https://github.com/"
-	pushInsteadOf = "github:"
-	pushInsteadOf = "git://github.com/"
-	pushInsteadOf = "https://github.com/"
-[url "git@gist.github.com:"]
-	insteadOf = "gst:"
-	pushInsteadOf = "gist:"
-	pushInsteadOf = "git://gist.github.com/"
-	pushInsteadOf = "https://gist.github.com/"
-[url "git@github.com:zanderbaldwin/"]
-	insteadOf = "git://github.com/zanderbaldwin/"
-[url "git@github.com:basekit/"]
-	insteadOf = "git://github.com/basekit/"
 [push]
 	default = current
 [pull]
@@ -42,3 +38,9 @@
 	diffFilter = diff-highlight
 [diff]
 	compactionHeuristic = true
+	algorithm = patience
+	mnemonicprefix = true
+[rerere]
+	# Remember my merges
+	# http://gitfu.wordpress.com/2008/04/20/git-rerere-rereremember-what-you-did-last-time/
+	enabled = true

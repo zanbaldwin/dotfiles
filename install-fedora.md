@@ -18,6 +18,11 @@ List of software to be installed, and blacklist the _nouveau_ (non-proprietary) 
 - Kernel-based Virtual Machine
 - Other tools I want on my command line as a non-root user
 
+> Certain software repositories aren't available for ARM64/aarch64 architecture. Go to Software
+> &rarr; Software Repositories, and disable:
+> - `phracek-PyCharm`
+> - `rpmfusion-nonfree-steam`
+
 > **TODO:** Figure out nVidia drivers for Wayland.
 ```bash
 rpm-ostree kargs \

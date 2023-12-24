@@ -35,7 +35,9 @@ curl -sSfL "https://get.wasmer.io" | bash
 install_wasmer_build_from_source () {
     INSTALL_DIRECTORY="${1:-${HOME}/.cargo/bin}"
     git clone "https://github.com/wasmerio/wasmer.git" "/tmp/wasmer"
-    cd "/tmp/wasmer" || return
+    cd "/tmp/wasmer" || return 1
+    LATEST_STABLE="$(git tag --list --sort="version:refname" | grep -E '\d+\.\d+' | grep -v '-' | tail -n1)"
+    git checkout "${LATEST_STABLE}" || return 1
     # TODO: Find a way to `git checkout "${lATEST_STABLE_VERSION}"`
     # Release Profile settings taken from Makefile.
     { \

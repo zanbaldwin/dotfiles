@@ -23,4 +23,4 @@ stow --dir="${TOOLBOX_SCRIPT_DIRECTORY}/../stow" --target="${HOME}" --stow \
     "ssh" \
     "starship" \
     "tmux" \
-    "zellig"
+    "zellij"

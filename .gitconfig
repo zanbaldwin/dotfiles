@@ -23,7 +23,7 @@
 
     # Pull Requests from GitHub
     review          = "!f() { git fetch -fu \"${2:-origin}\" \"refs/pull/${1}/head:pr/${1}\" && git checkout \"pr/${1}\"; }; f"
-    reviewed        = "!git checkout \"${1:-develop}\"; git for-each-ref \"refs/heads/pr/*\" --format=\"%(refname)\" | while read ref; do branch=\"${ref#refs/heads/}\"; git branch -D \"$branch\"; done"
+    reviewed        = "!git checkout \"${1:-master}\"; git for-each-ref \"refs/heads/pr/*\" --format=\"%(refname)\" | while read ref; do branch=\"${ref#refs/heads/}\"; git branch -D \"$branch\"; done"
 
 	# Rebase Shortcuts
 	continue        = rebase --continue

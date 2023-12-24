@@ -16,6 +16,7 @@ alias wget="wget -c"
 alias fuck='sudo "$BASH" -c "$(history -p !!)"'
 alias fucking="sudo"
 alias vim="vim -N"
+alias docker-composer="docker-compose"
 
 alias dig="dig +nocmd any +multiline +noall +answer"
 
@@ -23,6 +24,15 @@ alias dig="dig +nocmd any +multiline +noall +answer"
 for method in GET HEAD POST PUT DELETE TRACE OPTIONS; do
     alias "$method"="lwp-request -m '$method'"
 done
+
+docker() {
+    if [[ ($1 = "compose") || ($1 = "composer") ]]; then
+        shift
+        command docker-compose $@
+    else
+        command docker $@
+    fi
+}
 
 function f() {
     find . -name "$1" 2>&1 | grep -v 'Permission denied'

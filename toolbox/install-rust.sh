@@ -42,10 +42,11 @@ cargo install "broot"     # Terminal directory browser
 cargo install "zoxide"    # `cd` alternative
 
 # Specifically for Rust development instead of general tools
-cargo install "bacon"        # Background Rust Code Checker (alternative watch TUI)
-cargo install "cargo-expand" # Macro Source Code Expansion
-cargo install "cargo-info"   # crates.io in the terminal
-cargo install "sccache"      # Build Artifact Cache
+cargo install "bacon"         # Background Rust Code Checker (alternative watch TUI)
+cargo install "cargo-expand"  # Macro Source Code Expansion
+cargo install "cargo-info"    # crates.io in the terminal
+cargo install "sccache"       # Build Artifact Cache
+cargo install "tokio-console" # Tokio Tracing Console
 
 curl -sSfL "https://get.wasmer.io" | bash
 # This is mainly for reference.

@@ -99,10 +99,10 @@
 # Force Git to always download over SSH to prevent GitHub's API throttling and/or
 # asking for username and password (which is near-to-impossible to do on the
 # command-line if 2FA has been enabled).
-[url "git@github.com:"]
-    insteadOf  = https://github.com/
+#[url "git@github.com:"]
+#    insteadOf  = https://github.com/
 [merge]
-    ff         = only
+#    ff         = only
 
 [delta]
     features = unobtrusive-line-numbers decorations

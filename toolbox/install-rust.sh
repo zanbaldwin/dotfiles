@@ -35,7 +35,7 @@ cargo install "mprocs"    # Multi Process Runner
 cargo install "onefetch"  # Git Repository Overview
 cargo install "ripgrep"   # It's just fast
 cargo install "starship"  # PS1
-cargo install "zellig"    # Terminal Multiplexer (tmux replacement)
+cargo install "zellij"    # Terminal Multiplexer (tmux replacement)
 
 # The following need more testing on Linux. See `stow/bash/.bashrc.d/directories.sh`.
 cargo install "broot"     # Terminal directory browser

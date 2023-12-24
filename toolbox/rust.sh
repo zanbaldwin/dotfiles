@@ -18,11 +18,13 @@ sudo dnf install --assumeyes \
 
 # Yeah, this is not good. Running an arbitrary script from the internet.
 # Only doing this because Rust does not provide signatures for installing Rust in a version-agnostic way.
+# shellcheck disable=SC2015
 command -v "cargo" >"/dev/null" 2>&1 && { \
     rustup update; \
 } || { \
     curl --proto "=https" --tlsv1.2 -sSf "https://sh.rustup.rs" >"/tmp/rustup.sh" && { \
         sh /tmp/rustup.sh -qy --no-modify-path; \
+        # shellcheck source=/dev/null
         source "${HOME}/.cargo/env"; \
     } || { echo >&2 "Error downloading RustLang installation script."; } \
 }

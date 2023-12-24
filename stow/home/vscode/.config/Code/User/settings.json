@@ -2,8 +2,7 @@
     "editor.guides.bracketPairs": "active",
     "workbench.iconTheme": "material-icon-theme",
     "files.autoSave": "onFocusChange",
-    "editor.fontFamily": "'FiraCode Nerd Font', 'Fira Code', 'UbuntuMono Nerd Font', 'Ubuntu Mono', Menlo, Monaco, 'Courier New', monospace",
-    "editor.fontSize": 15,
+    "editor.fontFamily": "'JetBrainsMono Nerd Font', 'FiraCode Nerd Font', 'Fira Code', 'UbuntuMono Nerd Font', 'Ubuntu Mono', Menlo, Monaco, 'Courier New', monospace",
     "editor.renderWhitespace": "trailing",
     "editor.cursorStyle": "line-thin",
     "editor.cursorBlinking": "phase",
@@ -27,7 +26,9 @@
     "rust-analyzer.inlayHints.lifetimeElisionHints.useParameterNames": true,
     "rust-analyzer.lens.enable": false,
     "explorer.confirmDelete": false,
-    "editor.codeActionsOnSave": {},
+    "editor.codeActionsOnSave": {
+        
+    },
     "gitlens.codeLens.scopes": [
         "document"
     ],
@@ -35,5 +36,20 @@
     "git.autofetch": "all",
     "git.autoStash": true,
     "extensions.ignoreRecommendations": true,
-    "git.openRepositoryInParentFolders": "never"
+    "git.openRepositoryInParentFolders": "never",
+    "redhat.telemetry.enabled": false,
+    "telemetry.telemetryLevel": "off",
+    "github.copilot.advanced": {},
+    "github.copilot.enable": {
+        "*": true,
+        "plaintext": false,
+        "markdown": true,
+        "scminput": false
+    },
+    "editor.inlineSuggest.enabled": true,
+    "editor.rulers": [
+        80,
+        120,
+    ],
+    "window.zoomLevel": 1.5
 }

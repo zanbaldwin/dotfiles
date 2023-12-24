@@ -7,6 +7,10 @@
 # included, otherwise add the following line to your ~/.bashrc:
 # if [ -f ~/.bash_prompt ]; then . ~/.bash_prompt; fi
 
+# The `__git_ps1` function can be found at the following location, save it
+# to /etc/profile.d/git-prompt.sh for it to be available globally:
+# https://raw.github.com/git/git/master/contrib/completion/git-prompt.sh
+
 # Inputs.
 SHELL_NAME="\\v"
 TERMINAL="\\l"

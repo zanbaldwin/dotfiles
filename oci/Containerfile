@@ -5,7 +5,7 @@ ARG VARIANT="${VARIANT:-silverblue}"
 # At some point, they should start hosting images on "registry.fedoraproject.org/fedora/fedora-${VARIANT}".
 ARG IMAGE="${IMAGE:-quay.io/fedora/fedora-${VARIANT}}"
 
-# ========================RUST======================== #
+# ======================= RUST ======================= #
 # Rust is needed to build binaries for both Gnome and  #
 # Hyprland environments.                               #
 # ==================================================== #
@@ -18,10 +18,9 @@ RUN dnf install --assumeyes \
  && curl --proto "=https" --tlsv1.2 -sSf "https://sh.rustup.rs" >"/tmp/rustup.sh" \
  && sh /tmp/rustup.sh -qy
 
-# =====================ALACRITTY====================== #
-# There's no way I'm settling for GNOME Terminal.      #
-# ==================================================== #
+# === RUST === #
 FROM rust AS alacritty
+# There's absolutely no way I'm settling for Gnome Terminal as my default console.
 RUN source "${HOME}/.cargo/env" \
  && git clone "https://github.com/alacritty/alacritty.git" --branch "v0.12.3" "/tmp/alacritty" \
  && (cd "/tmp/alacritty"; cargo build --release) \
@@ -32,15 +31,20 @@ RUN source "${HOME}/.cargo/env" \
  && cp "/tmp/alacritty/extra/completions/alacritty.bash" "/opt/alacritty/etc/bash_completion.d/alacritty" \
  && rm -rf "/tmp/alacritty"
 
-# ================================= #
-# Build Base GNOME Silverblue Image #
-# ================================= #
+# ================ #
+#                  #
+#       GNOME      #
+#                  #
+# ================ #
 FROM "${IMAGE}:${VERSION}" AS gnome
 MAINTAINER "Zan Baldwin"
 COPY "./usr/" "/usr/"
 ## I would prefer to keep all software in Flatpaks, but the firefox from Flathub doesn't honour
 ## custom certificates from MkCert and the firefox from FedoraProject doesn't have enough codecs
 ## to play media on Twitter. So fuck it, back to system package.
+## When installing Firefox as a Flatpak, you *MUST* download it from the Fedora
+## repositories and not from Flathub - otherwise it won't respect the system-wide
+## CA Trust stores.
 RUN rpm-ostree override remove firefox firefox-langpacks
 RUN rpm-ostree install --idempotent --allow-inactive --releasever="39" \
         bridge-utils edk2-ovmf guestfs-tools libvirt qemu-kvm virt-install virt-manager \
@@ -59,129 +63,53 @@ RUN rpm-ostree install --idempotent --allow-inactive --releasever="39" \
 COPY "./usr/" "/usr/"
 COPY --from="alacritty" "/opt/alacritty/" "/usr/"
 
-# =============C/C++============ #
-# Build Hyprland Desktop Portal  #
-# Build Hyprland Window Manager  #
-# Build Mako Notification Daemon #
-# ============================== #
-FROM "fedora:${VERSION}" AS c-build
-RUN dnf upgrade --assumeyes && dnf install --assumeyes \
-        cairo-devel \
-        cmake \
-        cpio \
-        gcc-c++ \
-        gdk-pixbuf2-devel \
-        git \
-        hwdata-devel \
-        inih-devel \
-        libavutil-free-devel \
-        libavcodec-free-devel \
-        libavformat-free-devel \
-        libdisplay-info-devel \
-        libdrm-devel \
-        libinput-devel \
-        libseat-devel \
-        libuuid-devel \
-        libxcb-devel \
-        libxkbcommon-devel \
-        libX11-devel \
-        make \
-        mesa-libEGL-devel \
-        mesa-libgbm-devel \
-        meson \
-        ninja-build \
-        pango-devel \
-        pipewire-devel \
-        pixman-devel \
-        qt6-qtwayland-devel \
-        sdbus-cpp-devel \
-        systemd-devel \
-        wayland-devel \
-        wayland-protocols-devel \
-        wlroots-devel \
-        xcb-util-renderutil-devel \
-        xcb-util-wm-devel \
-        xorg-x11-server-Xwayland-devel
-RUN git clone --recursive "https://github.com/hyprwm/xdg-desktop-portal-hyprland" --branch "v1.2.5" "/tmp/xdg-desktop-portal-hyprland" \
- && meson setup "/tmp/xdg-desktop-portal-hyprland/build" "/tmp/xdg-desktop-portal-hyprland" --prefix="/opt/xdg-desktop-portal-hyprland" \
- && ninja -C "/tmp/xdg-desktop-portal-hyprland/build" install \
- && (cd "/tmp/xdg-desktop-portal-hyprland/hyprland-share-picker" && make all) \
- && rm -rf "/tmp/xdg-desktop-portal-hyprland"
-RUN git clone --recursive "https://github.com/hyprwm/Hyprland.git" --branch="v0.33.1" "/tmp/hyprland" \
- && make -C "/tmp/hyprland" install PREFIX="/opt/hyprland" \
- && rm -rf "/tmp/hyprland"
-RUN git clone --recursive "https://github.com/emersion/mako.git" --branch="v1.8.0" "/tmp/mako" \
- && meson setup "/tmp/mako/build" "/tmp/mako" --prefix="/opt/mako" \
- && sudo ninja -C "/tmp/mako/build" install \
- && mkdir -p "/opt/mako/etc/bash_completion.d" \
- && cp "/tmp/mako/contrib/completions/bash/mako" "/opt/mako/etc/bash_completion.d/mako" \
- && cp "/tmp/mako/contrib/completions/bash/makoctl" "/opt/mako/etc/bash_completion.d/makoctl" \
- && rm -rf "/tmp/mako"
-
-# ========================RUST======================== #
-# Build Eww (Elkowars Wacky Widgets) Bar               #
-# Build Swww (Solution to your Wayland Wallpaper Woes) #
-# Build Alacritty terminal emulator.                   #
-# Build Anyrun Application Launcher                    #
-# ==================================================== #
+# === RUST === #
 FROM rust AS rust-build
 RUN source "${HOME}/.cargo/env" \
- && git clone "https://github.com/elkowar/eww.git" --branch "v0.4.0" "/tmp/eww" \
- && (cd "/tmp/eww"; cargo build --release --no-default-features --features="wayland") \
- && mkdir -p "/opt/eww/bin" \
- && cp "/tmp/eww/target/release/eww" "/opt/eww/bin/eww" \
- && rm -rf "/tmp/eww"
-RUN source "${HOME}/.cargo/env" \
- && git clone "https://github.com/Horus645/swww.git" --branch "v0.7.3" "/tmp/swww" \
+ && git clone "https://github.com/Horus645/swww.git" --branch "v0.8.1" "/tmp/swww" \
  && (cd "/tmp/swww"; cargo build --release) \
  && mkdir -p "/opt/swww/bin" "/opt/swww/etc/bash_completion.d" \
  && cp "/tmp/swww/target/release/swww" "/opt/swww/bin/swww" \
  && cp "/tmp/swww/target/release/swww-daemon" "/opt/swww/bin/swww-daemon" \
  && cp "/tmp/swww/completions/swww.bash" "/opt/swww/etc/bash_completion.d/swww" \
  && rm -rf "/tmp/swww"
-# Anyrun hasn't released any stable versions/tags; checkout a known commit instead.
-RUN source "${HOME}/.cargo/env" \
- && git clone "https://github.com/Kirottu/anyrun.git" "/tmp/anyrun" \
- && git -C "/tmp/anyrun" fetch --all \
- && git -C "/tmp/anyrun" reset --hard "9ad3af89c0d92fbfdaa1f79bf7f93c60200f3831" \
- && (cd "/tmp/anyrun"; cargo build --release) \
- && mkdir -p "/opt/anyrun/bin" "/opt/anyrun/etc/anyrun/plugins" \
- && cp "/tmp/anyrun/target/release/anyrun" "/opt/anyrun/bin/anyrun" \
- && cp /tmp/anyrun/target/release/*.so "/opt/anyrun/etc/anyrun/plugins/" \
- && rm -rf "/tmp/anyrun"
 
-# ============================================== #
-# Layer Hyprland (+ Runtime Dependencies) on Top #
-# ============================================== #
+# === GOLANG === #
+FROM "fedora:${VERSION}" as golang-build
+RUN dnf install --assumeyes \
+        git \
+        golang
+RUN git clone "https://github.com/nwg-piotr/nwg-drawer.git" --branch "v0.4.3" "/tmp/nwg-drawer" \
+ && dnf install --assumeyes \
+        cairo-gobject-devel \
+        glib2-devel \
+        gtk-layer-shell-devel \
+        gtk3-devel \
+        make \
+ && make -C "/tmp/nwg-drawer" get \
+ && make -C "/tmp/nwg-drawer" build \
+ && mkdir -p "/opt/nwg-drawer/share/nwg-drawer" "/opt/nwg-drawer/bin" \
+ && cp -r "/tmp/nwg-drawer/desktop-directories" "/opt/nwg-drawer/share/nwg-drawer/" \
+ && cp "/tmp/nwg-drawer/drawer.css" "/opt/nwg-drawer/share/nwg-drawer/" \
+ && cp "/tmp/nwg-drawer/bin/nwg-drawer" "/opt/nwg-drawer/bin/" \
+ && rm -rf "/tmp/nwg-drawer"
+
+# ================ #
+#                  #
+#     Hyprland     #
+#                  #
+# ================ #
 FROM gnome AS hyprland
-## Runtime dependencies: Hyprland; xdg-desktop-portal-hyprland; Eww; Swww; Alacritty; Anyrun; extra.
+MAINTAINER "Zan Baldwin"
+# The Hyprland package in the Fedora repositories only seems to be a version or
+# two behind. Just install that instead of trying to compile from source - there's
+# too many dev/runtime dependencies, and sometimes xdg-desktop-portal-hyprland
+# just fails to build. It's not worth the hassle.
 RUN rpm-ostree install --idempotent --allow-inactive \
-        atk \
-        cairo \
-        cairo-gobject \
-        dbus \
-        fontconfig \
-        gdk-pixbuf2 \
-        gtk3 \
-        gtk-layer-shell \
-        inih \
-        jq \
-        libdisplay-info \
-        libseat \
-        libuuid \
-        pango \
-        pipewire-libs \
-        polkit-gnome \
-        qt5-qtwayland \
-        qt6-qtwayland \
-        sdbus-cpp \
-        socat \
+        hyprland \
+        waybar \
  && rm -rf /tmp/* /var/* \
  && ostree container commit
 # Tools built in previous steps.
-COPY --from="c-build" "/opt/hyprland/" "/usr/"
-COPY --from="c-build" "/opt/xdg-desktop-portal-hyprland/" "/usr/"
-COPY --from="c-build" "/opt/mako/" "/usr/"
-COPY --from="rust-build" "/opt/eww/" "/usr/"
 COPY --from="rust-build" "/opt/swww/" "/usr/"
-COPY --from="rust-build" "/opt/anyrun/" "/usr/"
+COPY --from="golang-build" "/opt/nwg-drawer/" "/usr/"

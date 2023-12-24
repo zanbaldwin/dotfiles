@@ -30,6 +30,7 @@ alias tmux="tmux attach || tmux new"
 alias follow='watch $(history -p !!)'
 
 alias xx="exit"
+alias hosts="cat '${HOME}/.ssh/config' | grep 'Host ' | cut -d' ' -f2 | sort"
 
 title() { print -Pn "\e]2;$@\a"; }
 
@@ -56,10 +57,7 @@ fi
 alias ll="ls -lAhHp${LL_OPTIONS}"
 
 # https://github.com/ogham/exa/releases
-which exa >/dev/null 2>&1
-if [ $? -eq 0 ]; then
-    alias ll="exa -labUh --git --group-directories-first"
-fi
+command -v exa >/dev/null 2>&1 && { alias ll="exa -labUh --git --group-directories-first"; }
 
 alias cp="cp -iv"
 alias mv="mv -iv"
@@ -84,16 +82,10 @@ function search() {
     grep -l -c -r "$1" .
 }
 
-which bat >/dev/null 2>&1
-if [ $? -eq 0 ]; then
-    # https://github.com/sharkdp/bat/releases
-    alias cat="bat --theme=DarkNeon"
-fi
+# https://github.com/sharkdp/bat/releases
+command -v bat >/dev/null 2>&1 && { alias cat="bat --theme=DarkNeon"; }
 
-which trash >/dev/null 2>&1
-if [ $? -eq 0 ]; then
-    alias rm="trash -v"
-fi
+command -v trash >/dev/null 2>&1 && { alias rm="trash -v"; }
 
 # Fuzzy Finder
 # (git clone --depth 1 https://github.com/junegunn/fzf.git /opt/fzf && /opt/fzf/install)
@@ -104,7 +96,7 @@ fi
 alias fzf="fzf-tmux"
 
 # apt install ncdu
-alias du="ncdu"
+command -v ncdu >/dev/null 2>&1 && { alias du="ncdu"; }
 
 function create_secure() {
     FOLDER=${1:-"/tmp/secure"}
@@ -128,7 +120,7 @@ alias fucking="sudo"
 # ======= #
 
 alias m="make"
-NANO="$(which nano 2>/dev/null)"
+NANO="$(command -v nano 2>/dev/null)"
 if [ $? -eq 0 ]; then
     alias nano="${NANO} -AES --tabsize=4"
 fi
@@ -141,10 +133,7 @@ alias v="vim -N"
 # ========== #
 
 # See https://github.com/denilsonsa/prettyping
-which prettyping >/dev/null 2>&1
-if [ $? -eq 0 ]; then
-    alias ping="prettyping --nolegend"
-fi
+command -v prettyping >/dev/null 2>&1 && { alias ping="prettyping --nolegend"; }
 alias wget="wget -c"
 alias mitm="mitmproxy --transparent --host"
 alias dig="dig +nocmd any +multiline +noall +answer"
@@ -166,16 +155,11 @@ function whois() {
 alias freenode="irssi --connect=chat.freenode.net --nick=ZanBaldwin"
 alias fx="firefox --new-instance --profile $(mktemp -d)"
 
-which mycli >/dev/null 2>&1
-if [ $? -eq 0 ]; then
-    alias mysql="mycli"
-fi
-
-which pgcli >/dev/null 2>&1
-if [ $? -eq 0 ]; then
-    alias psql="pgcli"
-    alias pgsql="pgcli"
-fi
+command -v mycli >/dev/null 2>&1 && { alias mysql="mycli"; }
+command -v pgcli >/dev/null 2>&1 && {
+    alias psql="pgcli";
+    alias pgsql="pgcli";
+}
 
 # ========================================================= #
 # GnuPG SSH Authentication                                  #
@@ -187,17 +171,13 @@ fi
 # - Add appropriate keygrips to "~/.gnupg/sshcontrol"       #
 # ========================================================= #
 
-which gpgconf 1>/dev/null 2>&1
-if [ $? -eq 0 ]; then
-    export SSH_AUTH_SOCK=$(gpgconf --list-dirs agent-ssh-socket)
-    gpgconf --launch gpg-agent
-fi
+command -v gpgconf >/dev/null 2>&1 && {
+    export SSH_AUTH_SOCK="$(gpgconf --list-dirs agent-ssh-socket)";
+    gpgconf --launch gpg-agent;
+}
 # Sometimes the GPG agent get in a weird state that means that using GPG
 # for Git Clone/Push/Pull over SSH stops working.
-which gpg-connect-agent >/dev/null 2>&1
-if [ $? -eq 0 ]; then
-    echo UPDATESTARTUPTTY | gpg-connect-agent
-]
+command -v gpg-connect-agent >/dev/null 2>&1 && { echo UPDATESTARTUPTTY | gpg-connect-agent; }
 
 # ======= #
 # Vagrant #
@@ -238,9 +218,8 @@ if [ $? -eq 0 ]; then
     # sure that running commands like "composer" will NOT use XDebug, but commands like "php ..."
     # WILL use XDebug.
     # You need the php-dev package (php5-dev, php7.0-dev, etc) installed to use "php-config".
-    which php-config 1>/dev/null 2>&1
-    if [ $? -eq 0 ] && [ -f "$(php-config --extension-dir)/xdebug.so" ]; then
-        alias php="$PHP -dzend_extension=xdebug.so"
+    if command -v php-config >/dev/null 2>&1 && [ -f "$(php-config --extension-dir)/xdebug.so" ]; then
+        alias php="${PHP} -dzend_extension=xdebug.so"
     fi
 
     # Vulcan Logic Disassembler
@@ -248,10 +227,7 @@ if [ $? -eq 0 ]; then
     alias vld='php -d vld.active=1 -d vld.execute=0 -d vld.dump_paths=1 -d vld.save_paths=1 -d vld.verbosity=0'
 
     # Add global Composer package binaries to $PATH.
-    COMPOSER=$(which composer)
-    if [ $? -eq 0 ]; then
-        export PATH="${PATH}:$(composer global config bin-dir --absolute 2>/dev/null)"
-    fi
+    command -v composer >/dev/null 2>&1 && { export PATH="${PATH}:$(composer global config bin-dir --absolute 2>/dev/null)"; }
 
     # For parallel package downloading in Composer (!!!) install the following global package:
     #     $ composer global require hirak/prestissimo
@@ -263,64 +239,15 @@ if [ $? -eq 0 ]; then
     #     $ cgr squizlabs/php_codesniffer
     # And then initialise them:
 
-    SYMAUTOPATH=$(which symfony-autocomplete)
+    SYMAUTOPATH=$(command -v symfony-autocomplete 2>/dev/null)
     if [ $? -eq 0 ]; then
         eval "$($SYMAUTOPATH)"
     fi
 
     # PHPUnit (this enables XDebug automatically on the CLI).
-    PHPUNIT=$(which phpunit)
-    if [ $? -eq 0 ]; then
-        alias phpunit="php $PHPUNIT"
-    fi
-
-    # Puli Universal Packages Manager.
-    PULI=$(which puli)
-    if [ $? -eq 0 ]; then
-        alias puli='set -f;puli';puli(){ command puli "$@";set +f;}
-    fi
+    command -v phpunit >/dev/null 2>&1 && { alias phpunit="php $PHPUNIT"; }
 
 fi
-
-# PHP Environment.
-# Use this to provision a PHP environment (useful when current OS does not support a high
-# enough version of PHP for the project). Defaults to the latest PHP version using Alpine
-# Linux (checks for new versions on each run). Specify the VERSION environment variable
-# for a different PHP version (eg: `VERSION=5.6 phpenv`). Can also be used to
-# provision other environments like Ruby or NodeJS (eg: `IMAGE=node phpenv`).
-function phpenv {
-    local DOCKER=${DOCKER:-"docker"}
-    command -v "${DOCKER}" >/dev/null 2>&1 || { echo >&2 "$(tput setaf 1)Docker Client \"${DOCKER}\" not installed.$(tput sgr0)"; return 1; }
-
-    local INFO=$("${DOCKER}" info >/dev/null 2>&1)
-    if [ $? -ne 0 ]; then
-        echo >&2 "$(tput setaf 1)Docker Daemon unavailable. Aborting!$(tput sgr0)"
-        if [ "$(id -u 2>/dev/null)" -ne "0" ]; then
-            echo >&2 "$(tput setaf 1)Perhaps retry as root?$(tput sgr0)"
-        fi
-        return 1
-    fi
-
-    local IMAGE=${IMAGE:-"php"}
-    local VERSION=${VERSION:-"alpine"}
-
-    local CACHE=""
-    local COMPOSER="$(which composer 2>/dev/null)"
-    if [ "${COMPOSER}" != "" ]; then
-        local COMPOSER="-v \"${COMPOSER}:/bin/composer\""
-        local COMPOSER_HOME_DIR="$(composer global config home 2>/dev/null)"
-        if [ $? -eq 0 ] && [ -d "${COMPOSER_HOME_DIR}" ]; then
-            local CACHE="-v \"${COMPOSER_HOME_DIR}:/.composer\" -e \"COMPOSER_HOME=/.composer\""
-        fi
-    fi
-
-    echo "$(tput setaf 2)Checking for newer version of \"${IMAGE}:${VERSION}\" on Docker Hub.$(tput setaf 6)"
-    docker pull "${IMAGE}:${VERSION}" 2>/dev/null || echo >&2 "$(tput setaf 1)Could not connect to Docker Hub. Skipping update."
-    echo "$(tput sgr0)"
-
-    local PHPENV="docker run -it --rm -v \"$(pwd):$(pwd)\" -w \"$(pwd)\" $CACHE $COMPOSER -u \"$(id -u):$(id -g)\" -e \"TERM=xterm\" \"${IMAGE}:${VERSION}\""
-    $SHELL -c "${PHPENV} sh"
-}
 
 # ======== #
 # Go! Lang #

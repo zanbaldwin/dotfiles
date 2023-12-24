@@ -6,11 +6,13 @@
 #     "Development Libraries" \
 #     "Development Tools"
 
+# Perl is required for OpenSSL to build -> openssl-sys -> zellij.
 sudo dnf install --assumeyes \
     "alsa-lib-devel" \
     "cmake" \
     "gcc" \
     "openssl-devel" \
+    "perl" \
     "pkg-config"
 
 # Yeah, this is not good. Running an arbitrary script from the internet.

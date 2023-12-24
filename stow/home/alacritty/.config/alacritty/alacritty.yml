@@ -158,7 +158,7 @@ font:
 
   # Point size
   # Use 11.0 for laptop screen, and 13.0 for 4K monitors.
-  size: 13.5
+  size: 11
 
   # Offset is the extra space around each character. `offset.y` can be thought
   # of as modifying the line spacing, and `offset.x` as modifying the letter

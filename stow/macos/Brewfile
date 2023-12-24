@@ -1,0 +1,29 @@
+# Work Tools
+brew "nginx"
+brew "node@18"
+brew "redis"
+brew "php@8.1"
+brew "postgresql@12"
+brew "yarn"
+
+# Upgrade these because the versions that come bundled
+# with macOS are really old due to licensing issues.
+brew "bash"
+brew "curl"
+brew "git"
+brew "make"
+brew "nano"
+
+# Helpful Tools
+brew "bash-completion"
+brew "btop"
+brew "bzip2"
+brew "fzf"
+brew "jq"
+brew "ncdu"
+brew "onefetch"
+brew "tmux"
+brew "yarn"
+
+# I realise "stow" is kinda pointless since we need to to install this file.
+brew "stow"

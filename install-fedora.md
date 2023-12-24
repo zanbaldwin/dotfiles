@@ -19,33 +19,27 @@ rpm-ostree install --idempotent \
     "https://mirrors.rpmfusion.org/nonfree/fedora/rpmfusion-nonfree-release-$(rpm -E %fedora).noarch.rpm"
 ```
 
-Install nVidia drivers.
-```bash
-rpm-ostree install --idempotent \
-    akmod-nvidia \
-    xorg-x11-drv-nvidia \
-    xorg-x11-drv-nvidia-cuda
-```
-
-Blacklist the _nouveau_ (non-proprietary) ones.
-```bash
-rpm-ostree kargs \
-    --append=rd.driver.blacklist=nouveau \
-    --append=modprobe.blacklist=nouveau \
-    --append=nvidia-drm.modeset=1
-```
-
 List of software to be installed:
+- nVidia Graphics Drivers
 - Build Essential (Development Tool & Libraries)
 - Kernel-based Virtual Machine
 - PHP & Nginx
 - Other tools I want on my command line as a non-root user
 ```bash
 rpm-ostree install --idempotent --allow-inactive \
+    akmod-nvidia xorg-x11-drv-nvidia xorg-x11-drv-nvidia-cuda \
     autoconf automake binutils bison gcc gcc-c++ gdb glibc-devel libtool make pkgconf strace byacc ccache cscope ctags elfutils indent ltrace perf valgrind ElectricFence astyle cbmc check cmake coan cproto insight nasm pscan python3-scons remake scorep splint yasm zzuf \
     virt-install libvirt-daemon-config-network libvirt-daemon-kvm qemu-kvm virt-manager virt-viewer guestfs-tools libguestfs-tools python3-libguestfs virt-top bridge-utils libvirt-devel edk2-ovmf \
-    php php-bcmath php-devel php-gd php-mbstring php-mysqlnd php-pdo php-pear php-pgsql php-pecl-amqp php-pecl-apcu php-pecl-redis5 php-pecl-xdebug3 php-pecl-zip php-pgsql php-process php-soap php-xml nginx \
+    php php-bcmath php-devel php-fpm php-gd php-mbstring php-mysqlnd php-pdo php-pear php-pgsql php-pecl-amqp php-pecl-apcu php-pecl-redis5 php-pecl-xdebug3 php-pecl-zip php-pgsql php-process php-soap php-xml nginx \
     distrobox neofetch ncdu shellcheck stow tmux
+```
+
+Blacklist the _nouveau_ (non-proprietary) graphics drivers.
+```bash
+rpm-ostree kargs \
+    --append=rd.driver.blacklist=nouveau \
+    --append=modprobe.blacklist=nouveau \
+    --append=nvidia-drm.modeset=1
 ```
 
 ## User (Mutable) Setup
@@ -72,8 +66,10 @@ Software from FlatHub:
 ```bash
 flatpak remote-add --if-not-exists flathub https://flathub.org/repo/flathub.flatpakrepo
 flatpak remote-modify --enable flathub
+
 flatpak install --noninteractive --assumeyes --or-update fedora \
     ca.desrt.dconf-editor
+
 flatpak install --noninteractive --assumeyes --or-update flathub \
     com.bitwarden.desktop \
     org.chromium.Chromium \

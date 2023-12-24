@@ -14,7 +14,7 @@ layout {
 
     tab name="System" {
         pane {
-            focus true
+            borderless true
             name "BTOP"
             cwd "/"
             command "btop"
@@ -23,6 +23,7 @@ layout {
 
     tab name="New Tab" focus=true {
         pane {
+            cwd "$HOME"
             focus true
             name "Pane #1"
         }

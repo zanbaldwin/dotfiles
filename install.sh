@@ -137,6 +137,7 @@ install_as_user() {
         cargo install bat; \
         cargo install exa; \
         cargo install git-delta; \
+        cargo install starship; \
     }
 
     # Pre-create some directories so that GNU stash symlinks the files that go in them rather
@@ -150,10 +151,12 @@ install_as_user() {
     SCRIPT_DIRECTORY="$(dirname "$(readlink -f "$0")")"
     stow --dir="${SCRIPT_DIRECTORY}" --target="${HOME}" alacritty
     stow --dir="${SCRIPT_DIRECTORY}" --target="${HOME}" bash
+    stow --dir="${SCRIPT_DIRECTORY}" --target="${HOME}" cargo
     stow --dir="${SCRIPT_DIRECTORY}" --target="${HOME}" editor
     stow --dir="${SCRIPT_DIRECTORY}" --target="${HOME}" git
     stow --dir="${SCRIPT_DIRECTORY}" --target="${HOME}" gnupg
     stow --dir="${SCRIPT_DIRECTORY}" --target="${HOME}" ssh
+    stow --dir="${SCRIPT_DIRECTORY}" --target="${HOME}" starship
     stow --dir="${SCRIPT_DIRECTORY}" --target="${HOME}" tmux
 
     dconf write "/org/gnome/desktop/input-sources/xkb-options" "['caps:swapescape']"

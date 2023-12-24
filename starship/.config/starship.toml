@@ -1,0 +1,86 @@
+# Get editor completions based on the config schema
+"$schema" = 'https://starship.rs/config-schema.json'
+
+add_newline = true
+format = """
+$os\
+$username\
+$hostname\
+$kubernetes\
+$directory\
+$fill\
+$git_branch\
+$git_commit\
+$git_state\
+$git_metrics\
+$git_status\
+$docker_context\
+$package\
+$nodejs\
+$php\
+$python\
+$rust\
+$terraform\
+$vagrant\
+$memory_usage\
+$aws\
+$gcloud\
+$env_var\
+$custom\
+$sudo\
+$cmd_duration\
+$line_break\
+$jobs\
+$status\
+$container\
+$shell\
+$character"""
+right_format= "$all"
+continuation_prompt = "[↳ ](bold white)"
+
+[os]
+disabled = false
+format = "[$symbol ]($style)"
+[os.symbols]
+Debian = "󰣚 "
+Fedora = "󰣛 "
+Linux = " "
+Macos = "󰘳 "
+Raspbian = " "
+Ubuntu = "󰕈 "
+
+[username]
+show_always = true
+format = '[$user]($style)'
+disabled = false
+style_user = "yellow"
+style_root = "bold red"
+
+[hostname]
+disabled = false
+ssh_only = false
+format = "[@](dimmed)[$ssh_symbol$hostname]($style)"
+style = "green"
+
+[directory]
+format = "[ $path]($style)[:](dimmed) "
+truncation_length = 5
+truncation_symbol = "…/"
+truncate_to_repo = false
+before_repo_root_style = "dimmed cyan"
+repo_root_style = "cyan"
+style = "cyan"
+read_only = ' 🔒'
+repo_root_format = " [$before_root_path]($before_repo_root_style)[$repo_root]($repo_root_style)[$path]($style)[$read_only]($read_only_style) "
+
+[fill]
+symbol = " "
+
+[status]
+disabled = true
+
+[sudo]
+disabled = false
+
+[git_metrics]
+disabled = false

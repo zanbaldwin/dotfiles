@@ -96,5 +96,5 @@ sudo dnf install --assumeyes \
     xcb-util-wm-devel \
     xorg-x11-server-Xwayland-devel
 
-git clone --recursive "https://github.com/hyprwm/Hyperland.git" "/tmp/hyprland"
-(cd "/tmp/hyprland"; make install PREFIX="${HOME}/.hypr")
+git clone --recursive "https://github.com/hyprwm/Hyprland.git" "/tmp/hyprland"
+(cd "/tmp/hyprland"; sudo make install)

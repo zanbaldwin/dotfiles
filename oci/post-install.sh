@@ -27,5 +27,7 @@ function enable_services() {
 }
 
 sudo sh -c "$(declare -f enable_services); enable_services \"$(whoami)\"";
-# Rootless Podman
+
 systemctl --user enable --now "podman.socket"
+systemctl --user enable --now "podman-restart.service"
+systemctl --user enable --now "flatpak-update.service"

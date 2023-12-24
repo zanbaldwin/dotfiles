@@ -1,5 +1,6 @@
 ARG VERSION="${VERSION:-39}"
 ARG VARIANT="${VARIANT:-silverblue}"
+# Use "quay.io/fedora-ostree-desktops/${VARIANT}" as the IMAGE if you want a version earlier than 39.
 ARG IMAGE="${IMAGE:-quay.io/fedora/fedora-${VARIANT}}"
 # Fedora 39 is the first to officially ship as an OCI image.
 ARG VERSION="${VERSION:-39}"
@@ -9,6 +10,7 @@ ARG VERSION="${VERSION:-39}"
 # ================================= #
 FROM "${IMAGE}:${VERSION}" AS gnome
 MAINTAINER "Zan Baldwin"
+COPY "./usr/" "/usr/"
 # Override OSTree until flatpak/flatpak#5452 is resolved and pushed up to Fedora Rawhide images.
 RUN rpm-ostree override remove firefox firefox-langpacks \
  && rpm-ostree override replace "https://bodhi.fedoraproject.org/updates/FEDORA-2023-cab8a89753" \
@@ -16,11 +18,11 @@ RUN rpm-ostree override remove firefox firefox-langpacks \
         bridge-utils edk2-ovmf guestfs-tools libvirt qemu-kvm virt-install virt-manager \
         podman-docker podman-plugins podman-tui containernetworking-plugins aardvark-dns \
         distrobox make ncdu nss-tools tlp tlp-rdw tmux \
- && sed -i 's/#AutomaticUpdatePolicy.*/AutomaticUpdatePolicy=check/' "/etc/rpm-ostreed.conf" \
  && systemctl enable "libvirtd" \
- && systemctl enable "podman" \
+ && systemctl enable "podman.service" \
  && systemctl enable "podman.socket" \
  && systemctl enable "podman-restart.service" \
+ && systemctl enable "flatpak-update.service" \
  && (systemctl enable "tlp.service" || true) \
  && cat "/etc/sudoers" | grep -v "secure_path" | tee "/etc/sudoers" >"/dev/null" \
  && rm -rf /tmp/* /var/* \

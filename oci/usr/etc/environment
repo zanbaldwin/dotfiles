@@ -1,0 +1,3 @@
+PATH="/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/snap/bin"
+MUTTER_DEBUG_FORCE_KMS_MODE=simple
+MOZ_ENABLE_WAYLAND=1

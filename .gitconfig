@@ -61,9 +61,9 @@
 	sniff           = "!git diff --name-only | grep \\\\.php\\$ | xargs --no-run-if-empty phpcs -p -v --standard=PSR2"
 
 [user]
-	name = Zan Baldwin
-	email           = hello@zanbaldwin.com
-	signingkey      = 419CB27C
+    name = Zan Baldwin
+    email           = hello@zanbaldwin.com
+    signingkey      = F59EC254A2DA8BE0C135126A21008A6ED04D2B52
 [push]
 	default         = simple
 	followTags      = true

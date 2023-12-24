@@ -141,7 +141,7 @@ alias v="vim -N"
 # ========== #
 
 # See https://github.com/denilsonsa/prettyping
-which prettyping >dev/null 2>&1
+which prettyping >/dev/null 2>&1
 if [ $? -eq 0 ]; then
     alias ping="prettyping --nolegend"
 fi
@@ -194,7 +194,10 @@ if [ $? -eq 0 ]; then
 fi
 # Sometimes the GPG agent get in a weird state that means that using GPG
 # for Git Clone/Push/Pull over SSH stops working.
-echo UPDATESTARTUPTTY | gpg-connect-agent
+which gpg-connect-agent >/dev/null 2>&1
+if [ $? -eq 0 ]; then
+    echo UPDATESTARTUPTTY | gpg-connect-agent
+]
 
 # ======= #
 # Vagrant #

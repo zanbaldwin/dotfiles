@@ -1,0 +1,44 @@
+* {
+    all: unset;
+}
+
+.statusbar {
+    // Hyprland gaps are defined in pixels, make sure they're the same here.
+    margin: 0 20px 0 20px;
+    background-color: #191f30;
+    border: 2px solid #212a44;
+    border-top: 0;
+    border-radius: 0 0 1rem 1rem;
+
+    .workspaces-widget {
+        .workspaces-title {
+            font-weight: bold;
+            margin: 0 10px 0 20px;
+        }
+
+        .workspace-entry {
+            background-color: #fff;
+            border-color: #fff;
+            border-radius: 10px;
+            border-width: 2px;
+            margin: 10px;
+
+            &.empty {
+                opacity: 0;
+            }
+        }
+    }
+
+    .clock {
+        margin-right: 1rem;
+        font-family: 'JetBrainsMono Nerd Font';
+
+        label {
+            padding: 0 0.5rem;
+
+            &.time {
+                font-weight: bold;
+            }
+        }
+    }
+}

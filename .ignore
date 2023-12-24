@@ -1,0 +1,15 @@
+# Global Git Ignore File
+# Symlink this file to ~/.ignore, the .gitconfig file bundled automatically includes it.
+
+/*.swp
+/.tmuxp.yaml
+/.DS_Store
+/.vagrant/
+/Thumbs.db
+/*.test
+/npm-debug.log*
+/yarn-debug.log*
+/yarn-error.log*
+/node_modules/
+/.env
+/composer.phar

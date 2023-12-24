@@ -53,3 +53,5 @@
 	enabled         = true
 [help]
 	autocorrect     = 1
+[core]
+	excludesFile    = ~/.ignore

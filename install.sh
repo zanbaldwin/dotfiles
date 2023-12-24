@@ -13,7 +13,7 @@ apt install -y \
     build-essential \
     ca-certificates \
     curl \
-    dconf-tools \
+    dconf-cli \
     fonts-firacode \
     git \
     gnupg-agent \
@@ -30,11 +30,11 @@ apt install -y \
     scdaemon \
     sl \
     stow \
-    tmux \
+    tmux
 
 # Docker Engine
-curl -fsSL "https://download.docker.com/linux/ubuntu/gpg" | gpg --dearmor -o "/usr/share/keyrings/docker-archive-keyring.gpg"
-echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/docker-archive-keyring.gpg] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable" | sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
+curl -fsSL "https://download.docker.com/linux/ubuntu/gpg" | gpg --dearmor >"/usr/share/keyrings/docker-archive-keyring.gpg"
+echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/docker-archive-keyring.gpg] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable" >"/etc/apt/sources.list.d/docker.list"
 apt update
 apt install -y \
     docker-ce \
@@ -75,7 +75,7 @@ command -v "cargo" >/dev/null 2>&1 && { \
 # [Discord](https://discord.com/api/download?platform=linux&format=deb)
 # [Docker Compose](https://docs.docker.com/compose/install/)
 # [NordVPN](https://support.nordvpn.com/Connectivity/Linux/1325531132/Installing-and-using-NordVPN-on-Debian-Ubuntu-Raspberry-Pi-Elementary-OS-and-Linux-Mint.htm)
-# [VirtualBox](https://www.virtualbox.org/wiki/Linux_Downloads)
+# [VirtualBox](https://www.virtualbox.org/wiki/Linux_Downloads); use deb file instead of repository.
 
 # Stow Configuration Files
 SCRIPT_DIRECTORY="$(dirname "$(readlink -f "$0")")"
@@ -91,7 +91,7 @@ dconf write "/org/gnome/desktop/input-sources/xkb-options" "['caps:swapescape']"
 
 # Other
 if [ ! -f "/etc/bash_completion.d/exa" ]; then
-    curl "https://raw.githubusercontent.com/ogham/exa/master/completions/bash/exa" | sudo tee "/etc/bash_completion.d/exa
+    curl -fsSL "https://raw.githubusercontent.com/ogham/exa/master/completions/bash/exa" >"/etc/bash_completion.d/exa"
 fi
 
 # Force Chromium to always allow Unsecured HTTP for Localhost, without force redirecting to HTTPS.
@@ -99,4 +99,4 @@ if [ ! -f "/etc/opt/chrome/policies/managed/policies.json" ]; then
     mkdir -p "/etc/opt/chrome/policies/managed"
     touch "/etc/opt/chrome/policies/managed/policies.json"
 fi
-echo '{"HSTSPolicyBypassList":["localhost"]}' > "/etc/opt/chrome/policies/managed/policies.json"
+echo '{"HSTSPolicyBypassList":["localhost"]}' >"/etc/opt/chrome/policies/managed/policies.json"

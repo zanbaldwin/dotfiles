@@ -104,7 +104,7 @@ alias freenode="irssi --connect=chat.freenode.net --nick=ZanBaldwin"
 # - Install "gnupg2" and "scdaemon".                        #
 # - Add "enable-ssh-support" to "~/.gnupg/gpg-agent.conf"   #
 #   - Or copy existing config from this repository          #
-# - Find [A]uthentication keygrips "gpg -K --with-keygrips" #
+# - Find [A]uthentication keygrips "gpg -K --with-keygrip"  #
 # - Add appropriate keygrips to "~/.gnupg/sshcontrol"       #
 # ========================================================= #
 

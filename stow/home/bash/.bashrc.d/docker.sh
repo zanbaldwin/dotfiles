@@ -36,6 +36,10 @@ elif command -v "podman" >"/dev/null" 2>&1; then
             command podman "$@"
         fi
     }
+elif [[ -f "/run/.containerenv" || -f "/run/.toolboxenv" ]]; then
+    command -v "flatpak-spawn" >"/dev/null" 2>&1 && {
+        alias docker="flatpak-spawn --host -- docker"
+    }
 fi
 
 # Podman Compose

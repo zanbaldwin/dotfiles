@@ -37,7 +37,7 @@ if command -v "onefetch" >"/dev/null" 2>&1 && command -v "git" >"/dev/null" 2>&1
         if git rev-parse --show-toplevel >"/dev/null" 2>&1; then
             NEW_REPO="$(git rev-parse --show-toplevel 2>"/dev/null")"
             if [ "${LAST_REPO}" != "${NEW_REPO}" ]; then
-                onefetch --show-logo="auto"
+                onefetch
                 LAST_REPO="${NEW_REPO}"
             fi
         fi

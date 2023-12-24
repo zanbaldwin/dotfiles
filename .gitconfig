@@ -1,48 +1,49 @@
 [alias]
-	st = status
-	co = checkout
-	line = log --oneline
-	s = status -s
-	prepush = rebase -i @{u}
-	fa = fetch --all
-	ft = fetch --tags
-	push = push --force-with-lease
-	appraise = !/home/zander/Golang/bin/git-appraise
-	snapshot = !git stash save "snapshot: $(date)" && git stash apply "stash@{0}"
-	snapshots = !git stash list --grep snapshot
+	st              = status
+	co              = checkout
+	line            = log --oneline
+	s               = status -s
+    d               = diff
+	prepush         = rebase -i @{u}
+	fa              = fetch --all
+	ft              = fetch --tags
+	push            = push --force-with-lease
+	appraise        = !/home/zander/Golang/bin/git-appraise
+	snapshot        = !git stash save "snapshot: $(date)" && git stash apply "stash@{0}"
+	snapshots       = !git stash list --grep snapshot
 	recent-branches = !git for-each-ref --count=15 --sort=-committerdate refs/heads/ --format='%(refname:short)'
-	amend = commit --amend
-	recommit = commit --amend --no-edit
-	continue = rebase --continue
-	skip = rebase --skip
-	abort = rebase --abort
-	uncommit = reset --soft HEAD^
-	assume   = update-index --assume-unchanged
-	unassume = update-index --no-assume-unchanged
-	assumed  = "!git ls-files -v | grep ^h | cut -c 3-"
+	amend           = commit --amend
+	recommit        = commit --amend --no-edit
+	continue        = rebase --continue
+	skip            = rebase --skip
+	abort           = rebase --abort
+	uncommit        = reset --soft HEAD^
+	assume          = update-index --assume-unchanged
+	unassume        = update-index --no-assume-unchanged
+	assumed         = "!git ls-files -v | grep ^h | cut -c 3-"
 [user]
-	name = Zander Baldwin
-	email = hello@zanderbaldwin.com
-	signingkey = 419CB27C
+	name            = Zander Baldwin
+	email           = hello@zanderbaldwin.com
+	signingkey      = 419CB27C
 [push]
-	default = current
+	default         = current
 [pull]
-	rebase = true
+	rebase          = true
 [commit]
-	gpgsign = true
+	gpgsign         = true
 [pager]
-	log = diff-highlight | less --tabs=4 -RFX
-	show = diff-highlight | less --tabs=4 -RFX
-	diff = diff-highlight | less --tabs=4 -RFX
+	log             = diff-highlight | less --tabs=4 -RFX
+	show            = diff-highlight | less --tabs=4 -RFX
+	diff            = diff-highlight | less --tabs=4 -RFX
 [interactive]
-	diffFilter = diff-highlight
+	diffFilter      = diff-highlight
 [diff]
 	compactionHeuristic = true
-	algorithm = patience
-	mnemonicprefix = true
+	algorithm           = patience
+	mnemonicprefix      = true
 [rerere]
 	# Remember my merges
 	# http://gitfu.wordpress.com/2008/04/20/git-rerere-rereremember-what-you-did-last-time/
-	enabled = true
+	enabled         = true
 [help]
-    autocorrect = 1
+    autocorrect     = 1

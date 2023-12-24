@@ -21,6 +21,7 @@ install_as_sudo() {
         curl \
         dconf-cli \
         direnv \
+        distrobox \
         fonts-firacode \
         fzy \
         git \

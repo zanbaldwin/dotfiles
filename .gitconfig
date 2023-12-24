@@ -1,0 +1,23 @@
+[alias]
+	st = status
+	co = checkout
+	line = log --oneline
+	s = status -s
+[user]
+	name = Zander Baldwin
+	email = hello@zanderbaldwin.com
+[url "git@github.com:"]
+	insteadOf = "gh:"
+	insteadOf = "git://github.com"
+	pushInsteadOf = "github:"
+	pushInsteadOf = "git://github.com/"
+	pushInsteadOf = "https://github.com/"
+[url "git@gist.github.com:"]
+	insteadOf = "gst:"
+	pushInsteadOf = "gist:"
+	pushInsteadOf = "git://gist.github.com/"
+	pushInsteadOf = "https://gist.github.com/"
+[url "git@github.com:zanderbaldwin/"]
+	insteadOf = "git://github.com/zanderbaldwin/"
+[push]
+	default = current

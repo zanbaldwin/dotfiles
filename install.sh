@@ -11,12 +11,14 @@ apt install -y \
     bash \
     bash-completion \
     build-essential \
+    ca-certificates \
     curl \
     git \
     gnupg-agent \
     gnupg-utils \
     gnupg2 \
     htop \
+    lsb-release \
     make \
     mosh \
     nano \
@@ -28,17 +30,33 @@ apt install -y \
     stow \
     tmux \
 
+# Docker Engine
+curl -fsSL "https://download.docker.com/linux/ubuntu/gpg" | gpg --dearmor -o "/usr/share/keyrings/docker-archive-keyring.gpg"
+echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/docker-archive-keyring.gpg] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable" | sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
+# VirtualBox
+curl -fsSL "https://www.virtualbox.org/download/oracle_vbox_2016.asc" | gpg --dearmor -o "/usr/share/keyrings/virtualbox-archive-keyring.gpg"
+echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/virtualbox-archive-keyring.gpg] https://download.virtualbox.org/virtualbox/debian $(lsb_release -cs) contrib" | sudo tee /etc/apt/sources.list.d/virtualbox.list > /dev/null
+
+apt update
+DEBIAN_FRONTEND=noninteractive apt install -qy \
+    virtualbox-6.1 \
+    virtualbox-ext-pack \
+    virtualbox-guest-utils \
+    docker-ce \
+    docker-ce-cli \
+    containerd.io \
+
 # These Snap packages don't conform to the secure way. Use classic installation.
 snap install --stable --classic aws-cli
-snap install --stable --classic nvim
 snap install --stable --classic phpstorm
+snap install --stable --classic code
 snap install --stable --classic slack
 
 snap install --stable bitwarden
 snap install --stable chromium
 snap install --stable chromium-ffmpeg
 snap install --stable httpie
-snap install --stable multipass
+snap install --stable spotify
 snap install --stable vlc
 
 snap refresh
@@ -57,7 +75,6 @@ command -v "cargo" >/dev/null 2>&1 && { \
 cargo install bat
 cargo install exa
 # [Discord](https://discord.com/api/download?platform=linux&format=deb)
-# [Docker](https://docs.docker.com/engine/install/ubuntu/)
 # [Docker Compose](https://docs.docker.com/compose/install/)
 # [NordVPN](https://support.nordvpn.com/Connectivity/Linux/1325531132/Installing-and-using-NordVPN-on-Debian-Ubuntu-Raspberry-Pi-Elementary-OS-and-Linux-Mint.htm)
 

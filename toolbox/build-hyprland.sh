@@ -63,7 +63,9 @@
 # (cd "/tmp/vulkan-renderer"; cmake . -Bbuild -D'CMAKE_BUILD_TYPE=Debug' -G'Ninja' && ninja -C build)
 
 # Hyprland
-sudo dnf install --assumeyes \
+# Want the latest versions of dependencies.
+sudo dnf upgrade --assumeyes
+sudo dnf install --assumeyes --allow-inactive \
     cairo-devel \
     cmake \
     cpio \
@@ -76,7 +78,6 @@ sudo dnf install --assumeyes \
     libdisplay-info-devel \
     libdrm-devel \
     libinput-devel \
-    libliftoff-devel \
     libseat-devel \
     libxcb-devel \
     libxkbcommon-devel \
@@ -97,7 +98,9 @@ sudo dnf install --assumeyes \
     xorg-x11-server-Xwayland-devel
 
 git clone --recursive "https://github.com/hyprwm/Hyprland.git" "${HOME}/.hyprland"
-# We want to build inside a toolbox, but install to the host system. Prefix with a directory that's available both inside and outside.
+git -C "${HOME}/.hyprland" checkout "$(latest_stable_version "${HOME}/.hyprland")"
+# We want to build inside a toolbox, but install to the host system.
+# Prefix with a directory that's available both inside and outside.
 (cd "${HOME}/.hyprland"; make install PREFIX="${HOME}/.hyprland-build")
 
 rm -rf \

@@ -20,6 +20,7 @@ stow --dir="${TOOLBOX_SCRIPT_DIRECTORY}/../stow" --target="${HOME}" --stow \
     "editor" \
     "flatpak" \
     "git" \
+    "hyprland" \
     "ssh" \
     "starship" \
     "tmux" \

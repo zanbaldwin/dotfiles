@@ -47,6 +47,9 @@ AutomaticUpdatePolicy=check
 ```
 
 ## User (Mutable) Setup
+
+> `cd` into the directory this repository was cloned into. Usually something like `~/.dotfiles`.
+
 Install software from Flathub: _BitWarden, Chromium, CLion, Discord, Flatseal,
 GNOME Extension Manager, Obsidian, PHPStorm, Skype, Slack, SmartGit, Spotify,
 VLC, VS Code, Zoom._

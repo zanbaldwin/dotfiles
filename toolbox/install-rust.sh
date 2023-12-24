@@ -25,7 +25,7 @@ command -v "cargo" >"/dev/null" 2>&1 && { \
 # Kept running into /tmp ramfs running out of space on small VMs.
 
 # Important Rust binaries I want for *every* installation.
-cargo install "sccache"                                      # Build Artifact Cache
+cargo install --config="rustc-wrapper=false"     "sccache"   # Build Artifact Cache
 cargo install --config="rustc-wrapper='sccache'" "bat"       # `cat` but better
 cargo install --config="rustc-wrapper='sccache'" "exa"       # `ls` but better
 cargo install --config="rustc-wrapper='sccache'" "starship"  # PS1
@@ -40,7 +40,7 @@ cargo install --config="rustc-wrapper='sccache'" "zellij"    # Terminal Multiple
 if [[ "${OSTYPE}" == "linux-gnu"* ]]; then
     # Alacritty on macOS is poopy. Only install on Linux.
     # iTerm2 is the best you're going to get for macOS and that's still shit.
-    cargo install "alacritty";
+    cargo install --config="rustc-wrapper='sccache'" "alacritty";
 fi
 
 # The following need more testing on Linux. See `stow/bash/.bashrc.d/directories.sh`.

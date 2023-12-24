@@ -41,10 +41,10 @@ List of software to be installed:
 - PHP & Nginx
 - Other tools I want on my command line as a non-root user
 ```bash
-rpm-ostree install --idempotent \
+rpm-ostree install --idempotent --allow-inactive \
     autoconf automake binutils bison gcc gcc-c++ gdb glibc-devel libtool make pkgconf strace byacc ccache cscope ctags elfutils indent ltrace perf valgrind ElectricFence astyle cbmc check cmake coan cproto insight nasm pscan python3-scons remake scorep splint yasm zzuf \
     virt-install libvirt-daemon-config-network libvirt-daemon-kvm qemu-kvm virt-manager virt-viewer guestfs-tools libguestfs-tools python3-libguestfs virt-top bridge-utils libvirt-devel edk2-ovmf \
-    php php-bcmath php-devel php-gd php-imap php-mbstring php-mysqlnd php-pdo php-pear php-pgsql php-pecl-amqp php-pecl-apcu php-pecl-redis5 php-pecl-xdebug3 php-pecl-zip php-pgsql php-process php-soap php-xml nginx \
+    php php-bcmath php-devel php-gd php-mbstring php-mysqlnd php-pdo php-pear php-pgsql php-pecl-amqp php-pecl-apcu php-pecl-redis5 php-pecl-xdebug3 php-pecl-zip php-pgsql php-process php-soap php-xml nginx \
     distrobox neofetch ncdu shellcheck stow tmux
 ```
 
@@ -71,8 +71,25 @@ Software from FlatHub:
 
 ```bash
 flatpak remote-add --if-not-exists flathub https://flathub.org/repo/flathub.flatpakrepo
-flatpak install --noninteractive fedora  applications-fedora.list
-flatpak install --noninteractive flathub applications-flathub.list
+flatpak remote-modify --enable flathub
+flatpak install --noninteractive --assumeyes --or-update fedora \
+    ca.desrt.dconf-editor
+flatpak install --noninteractive --assumeyes --or-update flathub \
+    com.bitwarden.desktop \
+    org.chromium.Chromium \
+    com.jetbrains.CLion \
+    com.discordapp.Discord \
+    com.github.tchx84.Flatseal \
+    com.mattjakeman.ExtensionManager \
+    md.obsidian.Obsidian \
+    com.jetbrains.PhpStorm \
+    com.skype.Client \
+    com.slack.Slack \
+    com.syntevo.SmartGit \
+    com.spotify.Client \
+    org.videolan.VLC \
+    com.visualstudio.code \
+    us.zoom.Zoom
 ```
 
 Configure GNOME Desktop
@@ -116,7 +133,7 @@ command -v "cargo" >/dev/null 2>&1 && { \
 Tools that can go in `~/.bin` (the mutable version of `/usr/local/bin`)
 - [`btop`](https://github.com/aristocratos/btop)
 - [`composer`](https://getcomposer.org)
-- `duf`
+- [`duf`](https://github.com/muesli/duf)
 
 ## Toolboxes
 

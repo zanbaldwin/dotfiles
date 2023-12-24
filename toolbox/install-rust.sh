@@ -7,6 +7,7 @@ sudo dnf group install --assumeyes \
 
 sudo dnf install --assumeyes \
     "cmake" \
+    "fontconfig-devel" \
     "mold"
 
 # Yeah, this is not good. Running an arbitrary script from the internet.

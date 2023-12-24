@@ -2,6 +2,11 @@
 # PS1 #
 # === #
 
+# To use this file, symlink it to ~/.bash_prompt
+# If you are using the included .bash_aliases file then it is automatically
+# included, otherwise add the following line to your ~/.bashrc:
+# if [ -f ~/.bash_prompt ]; then . ~/.bash_prompt; fi
+
 # Inputs.
 SHELL_NAME="\\v"
 TERMINAL="\\l"

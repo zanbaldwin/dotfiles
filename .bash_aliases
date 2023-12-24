@@ -1,7 +1,24 @@
-alias vssh="vagrant ssh"
-alias vsync="vagrant rsync"
-alias ll="ls -lAh --color=auto --group-directories-first"
+# To use this file, symlink it to ~/.bash_aliases (it should already be included
+# in ~/.bashrc).
 
+# ============= #
+# Bash-specific #
+# ============= #
+
+# Up & down map to history search once a command has been started.
+bind '"\e[A":history-search-backward'
+bind '"\e[B":history-search-forward'
+
+# If a file specifying a custom prompt exists, include it.
+if [ -f ~/.bash_prompt ]; then
+    . ~/.bash_prompt
+fi
+
+# ==================== #
+# Directory Management #
+# ==================== #
+
+alias ll="ls -lAh --color=auto --group-directories-first"
 alias c="clear"
 alias ..="cd .."
 alias ~="cd ~"
@@ -10,29 +27,64 @@ alias back="cd -"
 alias mkdir="mkdir -pv"
 alias chmod="chmod -Rv"
 alias chown="chown -Rv"
-alias nano="nano -AES --tabsize=4"
-alias n="nano -AES --tabsize=4"
 alias rm="rm -I --preserve-root -v"
-# alias rm="trash"
-alias wget="wget -c"
+function f() {
+    find . -name "$1" 2>&1 | grep -v 'Permission denied'
+}
+function search() {
+    grep -l -c -r "$1" .
+}
+
+# ================ #
+# Anger Management #
+# ================ #
+
 alias fuck='sudo "$BASH" -c "$(history -p !!)"'
 alias fucking="sudo"
+
+# ======= #
+# Editors #
+# ======= #
+
+alias nano="nano -AES --tabsize=4"
+alias n="nano -AES --tabsize=4"
 alias vim="vim -N"
 alias v="vim -N"
-# Old habits die hard...
-alias docker-composer="docker-compose"
 
+# ========== #
+# Networking #
+# ========== #
+
+alias wget="wget -c"
 alias dig="dig +nocmd any +multiline +noall +answer"
-
-# Up & down map to history search once a command has been started.
-bind '"\e[A":history-search-backward'
-bind '"\e[B":history-search-forward'
-
 # One of @janmoesen’s ProTip™s
 for method in GET HEAD POST PUT DELETE TRACE OPTIONS; do
     alias "$method"="lwp-request -m '$method'"
 done
+function whois() {
+    local WHOIS=$(which whois)
+    if [ $WHOIS != "" ]; then
+        # Get domain from URL
+        local DOMAIN=$(echo "$1" | awk -F/ '{print $3}')
+        if [ -z $DOMAIN ]; then DOMAIN=$1; fi
+        echo "Getting whois record for: $DOMAIN …"
+        $WHOIS -h whois.internic.net $DOMAIN | sed '/NOTICE:/q'
+    fi
+}
 
+# ======= #
+# Vagrant #
+# ======= #
+
+alias vssh="vagrant ssh"
+alias vsync="vagrant rsync"
+
+# ====== #
+# Docker #
+# ====== #
+
+# Old habits die hard...
+alias docker-composer="docker-compose"
 docker() {
     if [[ ($1 = "compose") || ($1 = "composer") ]]; then
         shift
@@ -42,32 +94,70 @@ docker() {
     fi
 }
 
-function f() {
-    find . -name "$1" 2>&1 | grep -v 'Permission denied'
-}
+# === #
+# PHP #
+# === #
 
-function search() {
-    grep -l -c -r "$1" .
-}
+PHP=$(which php)
+if [ $? -eq 0 ]; then
 
-# Start an HTTP server from a directory, optionally specifying the port
-function server() {
-    local port="${1:-8000}"
-    open "http://localhost:${port}/"
-    # Set the default Content-Type to `text/plain` instead of `application/octet-stream`
-    # And serve everything as UTF-8 (although not technically correct, this doesn’t break anything for binary files)
-    python -c $'import SimpleHTTPServer;\nmap = SimpleHTTPServer.SimpleHTTPRequestHandler.extensions_map;\nmap[""] = "text/plain";\nfor key, value in map.items():\n\tmap[key] = value + ";charset=UTF-8";\nSimpleHTTPServer.test();' "$port"
-}
-
-function whois() {
-    local domain=$(echo "$1" | awk -F/ '{print $3}') # get domain from URL
-    if [ -z $domain ] ; then
-        domain=$1
+    # Make sure that XDebug is installed but not enabled in the CLI configuration. This will make
+    # sure that running commands like "composer" will NOT use XDebug, but commands like "php ..."
+    # WILL use XDebug.
+    if [ -f "$(php-config --extension-dir)/xdebug.so" ]; then
+        alias php="$PHP -dzend_extension=xdebug.so"
     fi
-    echo "Getting whois record for: $domain …"
 
-    # avoid recursion
-                    # this is the best whois server
-                                                    # strip extra fluff
-    /usr/bin/whois -h whois.internic.net $domain | sed '/NOTICE:/q'
-}
+    # Vulcan Logic Disassembler
+    # To install: `pecl install vld` (currently in beta only, so install vld-beta instead).
+    alias vld='php -d vld.active=1 -d vld.execute=0 -d vld.dump_paths=1 -d vld.save_paths=1 -d vld.verbosity=0'
+
+    # Add global Composer package binaries to $PATH.
+    export PATH="$PATH:$HOME/.config/composer/vendor/bin:$HOME/.composer/vendor/bin"
+
+    # For parallel package downloading in Composer (!!!) install the following global package:
+    #     $ composer global require hirak/prestissimo
+    # Now that we have Composer package binaries on the PATH, install the useful CGR package:
+    #     $ composer global require consolidation/cgr
+    # Then install some useful packages:
+    #     $ cgr bamarni/symfony-console-autocomplete
+    #     $ cgr phpunit/phpunit
+    #     $ cgr squizlabs/php_codesniffer
+    #     $ cgr puli/cli
+    # And then initialise them:
+
+    SYMAUTOPATH=$(which symfony-autocomplete)
+    if [ $? -eq 0 ]; then
+        eval "$($SYMAUTOPATH)"
+    fi
+
+    # PHPUnit (this enables XDebug automatically on the CLI).
+    PHPUNIT=$(which phpunit)
+    if [ $? -eq 0 ]; then
+        alias phpunit="php $PHPUNIT"
+    fi
+
+    # Puli Universal Packages Manager.
+    PULI=$(which puli)
+    if [ $? -eq 0 ]; then
+        alias puli='set -f;puli';puli(){ command puli "$@";set +f;}
+    fi
+
+fi
+
+# ======== #
+# Go! Lang #
+# ======== #
+
+export GOROOT="/usr/lib/go"
+export GOPATH="$HOME/code/golang"
+export PATH="$PATH:$GOPATH/bin"
+
+# === #
+# AWS #
+# === #
+
+# AWS Autocompletion
+if [[ -f /usr/local/bin/aws_completer ]]; then
+    complete -C '/usr/local/bin/aws_completer' aws
+fi

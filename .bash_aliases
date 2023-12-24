@@ -127,10 +127,11 @@ alias fucking="sudo"
 # ======= #
 
 command -v nano >/dev/null 2>&1 && {
+    NANO_ALIAS="$(which nano) -AE --tabsize=4"
     NANO_FLAGS="-AE --tabsize=4"
-    alias nano="nano ${NANO_FLAGS}"
-    export EDITOR="$(command -v nano 2>/dev/null) ${NANO_FLAGS}"
-    export VISUAL="${EDITOR}"
+    alias nano="${NANO_ALIAS}"
+    export EDITOR="${NANO_ALIAS}"
+    export VISUAL="${NANO_ALIAS}"
 }
 
 alias vim="vim -N"
@@ -225,15 +226,14 @@ alias alpine="docker run --rm $(dterm) -v \"$(pwd):$(pwd)\" -w \"$(pwd)\" alpine
 # PHP #
 # === #
 
-PHP=$(which php)
-if [ $? -eq 0 ]; then
+command -v php >/dev/null 2>&1 && {
 
     # Make sure that XDebug is installed but not enabled in the CLI configuration. This will make
-    # sure that running commands like "composer" will NOT use XDebug, but commands like "php ..."
-    # WILL use XDebug.
+    # sure that running commands like "composer" will NOT use XDebug.
+    # If you wish to enable XDebug while using PHP's CLI SAPI, use the command alias "xdebug" instead.
     # You need the php-dev package (php5-dev, php7.0-dev, etc) installed to use "php-config".
     if command -v php-config >/dev/null 2>&1 && [ -f "$(php-config --extension-dir)/xdebug.so" ]; then
-        alias php="${PHP} -dzend_extension=xdebug.so"
+        alias xdebug="php -dzend_extension=xdebug.so"
     fi
 
     # Vulcan Logic Disassembler
@@ -243,25 +243,12 @@ if [ $? -eq 0 ]; then
     # Add global Composer package binaries to $PATH.
     command -v composer >/dev/null 2>&1 && { export PATH="${PATH}:$(composer global config bin-dir --absolute 2>/dev/null)"; }
 
-    # For parallel package downloading in Composer (!!!) install the following global package:
-    #     $ composer global require hirak/prestissimo
-    # Now that we have Composer package binaries on the PATH, install the useful CGR package:
-    #     $ composer global require consolidation/cgr
-    # Then install some useful packages:
-    #     $ cgr bamarni/symfony-console-autocomplete
-    #     $ cgr phpunit/phpunit
-    #     $ cgr squizlabs/php_codesniffer
-    # And then initialise them:
-
-    SYMAUTOPATH=$(command -v symfony-autocomplete 2>/dev/null)
+    SYMAUTOPATH="$(command -v symfony-autocomplete 2>/dev/null)"
     if [ $? -eq 0 ]; then
-        eval "$($SYMAUTOPATH)"
+        eval "$(${SYMAUTOPATH})"
     fi
 
-    # PHPUnit (this enables XDebug automatically on the CLI).
-    command -v phpunit >/dev/null 2>&1 && { alias phpunit="php $PHPUNIT"; }
-
-fi
+}
 
 # ======== #
 # Go! Lang #

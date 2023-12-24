@@ -65,5 +65,6 @@ cargo install "cargo-update"  # Update all installed binaries
 cargo install "gimoji"        # Select an appropriate emoji to Git commits depending on what the commit does
 cargo install "gitui"         # Git TUI
 cargo install "oha"           # HTTP Load Testing
+cargo install "atuin"         # Better Bash History
 
 curl -sSfL "https://get.wasmer.io" | bash

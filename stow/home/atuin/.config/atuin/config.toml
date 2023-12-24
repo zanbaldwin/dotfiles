@@ -1,0 +1,5 @@
+dialect = "uk"
+auto_sync = true
+# Atuin installed via Cargo, use `cargo install-update --all` to upgrade.
+update_check = false
+filter_mode_shell_up_key_binding = "directory"

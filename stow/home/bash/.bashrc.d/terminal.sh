@@ -1,9 +1,5 @@
 #!/bin/bash
 
-# Up & down map to history search once a command has been started.
-bind '"\e[A":history-search-backward'
-bind '"\e[B":history-search-forward'
-
 # Starship PS1 Prompt
 command -v starship >"/dev/null" 2>&1 && {
     eval "$(starship init bash)"
@@ -22,8 +18,6 @@ alias sudo="sudo --preserve-env --"
 # Watch the output of the last command instead of having to
 # execute it constantly whilst waiting for a different output.
 alias follow='watch $(history -p !!)'
-
-function title { print -Pn "\e]2;${@}\a"; }
 
 alias tmux="tmux attach || tmux new"
 

@@ -14,6 +14,8 @@ export PATH="$PATH:$GOPATH/bin"
 alias php='php -dzend_extension=xdebug.so'
 alias phpunit='php $(which phpunit)'
 export PATH="$PATH:$HOME/.config/composer/vendor/bin:$HOME/.composer/vendor/bin"
+# For parallel package downloading in Composer (!!!) install the following global package:
+#  - composer global require hirak/prestissimo
 # Now that we have Composer package binaries on the PATH, install the useful CGR package:
 #     $ composer global require consolidation/cgr
 # Then install some useful packages:

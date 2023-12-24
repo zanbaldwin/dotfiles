@@ -1,9 +1,10 @@
 #!/bin/bash
 
-# Eventually replace this with Stowed DConf settings.
+command -v "dconf" 1>"/dev/null" 2>&1 || {
+    echo 1>&2 "dconf not available"
+    exit 1
+}
 
-dconf write "/org/gnome/desktop/input-sources/xkb-options" "['caps:swapescape']"
-dconf write "/org/gnome/desktop/calendar/show-weekdate" "false"
-dconf write "/org/gnome/desktop/interface/clock-show-weekday" "true"
-dconf write "/org/gnome/desktop/wm/preferences/button-layout" "'appmenu:minimize,maximize,close'"
-dconf write "/org/gnome/system/location/enabled" "false"
+if [ -f "${HOME}/.config/dconf/custom.ini" ]; then
+    dconf load / < "${HOME}/.config/dconf/custom.ini"
+fi

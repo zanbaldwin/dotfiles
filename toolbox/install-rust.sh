@@ -10,10 +10,10 @@ sudo dnf group install --assumeyes \
 command -v "cargo" >"/dev/null" 2>&1 && { \
     rustup update; \
 } || { \
-    curl --proto '=https' --tlsv1.2 -sSf "https://sh.rustup.rs" >"/tmp/rustup.sh" && { \
+    curl --proto "=https" --tlsv1.2 -sSf "https://sh.rustup.rs" >"/tmp/rustup.sh" && { \
         sh /tmp/rustup.sh -qy --no-modify-path; \
         source "${HOME}/.cargo/env"; \
-    } || { echo >&2 "Error downloading Rustlang installation script."; } \
+    } || { echo >&2 "Error downloading RustLang installation script."; } \
 }
 
 cargo install \

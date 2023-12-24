@@ -25,13 +25,16 @@
 	continue        = rebase --continue
 	skip            = rebase --skip
 	abort           = rebase --abort
-	# Prepush opens up an interactive rebase for all the changes that haven't been pushed to the remote upstream branch yet.
+	# Prepush opens up an interactive rebase for all the changes that haven't
+	# been pushed to the remote upstream branch yet.
 	prepush         = rebase -i @{u}
-	# If the current working tree is clean, then pull the latest "develop" and rebase it into the current branch.
+	# If the current working tree is clean, then pull the latest "develop" and
+	# rebase it into the current branch.
 	getdev          = "!([ $(git diff-files | wc -l) -eq 0 ] || (echo 'Working directory not clean. Aborting.'; return 1)) && git checkout develop && git pull origin develop && git checkout - && git rebase develop"
 
-	# Assume (and its counterpart unassume) will "assume" files haven't changed. Use to prevent files from appearing in
-	# status and diff lists if they have changed locally. Ideal for edits in configuration that shouldn't be committed.
+	# Assume (and its counterpart unassume) will "assume" files haven't changed.
+	# Use to prevent files from appearing in modified-files lists if they have
+	# changed locally. Ideal for edits in configuration that shouldn't be committed.
 	assume          = update-index --assume-unchanged
 	unassume        = update-index --no-assume-unchanged
 	# List assumed files
@@ -44,11 +47,11 @@
 	# EXTERNAL TOOLING #
 	# ================ #
 
-	# Install with "go get github.com/google/git-appraise/git-appraise" (Golang tools required).
+	# Install with "go get github.com/google/git-appraise/git-appraise" (Golang
+	# tools required).
 	appraise        = !git-appraise
 
-	# Requires PHPCS, install with "composer global require squizlabs/php_codesniffer"
-	# (or recommended "cgr squizlabs/php_codesniffer", see ".bash_aliases" for details).
+	# Requires PHPCS; "composer global require squizlabs/php_codesniffer" (or cgr).
 	sniff           = "!git diff --name-only | grep \\\\.php\\$ | xargs --no-run-if-empty phpcs -p -v --standard=PSR2"
 
 [user]
@@ -60,9 +63,9 @@
 [pull]
 	rebase          = true
 [pager]
-	# "diff-highlight" isn't installed by default, you can find it in the contrib section of the Git repo:
+	# "diff-highlight" isn't installed by default, you can find it in the
+	# contrib section of the Git repo (requires Perl to be installed):
 	# https://github.com/git/git/blob/master/contrib/diff-highlight/diff-highlight
-	# (requires Perl to be installed).
 	log             = diff-highlight | less --tabs=4 -RFX
 	show            = diff-highlight | less --tabs=4 -RFX
 	diff            = diff-highlight | less --tabs=4 -RFX
@@ -80,7 +83,8 @@
 	autocorrect     = 1
 [core]
 	excludesFile    = ~/.ignore
-# Force Git to always download over SSH to prevent GitHub's API throttling and/or asking for
-# username and password (which is impossible to do on the command-line if 2FA has been enabled).
+# Force Git to always download over SSH to prevent GitHub's API throttling and/or
+# asking for username and password (which is near-to-impossible to do on the
+# command-line if 2FA has been enabled).
 [url "git@github.com:"]
 	insteadOf       = https://github.com/

@@ -5,7 +5,8 @@ export DOTFILES="${HOME}/.dotfiles"
 git clone "git@github.com:zanbaldwin/dotfiles.git" "${DOTFILES}"
 ```
 
-- User configuration files are stored in [`stow/`](./stow)
+- User configuration files are stored in [`stow/`](./stow) and can be installed
+  via the [`stow-config.sh`](toolbox/stow-config.sh) script.
 - Environment setup scripts are stored in [`toolbox/`](./toolbox)
 - Various notes, reminders and archived stuff are in [`notes/`](./notes)
 

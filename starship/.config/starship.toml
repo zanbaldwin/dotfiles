@@ -3,6 +3,7 @@
 
 add_newline = true
 format = """
+$status\
 $os\
 $username\
 $hostname\
@@ -31,35 +32,44 @@ $sudo\
 $cmd_duration\
 $line_break\
 $jobs\
-$status\
 $container\
 $shell\
 $character"""
-right_format= "$all"
 continuation_prompt = "[↳ ](bold white)"
+
+[character]
+format = "$symbol "
+success_symbol = "[❯](blue)"
+error_symbol = "[✖](bold red)"
+
+[status]
+format = '[$status]($style) '
+style = 'bold red'
+disabled = false
 
 [os]
 disabled = false
 format = "[$symbol ]($style)"
+style = "gray"
 [os.symbols]
-Debian = "󰣚 "
-Fedora = "󰣛 "
-Linux = " "
-Macos = "󰘳 "
-Raspbian = " "
-Ubuntu = "󰕈 "
+Debian = '󰣚'
+Fedora = '󰣛'
+Linux = ''
+Macos = '󰘳'
+Raspbian = ''
+Ubuntu = '󰕈'
 
 [username]
 show_always = true
 format = '[$user]($style)'
 disabled = false
-style_user = "yellow"
-style_root = "bold red"
+style_user = "cyan"
+style_root = "red"
 
 [hostname]
 disabled = false
 ssh_only = false
-format = "[@](dimmed)[$ssh_symbol$hostname]($style)"
+format = "[@](white dimmed)[$ssh_symbol$hostname]($style)"
 style = "green"
 
 [directory]
@@ -71,16 +81,20 @@ before_repo_root_style = "dimmed cyan"
 repo_root_style = "cyan"
 style = "cyan"
 read_only = ' 🔒'
-repo_root_format = " [$before_root_path]($before_repo_root_style)[$repo_root]($repo_root_style)[$path]($style)[$read_only]($read_only_style) "
+repo_root_format = " [$before_root_path]($before_repo_root_style)[$repo_root]($repo_root_style)[$path]($style)[$read_only]($read_only_style)[:](dimmed) "
 
 [fill]
 symbol = " "
-
-[status]
-disabled = true
 
 [sudo]
 disabled = false
 
 [git_metrics]
 disabled = false
+
+[shell]
+disabled = true
+[jobs]
+disabled = true
+[container]
+disabled = true

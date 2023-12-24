@@ -436,7 +436,7 @@ colors:
 #   - (Linux/BSD) user login shell
 #   - (Windows) powershell
 shell:
-  program: '~/.cargo/bin/zellig'
+  program: 'zellij'
   args: []
 
 # Startup directory

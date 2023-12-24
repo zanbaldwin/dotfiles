@@ -66,6 +66,7 @@ install_as_sudo() {
     apt install -y --no-install-recommends --no-install-suggests \
         docker-ce \
         docker-ce-cli \
+        docker-compose-plugin \
         containerd.io \
         symfony-cli \
         terraform
@@ -132,8 +133,15 @@ install_as_user() {
         cargo install exa; \
     }
 
+    # Pre-create some directories so that GNU stash symlinks the files that go in them rather
+    # than symlinking the directories themselves.
+    mkdir -p "${HOME}/.config"
+    mkdir -p "${HOME}/.gnupg"
+    mkdir -p "${HOME}/.ssh"
+
     # Stow Configuration Files
     SCRIPT_DIRECTORY="$(dirname "$(readlink -f "$0")")"
+    stow --dir="${SCRIPT_DIRECTORY}" --target="${HOME}" alacritty
     stow --dir="${SCRIPT_DIRECTORY}" --target="${HOME}" bash
     stow --dir="${SCRIPT_DIRECTORY}" --target="${HOME}" editor
     stow --dir="${SCRIPT_DIRECTORY}" --target="${HOME}" git
@@ -144,6 +152,29 @@ install_as_user() {
     dconf write "/org/gnome/desktop/input-sources/xkb-options" "['caps:swapescape']"
 }
 
+install_alacritty() {
+    VERSION="${1:-v0.10.1}"
+    # Because the following requires Rust to compile.
+    apt install -y --no-install-recommends --no-install-suggests \
+        cmake \
+        pkg-config \
+        libfreetype6-dev \
+        libfontconfig1-dev \
+        libxcb-xfixes0-dev \
+        libxkbcommon-dev \
+        python3
+    git clone "https://github.com/alacritty/alacritty.git" "/tmp/alacritty" --branch "${VERSION}"
+    (cd "/tmp/alacritty"; cargo build --release)
+    cp "/tmp/alacritty/target/release/alacritty" "/usr/local/bin/alacritty"
+    tic -xe alacritty,alacritty-direct "/tmp/alacritty/extra/alacritty.info"
+    cp "/tmp/alacritty/extra/logo/alacritty-term.svg" "/usr/share/pixmaps/Alacritty.svg"
+    cp "/tmp/alacritty/extra/linux/Alacritty.desktop" "/usr/share/applications/alacritty.desktop"
+    mkdir -p "/usr/local/share/man/man1"
+    gzip -c "/tmp/alacritty/extra/alacritty.man" >"/usr/local/share/man/man1/alacritty.1.gz"
+    gzip -c "/tmp/alacritty/extra/alacritty-msg.man" >"/usr/local/share/man/man1/alacritty-msg.1.gz"
+    cp "/tmp/alacritty/extra/completions/alacritty.bash" "/etc/bash_completions.d/alacritty"
+}
+
 echo >&2 "This installation script needs root access to install system packages."
 # These things need to be installed as the root user (pass in a reference to
 # the current user).
@@ -152,15 +183,16 @@ sudo sh -c "$(declare -f install_as_sudo); install_as_sudo \"${USER}\"";
 # home directory and environment.
 install_as_user
 
+LATEST_ALACRITTY_TAG_VERSION="v0.10.1"
+# sudo sh -c "$(declare -f install_alacritty); install_alacritty \"${LATEST_ALACRITTY_TAG_VERSION}\"";
+
+
 # ================================================== #
 # Other Software (best left for manual installation) #
 # ================================================== #
 
 # - Discord
 #   https://discord.com/api/download?platform=linux&format=deb
-
-# - Docker Compose
-#   https://docs.docker.com/compose/install/
 
 # - NordVPN
 #   https://support.nordvpn.com/Connectivity/Linux/1325531132/Installing-and-using-NordVPN-on-Debian-Ubuntu-Raspberry-Pi-Elementary-OS-and-Linux-Mint.htm

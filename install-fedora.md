@@ -83,6 +83,13 @@ toolbox enter dconf
 bash "./toolbox/install-dconf.sh"
 ```
 
+Setup PHP Environment
+```bash
+toolbox create php
+toolbox enter php
+bash "./toolbox/install-php.sh"
+```
+
 Install Rust (and Cargo, and awesome command-line tools)
 ```bash
 toolbox create rust

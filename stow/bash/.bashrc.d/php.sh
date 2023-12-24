@@ -10,6 +10,6 @@ command -v "php" >"/dev/null" 2>&1 && {
     alias vld='php -d vld.active=1 -d vld.execute=0 -d vld.dump_paths=1 -d vld.save_paths=1 -d vld.verbosity=1'
 
     command -v "composer" >"/dev/null" 2>&1 && {
-        add_to_path "$(composer global config bin-dir --absolute 2>/dev/null)"
+        add_to_path "$(XDEBUG_MODE="off" composer global config bin-dir --absolute 2>/dev/null)"
     }
 }

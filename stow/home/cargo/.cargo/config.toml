@@ -2,14 +2,8 @@
 git-fetch-with-cli = true
 
 [build]
-rustc-wrapper = "sccache"
+# ScCache is causing builds to hang inside Toolbox containers on Silverblue?
+#rustc-wrapper = "sccache"
 
 [registries.crates-io]
 protocol = "sparse"
-
-# The following means that the Mold linker will be required for Linux builds.
-# Though the last time I tried to build for a Linux target on macOS it failed spectacularly, so 🤷‍♀️
-#[target.x86_64-unknown-linux-gnu]
-#rustflags = ["-C", "link-arg=-fuse-ld=/usr/bin/mold"]
-# Uncomment the following line if GCC is not recent enough to understand the `fuse-ld` option.
-#linker = "clang"

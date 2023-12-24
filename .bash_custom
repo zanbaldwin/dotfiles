@@ -1,14 +1,27 @@
-# Paths
-# =====
+# ===== #
+# Paths #
+# ===== #
 
-export PATH="$PATH:$HOME/.composer/vendor/bin"
-# composer global require bamarni/symfony-console-autocomplete
-# eval "$(symfony-autocomplete)"
+# Golang
 export GOROOT="/usr/lib/go"
 export GOPATH="$HOME/code/golang"
+export PATH="$PATH:$GOPATH/bin"
 
-# PS1
-# ===
+# Composer
+export PATH="$PATH:$HOME/.composer/vendor/bin"
+
+# Now that we have Composer package binaries on the PATH, install some useful things:
+#     composer global require {packageName}
+#      - bamarni/symfony-console-autocomplete
+#      - phpunit/phpunit
+#      - squizlabs/php_codesniffer
+# And then initialise them:
+eval "$(symfony-autocomplete)"
+
+
+# === #
+# PS1 #
+# === #
 
 # Inputs.
 SHELL_NAME="\\v"

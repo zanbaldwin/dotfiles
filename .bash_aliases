@@ -23,6 +23,10 @@ alias docker-composer="docker-compose"
 
 alias dig="dig +nocmd any +multiline +noall +answer"
 
+# Up & down map to history search once a command has been started.
+bind '"\e[A":history-search-backward'
+bind '"\e[B":history-search-forward'
+
 # One of @janmoesen’s ProTip™s
 for method in GET HEAD POST PUT DELETE TRACE OPTIONS; do
     alias "$method"="lwp-request -m '$method'"

@@ -1,7 +1,7 @@
 [alias]
 	st              = status
 	co              = checkout
-	line            = log --oneline
+	line            = log --oneline --graph
 	s               = status -s
     d               = diff
 	prepush         = rebase -i @{u}

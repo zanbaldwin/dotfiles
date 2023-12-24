@@ -56,6 +56,7 @@ alias v="vim -N"
 # ========== #
 
 alias wget="wget -c"
+alias mitm="mitmproxy --transparent --host"
 alias dig="dig +nocmd any +multiline +noall +answer"
 # One of @janmoesen’s ProTip™s
 for method in GET HEAD POST PUT DELETE TRACE OPTIONS; do
@@ -149,9 +150,9 @@ fi
 # Go! Lang #
 # ======== #
 
-export GOROOT="/usr/lib/go"
+export GOROOT="/usr/local/go"
 export GOPATH="$HOME/code/golang"
-export PATH="$PATH:$GOPATH/bin"
+export PATH="$PATH:$GOROOT/bin:$GOPATH/bin"
 
 # === #
 # AWS #

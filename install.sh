@@ -198,6 +198,8 @@ LATEST_ALACRITTY_TAG_VERSION="v0.10.1"
 
 # - NordVPN
 #   https://support.nordvpn.com/Connectivity/Linux/1325531132/Installing-and-using-NordVPN-on-Debian-Ubuntu-Raspberry-Pi-Elementary-OS-and-Linux-Mint.htm
+#   Note: on Ubuntu 22.04, `systemd-resolve` (which NordVPN relies on) has been renamed to `resolvectl`; run the following command:
+#   - sudo ln -s /usr/bin/resolvectl /usr/bin/systemd-resolve
 
 # - VirtualBox (use deb file instead of repository)
 #   https://www.virtualbox.org/wiki/Linux_Downloads

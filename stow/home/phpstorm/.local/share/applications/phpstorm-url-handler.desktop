@@ -1,0 +1,9 @@
+[Desktop Entry]
+Name=PHPStorm URL Handler
+Type=Application
+Icon=phpstorm
+Categories=TextEditor;Utility;
+Exec=flatpak-phpstorm %u
+NoDisplay=true
+Terminal=false
+MimeType=x-scheme-handler/phpstorm;x-scheme-handler/pstorm;

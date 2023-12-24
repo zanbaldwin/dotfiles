@@ -5,7 +5,8 @@ mkdir -p \
     "${HOME}/bin" \
     "${HOME}/.cargo" \
     "${HOME}/code" \
-    "${HOME}/.config" \
+    "${HOME}/.config/autostart" \
+    "${HOME}/.local/share/applications" \
     "${HOME}/.ssh"
 
 if ! command -v "stow" >"/dev/null" 2>&1; then

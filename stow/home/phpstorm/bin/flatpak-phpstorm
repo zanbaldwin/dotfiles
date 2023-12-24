@@ -1,0 +1,52 @@
+#!/usr/bin/env bash
+
+if [ $# -lt 1 ]; then
+    echo >&2 "No PHPStorm URI passed.";
+    exit 1;
+fi
+
+# PHPStorm URL Handler for Linux
+# @author Stefan Auditor <stefan@auditor.email>
+
+# Handles:
+#   phpstorm://open?url=file://@file&line=@line
+#   phpstorm://open?file=@file&line=@line
+#   phpstorm://open?url=file://@file:@line
+#   phpstorm://open?file=@file:line
+
+# URL Decode in Bash
+# See https://stackoverflow.com/a/37840948
+function urldecode() {
+    : "${*//+/ }";
+    echo -e "${_//%/\\x}";
+}
+
+ARG=$(urldecode "${1}")
+PATTERN=".*file(:\/\/|\=)(.*)(:|&line=)(.*)"
+
+FILE=$(echo "${ARG}" | sed -r "s/${PATTERN}/\2/")
+LINE=$(echo "${ARG}" | sed -r "s/${PATTERN}/\4/")
+
+if [ ! -f "${FILE}" ]; then
+    echo "Not a valid file."
+    exit 2;
+fi
+
+# Is PHPStorm installed locally on the host machine?
+if command -v "phpstorm" >"/dev/null" 2>&1; then
+    phpstorm --line "${LINE}" "${FILE}";
+    exit 0;
+elif command -v "pstorm" >"/dev/null" 2>&1; then
+    pstorm --line "${LINE}" "${FILE}";
+    exit 0;
+fi
+
+# Is PHPStorm installed in a Flatpak container?
+if command -v "flatpak" >"/dev/null" 2>&1; then
+    if flatpak list 2>"/dev/null" | grep "com.jetbrains.PhpStorm" >"/dev/null" 2>&1; then
+        flatpak run "com.jetbrains.PhpStorm" -- --line "${LINE}" "${FILE}"
+    fi
+fi
+
+echo >&2 "Could not determine a PHPStorm installation."
+exit 3

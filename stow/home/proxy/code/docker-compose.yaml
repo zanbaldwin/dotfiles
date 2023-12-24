@@ -16,6 +16,8 @@ services:
             interval: 10s
             timeout: 3s
         network_mode: 'host'
+        environment:
+            PUID: "${UID}"
         ports:
             - target: 80
               published: 80

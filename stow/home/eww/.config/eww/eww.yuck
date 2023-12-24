@@ -3,8 +3,16 @@
 (defpoll FULLNAME :initial "" :interval "1h" `getent passwd "$USERNAME" | cut -d':' -f5 | cut -d',' -f1`)
 (defpoll UPTIME :initial "" :interval "1s" `uptime --pretty | sed 's/up //g'`)
 
-(deflisten workspaces :initial "[]" "bash ./scripts/get-workspaces.sh")
-(deflisten current_workspace :initial "1" "bash ./scripts/get-active-workspace.sh")
+(deflisten workspaces :initial "[]" "bash true")
+(deflisten current_workspace :initial "1" "bash true")
+; (deflisten workspaces :initial "[]" "bash ./scripts/get-workspaces.sh")
+; (deflisten current_workspace :initial "1" "bash ./scripts/get-active-workspace.sh")
+
+(defwidget blank_workspaces []
+  (box :space-evenly false
+    (label :text "Workspaces")
+  )
+)
 (defwidget workspaces []
   (eventbox :onscroll "bash ./scripts/change-active-workspace.sh {} ${current_workspace}" :class "workspaces-widget"
     (box :space-evenly false
@@ -22,6 +30,11 @@
   )
 )
 
+(defwidget blank_window_title []
+  (box
+    (label :text "Hyprland")
+  )
+)
 (deflisten window :initial "..." "bash ./scripts/get-window-title.sh")
 (defwidget window_title []
   (box
@@ -73,9 +86,9 @@
 
 (defwidget statusbar []
   (box :class "statusbar"
-    (workspaces)
-    (window_title)
-    (system)
+    (blank_workspaces)
+    (blank_window_title)
+    (clock)
   )
 )
 

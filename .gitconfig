@@ -29,8 +29,6 @@
 	default         = current
 [pull]
 	rebase          = true
-[commit]
-	gpgsign         = true
 [pager]
 	log             = diff-highlight | less --tabs=4 -RFX
 	show            = diff-highlight | less --tabs=4 -RFX

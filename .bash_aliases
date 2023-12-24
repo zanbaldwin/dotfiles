@@ -41,7 +41,7 @@ alias back="cd -"
 alias mkdir="mkdir -pv"
 alias chmod="chmod -Rv"
 alias chown="chown -Rv"
-alias rm="rm -I --preserve-root -v"
+alias rm="rm -v"
 function f() {
     find . -name "$1" 2>&1 | grep -v 'Permission denied'
 }

@@ -11,9 +11,9 @@ THIS_DIR="$(dirname "$(readlink -f "$0")")"
 } | sudo tee --append "/etc/containers/registries.conf"
 
 # Installation scripts that work on the host, rather than a toolbox container.
-bash "${THIS_DIR}/toolbox/apps.sh"
 bash "${THIS_DIR}/toolbox/fonts.sh"
 bash "${THIS_DIR}/toolbox/gnome.sh"
+bash "${THIS_DIR}/toolbox/apps.sh"
 
 toolbox create rust \
     && toolbox run --container="rust" bash "${THIS_DIR}/toolbox/rust.sh" \
@@ -33,10 +33,10 @@ fi
 # For installation on a new machine, always use the same version of Fedora as is
 # currently running. Can upgrade to `latest` at the later date if need be.
 VERSION="${VERSION_ID:-latest}"
-podman build --target="gnome" --build-arg="VERSION=${VERSION}" --tag="localhost:5000/zanbaldwin/silverblue:${VERSION}" "${THIS_DIR}/oci" \
+podman build --target="gnome" --build-arg="VERSION=${VERSION}" --tag="localhost:5000/zanbaldwin/silverblue" "${THIS_DIR}/oci" \
     && podman run -d --name="registry" --publish="5000:5000" "docker.io/library/registry:2" \
     && podman push "localhost:5000/zanbaldwin/silverblue:39" \
-    && rpm-ostree rebase "ostree-unverified-registry:localhost:5000/zanbaldwin/silverblue:${VERSION}"
+    && rpm-ostree rebase "ostree-unverified-registry:localhost:5000/zanbaldwin/silverblue"
 
 systemctl reboot
 

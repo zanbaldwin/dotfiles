@@ -11,15 +11,17 @@ ARG IMAGE="${IMAGE:-quay.io/fedora/fedora-${VARIANT}}"
 # ==================================================== #
 FROM "fedora:${VERSION}" AS rust
 RUN dnf install --assumeyes \
-        curl git \
-        atk-devel cairo-devel cairo-gobject-devel gcc gdk-pixbuf2-devel gtk3-devel pango-devel \
-        cmake freetype-devel fontconfig-devel libxcb-devel libxkbcommon-devel g++ \
-        gtk-layer-shell-devel \
+        cmake \
+        curl \
+        gcc \
+        g++ \
+        git \
  && curl --proto "=https" --tlsv1.2 -sSf "https://sh.rustup.rs" >"/tmp/rustup.sh" \
  && sh /tmp/rustup.sh -qy
 
 # === RUST === #
 FROM rust AS alacritty
+RUN dnf install --assumeyes fontconfig-devel
 # There's absolutely no way I'm settling for Gnome Terminal as my default console.
 RUN source "${HOME}/.cargo/env" \
  && git clone "https://github.com/alacritty/alacritty.git" --branch "v0.12.3" "/tmp/alacritty" \

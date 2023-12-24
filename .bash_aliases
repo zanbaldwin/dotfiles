@@ -19,6 +19,7 @@ fi
 
 # Do not word wrap
 alias less="less -S -R"
+alias tmux="tmux attach || tmux new"
 
 # Watch the output of the last command instead of having to
 # execute it constantly whilst waiting for a different output.

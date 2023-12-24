@@ -24,9 +24,9 @@ alias less="less -S -R"
 # execute it constantly whilst waiting for a different output.
 alias follow='watch $(history -p !!)'
 
-# ==================== #
-# Directory Management #
-# ==================== #
+# ============================= #
+# Directory and File Management #
+# ============================= #
 
 # Some systems have a version of "ls" that does not have the
 # "--group-directories-first" command-line flag, check for it
@@ -46,6 +46,8 @@ alias back="cd -"
 alias mkdir="mkdir -pv"
 alias chmod="chmod -Rv"
 alias chown="chown -Rv"
+# See https://github.com/sharkdp/bat/releases
+alias cat="bat"
 alias rm="rm -v"
 function f() {
     find . -name "$1" 2>&1 | grep -v 'Permission denied'
@@ -57,6 +59,17 @@ which trash >/dev/null 2>&1
 if [ $? -eq 0 ]; then
     alias rm="trash -v"
 fi
+
+# Fuzzy Finder
+# (git clone --depth 1 https://github.com/junegunn/fzf.git /opt/fzf && /opt/fzf/install)
+#   - CTRL-R: Search through command history.
+#   - CTRL-T: Search and insert filename at cursor
+#   - ALT-C:  Search and change to directory.
+[ -f ~/.fzf.bash ] && source ~/.fzf.bash
+alias fzf="fzf-tmux"
+
+# apt install ncdu
+alias du="ncdu"
 
 # ================ #
 # Anger Management #
@@ -79,6 +92,8 @@ alias v="vim -N"
 # Networking #
 # ========== #
 
+# See https://github.com/denilsonsa/prettyping
+alias ping="prettyping"
 alias wget="wget -c"
 alias mitm="mitmproxy --transparent --host"
 alias dig="dig +nocmd any +multiline +noall +answer"
@@ -256,6 +271,12 @@ function phpenv {
 export GOROOT="/usr/local/go"
 export GOPATH="${HOME}/code/golang"
 export PATH="${PATH}:${GOROOT}/bin:${GOPATH}/bin"
+
+# ====== #
+# NodeJS #
+# ====== #
+
+export PATH="${HOME}/.yarn/bin:${HOME}/.config/yarn/global/node_modules/.bin:${PATH}"
 
 # =============== #
 # Auto-completion #

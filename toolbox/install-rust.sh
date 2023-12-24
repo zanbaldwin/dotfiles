@@ -1,6 +1,6 @@
 #!/bin/bash
 
-sudo dnf group install \
+sudo dnf group install --assumeyes \
     "C Development Tools and Libraries" \
     "Development Libraries" \
     "Development Tools"

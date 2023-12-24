@@ -45,6 +45,7 @@
     abort       = rebase --abort
 
     # Misc
+    root        = rev-parse --show-toplevel
     versions    = "!git tag | grep \"^[vV]\\?[0-9.]\\+$\" | sort -V"
     ignored     = "!git -C \"$GIT_PREFIX\" status -s --ignored \"$@\" | grep \"^!!\" | cut -c 4-"
     # Pull Requests from GitHub (eg, "git review 21604")
@@ -64,6 +65,7 @@
 [push]
     default     = simple
     followTags  = true
+	autoSetupRemote = true
 [pull]
     rebase      = true
 [pager]

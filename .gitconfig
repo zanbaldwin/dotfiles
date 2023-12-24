@@ -27,7 +27,7 @@
 	sniff           = "!git diff --name-only | grep \\\\.php\\$ | xargs --no-run-if-empty phpcs -p -v --standard=PSR2"
 	versions        = "!v() { git tag | grep \"^[vV]\\?[0-9.]\\+$\" | sort -V; }; v"
 [user]
-	name            = Zander Baldwin
+	name            = Zan Baldwin
 	email           = hello@zanderbaldwin.com
 	signingkey      = 419CB27C
 [push]

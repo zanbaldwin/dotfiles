@@ -4,6 +4,7 @@ sudo dnf install --assumeyes \
     "php" \
     "php-bcmath" \
     "php-devel" \
+    "php-ffi" \
     "php-fpm" \
     "php-gd" \
     "php-intl" \

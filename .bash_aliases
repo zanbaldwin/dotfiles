@@ -48,7 +48,7 @@ function search() {
 # Anger Management #
 # ================ #
 
-alias fuck='sudo "$BASH" -c "$(history -p !!)"'
+alias fuck='sudo "$SHELL" -c "$(history -p !!)"'
 alias fucking="sudo"
 
 # ======= #

@@ -11,6 +11,12 @@ export PATH="${PATH}:${HOME}/.bin"
 
 alias sq="bin/sq-cli/sq"
 
+# ========== #
+# Monitoring #
+# ========== #
+
+alias gtop="watch -n0.2 nvidia-smi --format=csv --query-gpu=power.draw,utilization.gpu,fan.speed,temperature.gpu"
+
 # ============= #
 # Bash-specific #
 # ============= #

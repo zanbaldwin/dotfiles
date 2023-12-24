@@ -20,8 +20,6 @@ sudo dnf install --assumeyes \
     "php-process" \
     "php-soap" \
     "php-xml"
-sudo dnf install --assumeyes \
-    "nginx"
 
 { \
     echo "[XDebug]"; \

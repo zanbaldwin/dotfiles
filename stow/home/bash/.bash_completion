@@ -1,0 +1,11 @@
+#!/usr/bin/env bash
+
+if [ -d ~/.bash_competion.d ]; then
+    for completion_file in ~/.bash_completion.d/*.sh; do
+        if [ -f "${completion_file}" ]; then
+            # shellcheck source="/dev/null"
+            source "${completion_file}"
+        fi
+    done
+fi
+unset completion_file

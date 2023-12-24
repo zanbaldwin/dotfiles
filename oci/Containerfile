@@ -93,7 +93,6 @@ RUN    rpm-ostree override remove firefox firefox-langpacks \
         bridge-utils edk2-ovmf guestfs-tools libvirt qemu-kvm virt-install virt-manager virt-top \
         podman-docker podman-plugins podman-tui \
         distrobox ncdu nss-tools tlp tlp-rdw tmux \
-        libdisplay-info \
     && sed -i 's/#AutomaticUpdatePolicy.*/AutomaticUpdatePolicy=check/' "/etc/rpm-ostreed.conf" \
     && systemctl enable "podman" \
     && systemctl enable  "podman.socket" \
@@ -107,7 +106,12 @@ RUN    rpm-ostree override remove firefox firefox-langpacks \
 # ====================================== #
 FROM gnome AS hyprland
 COPY --from="hyprland-build" "/opt/hyprland/" "/usr/"
+COPY --from="hyprland-build" "/opt/xdg-desktop-portal-hyprland/" "/usr/"
+COPY --from="rust-build" "/opt/eww/eww" "/usr/bin/eww"
+COPY --from="rust-build" "/opt/swww/" "/usr/bin/"
 RUN rpm-ostree install --idempotent --allow-inactive \
+        inih libdisplay-info libseat pipewire-libs qt6-qtwayland \
+        atk cairo cairo-gobject gdk-pixbuf2 gtk3 libuuid pango \
         waybar \
     && rm -rf /tmp/* /var/* \
     && ostree container commit

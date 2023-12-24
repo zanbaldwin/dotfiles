@@ -7,17 +7,21 @@ export GOROOT="/usr/lib/go"
 export GOPATH="$HOME/code/golang"
 export PATH="$PATH:$GOPATH/bin"
 
-# Composer
+# PHP+Composer
+# Make sure that xdebug is installed but not enabled in the CLI configuration. This will make
+# sure that running commands like "composer" will not use XDebug, but commands like "php ..."
+# will use XDebug.
+alias php='php -dzend_extension=xdebug.so'
+alias phpunit='php $(which phpunit)'
 export PATH="$PATH:$HOME/.composer/vendor/bin"
-
-# Now that we have Composer package binaries on the PATH, install some useful things:
-#     composer global require {packageName}
-#      - bamarni/symfony-console-autocomplete
-#      - phpunit/phpunit
-#      - squizlabs/php_codesniffer
+# Now that we have Composer package binaries on the PATH, install the useful CGR package:
+#     $ composer global require consolidation/cgr
+# Then install some useful packages:
+#     $ cgr bamarni/symfony-console-autocomplete
+#     $ cgr phpunit/phpunit
+#     $ cgr squizlabs/php_codesniffer
 # And then initialise them:
 eval "$(symfony-autocomplete)"
-
 
 # === #
 # PS1 #
@@ -45,10 +49,4 @@ GREEN="\[\033[38;5;34m\]"
 LIGHT_GREY="\[\033[38;5;249m\]"
 CYAN="\[\033[38;5;39m\]"
 WHITE="\[\033[38;5;15m\]"
-# Git Branch Detector
-function parse_git_branch () {
-    if [[ $(which git) -ne "" ]]; then
-        git branch 2> /dev/null | sed -e '/^[^*]/d' -e 's/* \(.*\)/ (\1)/'
-    fi
-}
-export PS1="$RED{$TEXT_BOLD$EXIT_CODE$TEXT_NORMAL$RED}$DARK_GREY: $GREEN$USERNAME$WHITE@$TEXT_BOLD$GREEN$HOSTNAME_FULL$WHITE$TEXT_NORMAL: $LIGHT_GREY$WORKING_DIRECTORY$EARTH\$(parse_git_branch)$WHITE$PERMISSION_INDICATOR\n$CYAN$TEXT_BOLD>$WHITE $TEXT_NORMAL\[$(tput sgr0)\]"
+export PS1="$RED{$TEXT_BOLD$EXIT_CODE$TEXT_NORMAL$RED}$DARK_GREY: $GREEN$USERNAME$WHITE@$TEXT_BOLD$GREEN$HOSTNAME_FULL$WHITE$TEXT_NORMAL: $LIGHT_GREY$WORKING_DIRECTORY$EARTH\`__git_ps1\` $WHITE$PERMISSION_INDICATOR\n$CYAN$TEXT_BOLD>$WHITE $TEXT_NORMAL\[$(tput sgr0)\]"

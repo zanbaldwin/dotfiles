@@ -11,6 +11,7 @@ alias rm='rm -I --preserve-root'
 alias wget='wget -c'
 alias fuck='sudo "$BASH" -c "$(history -p !!)"'
 alias fucking='sudo'
+alias vim='vim -N'
 
 alias dig='dig +nocmd any +multiline +noall +answer'
 

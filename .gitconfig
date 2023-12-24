@@ -3,12 +3,19 @@
 	co = checkout
 	line = log --oneline
 	s = status -s
+	prepush = rebase -i @{u}
+	fa = fetch --all
+	ft = fetch --tags
+	push = push --force-with-lease
+	appraise = !/home/zander/Golang/bin/git-appraise
 [user]
 	name = Zander Baldwin
 	email = hello@zanderbaldwin.com
+	signingkey = 419CB27C
 [url "git@github.com:"]
 	insteadOf = "gh:"
 	insteadOf = "git://github.com"
+    insteadOf = "https://github.com/"
 	pushInsteadOf = "github:"
 	pushInsteadOf = "git://github.com/"
 	pushInsteadOf = "https://github.com/"
@@ -19,5 +26,19 @@
 	pushInsteadOf = "https://gist.github.com/"
 [url "git@github.com:zanderbaldwin/"]
 	insteadOf = "git://github.com/zanderbaldwin/"
+[url "git@github.com:basekit/"]
+	insteadOf = "git://github.com/basekit/"
 [push]
 	default = current
+[pull]
+	rebase = true
+[commit]
+	gpgsign = true
+[pager]
+	log = diff-highlight | less --tabs=4 -RFX
+	show = diff-highlight | less --tabs=4 -RFX
+	diff = diff-highlight | less --tabs=4 -RFX
+[interactive]
+	diffFilter = diff-highlight
+[diff]
+	compactionHeuristic = true

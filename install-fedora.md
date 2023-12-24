@@ -75,29 +75,27 @@ bash "./toolbox/setup-gnome.sh"
 Import custom configuration from this repository.
 ```bash
 toolbox create stow
-toolbox enter stow
-bash "./toolbox/stow-config.sh"
+toolbox run --container="stow" bash "./toolbox/stow-config.sh"
 ```
 
 Install Rust (and Cargo, and awesome command-line tools)
 ```bash
 toolbox create rust
-toolbox enter rust
-bash "./toolbox/install-rust.sh"
+toolbox run --container="rust" bash "./toolbox/install-rust.sh"
 ```
 
 Setup PHP Environment
 ```bash
 toolbox create php
-toolbox enter php
-bash "./toolbox/install-php.sh"
+toolbox run --container="php" bash "./toolbox/install-php.sh"
 ```
 
 Setup Hyprland WM
 ```bash
 toolbox create hyprland
-toolbox enter hyprland
-bash "./toolbox/build-hyprland.sh
+toolbox run --container="hyprland" bash "./toolbox/build-hyprland.sh"
+rsync --archive --whole-file "${HOME}/.hyprland-build/" "/usr/local/"
+rm -rf "${HOME}/.hyprland-build"
 ```
 
 ### Common Terminal Tools
@@ -113,8 +111,10 @@ Tools that can go in `~/bin` (the mutable version of `/usr/local/bin`)
 ### Fonts
 Download the following [Nerd Fonts](https://www.nerdfonts.com/font-downloads), extract the Zip files, and move `*Complete.(ttf|otf)` into `~/.local/share/fonts`:
 - BitstreamVeraSansMono
+- Caskaydia Cove
 - FiraCode
 - JetBrainsMono
+- Meslo
 - RobotoMono
 - UbuntuMono
 

@@ -1,19 +1,21 @@
 #!/usr/bin/env bash
 
-# Some systems have a version of "ls" that does not have the
-# "--group-directories-first" or "-G" command-line flags,
-# check for them here before setting the alias.
-LL_OPTIONS=""
-if ls -G >"/dev/null" 2>&1; then
-    LL_OPTIONS="${LL_OPTIONS}G"
-fi
-if ls --group-directories-first >"/dev/null" 2>&1; then
-    LL_OPTIONS="${LL_OPTIONS} --group-directories-first"
-fi
-
 if command -v "exa" >"/dev/null" 2>&1; then
     alias ll="exa -labUh --git --group-directories-first --icons";
 else
+    # Some systems have a version of "ls" that does not have the
+    # "--group-directories-first" or "-G" command-line flags,
+    # check for them here before setting the alias.
+    LL_OPTIONS=""
+    if ls -G >"/dev/null" 2>&1; then
+        LL_OPTIONS="${LL_OPTIONS}G"
+    fi
+    if ls --group-directories-first >"/dev/null" 2>&1; then
+        LL_OPTIONS="${LL_OPTIONS} --group-directories-first"
+    fi
+    # Speedup "ls" command by specifying we don't care about the colour
+    # output based on file permissions.
+    export LS_COLORS='ex=00:su=00:sg=00:ca=00:'
     # shellcheck disable=SC2139
     alias ll="ls -lAhHp${LL_OPTIONS}";
 fi

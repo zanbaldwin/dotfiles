@@ -108,8 +108,11 @@ alias freenode="irssi --connect=chat.freenode.net --nick=ZanBaldwin"
 # - Add appropriate keygrips to "~/.gnupg/sshcontrol"       #
 # ========================================================= #
 
-export SSH_AUTH_SOCK=$(gpgconf --list-dirs agent-ssh-socket)
-gpgconf --launch gpg-agent
+which gpgconf 1>/dev/null 2>&1
+if [ $? -eq 0 ]; then
+    export SSH_AUTH_SOCK=$(gpgconf --list-dirs agent-ssh-socket)
+    gpgconf --launch gpg-agent
+fi
 
 # ======= #
 # Vagrant #

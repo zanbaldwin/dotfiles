@@ -16,11 +16,11 @@ COPY "./usr/" "/usr/"
 ## to play media on Twitter. So fuck it, back to system package.
 # RUN rpm-ostree override remove firefox firefox-langpacks
 ## Override OSTree until flatpak/flatpak#5452 is resolved and pushed up to Fedora Rawhide images.
-RUN rpm-ostree override replace "https://bodhi.fedoraproject.org/updates/FEDORA-2023-cab8a89753" \
+RUN rpm-ostree override replace "https://bodhi.fedoraproject.org/updates/FEDORA-2023-cab8a89753"
 RUN rpm-ostree install --idempotent --allow-inactive --releasever="39" \
         bridge-utils edk2-ovmf guestfs-tools libvirt qemu-kvm virt-install virt-manager \
         podman-docker podman-plugins podman-tui containernetworking-plugins aardvark-dns \
-        distrobox make ncdu nss-tools tlp tlp-rdw tmux \
+        distrobox make ncdu nss-tools neovim tlp tlp-rdw tmux \
         ffmpeg-free mozilla-openh264 \
  && systemctl enable "libvirtd" \
  && systemctl enable "podman.service" \

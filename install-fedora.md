@@ -17,6 +17,8 @@ List of software to be installed, and blacklist the _nouveau_ (non-proprietary) 
 - nVidia Graphics Drivers
 - Kernel-based Virtual Machine
 - Other tools I want on my command line as a non-root user
+
+> **TODO:** Figure out nVidia drivers for Wayland.
 ```bash
 rpm-ostree kargs \
     --append=rd.driver.blacklist=nouveau \

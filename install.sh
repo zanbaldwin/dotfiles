@@ -24,6 +24,7 @@ install_as_sudo() {
         gnupg-utils \
         gnupg2 \
         htop \
+        jq \
         lsb-release \
         make \
         mosh \
@@ -40,11 +41,14 @@ install_as_sudo() {
     curl -fsSL "https://download.docker.com/linux/ubuntu/gpg" \
         | gpg --dearmor >"/usr/share/keyrings/docker-archive-keyring.gpg"
     echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/docker-archive-keyring.gpg] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable" >"/etc/apt/sources.list.d/docker.list"
+    # Symfony CLI (not happy about the lack of signed packages there, Fabien)
+    echo "deb [arch=$(dpkg --print-architecture) trusted=yes] https://repo.symfony.com/apt/ /" >"/etc/apt/sources.list.d/symfony-cli.list"
     apt update
     apt install -y \
         docker-ce \
         docker-ce-cli \
-        containerd.io
+        containerd.io \
+        symfony-cli
     usermod -aG "docker" "${ORIGINAL_USER}"
 
     snap install --stable --classic aws-cli
@@ -65,12 +69,15 @@ install_as_sudo() {
     fi
 
     # Force Chromium to always allow Unsecured HTTP for Localhost, without force
-    # redirecting to HTTPS.
-    if [ ! -f "/etc/opt/chrome/policies/managed/policies.json" ]; then
-        mkdir -p "/etc/opt/chrome/policies/managed"
-        touch "/etc/opt/chrome/policies/managed/policies.json"
-    fi
-    echo '{"HSTSPolicyBypassList":["localhost"]}' >"/etc/opt/chrome/policies/managed/policies.json"
+    # redirecting to HTTPS. Add the string "localhost" to the HSTSPolicyBypassList
+    # array inside already existing JSON, defaulting to an empty object when the
+    # file does not exist or is invalid JSON.
+    TEMPFILE="$(mktemp)" # (to prevent race conditions inside pipelines)
+    (cat "/etc/opt/chrome/policies/managed/policies.json" 2>/dev/null || echo '{}') \
+        | (grep "." || echo '{}') \
+        | (jq 2>/dev/null || echo '{}') \
+        | jq '.HSTSPolicyBypassList|=(.+["localhost"]|unique)' >"${TEMPFILE}" \
+        && mv "${TEMPFILE}" "/etc/opt/chrome/policies/managed/policies.json"
 }
 
 install_as_user() {

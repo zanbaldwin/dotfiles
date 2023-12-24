@@ -96,6 +96,10 @@ alias freenode="irssi --connect=chat.freenode.net --nick=ZanBaldwin"
 alias vssh="vagrant ssh"
 alias vsync="vagrant rsync"
 
+# For the following shortcut to the VM DB, you will need:
+#  mysql-client, .dev DNSMasq config, a working VM, all privileges granted to "root@%".
+alias bksql="mysql -u root -h basekit.dev basekit"
+
 # ====== #
 # Docker #
 # ====== #

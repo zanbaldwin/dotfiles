@@ -1,5 +1,9 @@
 # Setting Up Fedora Silverblue
 
+Still left to figure out:
+- [ ] Getting PHPStorm inside a Flatpak container to access PHP, either `toolbox` or `rpm-ostree`, using `flatpak-spawn`?
+- [ ] Getting Docker Compose to work with Podman, using `podman-docker`?
+
 ## System (Immutable) Setup
 
 ### Image Layers
@@ -9,6 +13,7 @@ rpm-ostree upgrade --check
 ```
 
 Installing the full RPM Fusion repositories, not just the ones that come with Fedora base.
+The non-free nVidia repositories are already enabled so maybe this can be skipped?
 ```bash
 rpm-ostree install --idempotent \
     "https://mirrors.rpmfusion.org/free/fedora/rpmfusion-free-release-$(rpm -E %fedora).noarch.rpm" \

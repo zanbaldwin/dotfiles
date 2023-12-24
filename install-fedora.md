@@ -24,7 +24,6 @@ rpm-ostree install --idempotent \
 List of software to be installed, and blacklist the _nouveau_ (non-proprietary) graphics drivers:
 - nVidia Graphics Drivers
 - Kernel-based Virtual Machine
-- PHP & Nginx (so that PHP-FPM is available as a system service)
 - Other tools I want on my command line as a non-root user
 ```bash
 rpm-ostree install --idempotent --allow-inactive \

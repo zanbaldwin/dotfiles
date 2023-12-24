@@ -231,17 +231,21 @@ command -v "gpg-connect-agent" >/dev/null 2>&1 && {
 
 # Old habits die hard...
 alias docker-composer="docker-compose"
-docker() {
-    if [[ ("$1" = "compose") || ("$1" = "composer") ]]; then
-        shift
-        command docker-compose $@
-    elif [[ "$1" = "machine" ]]; then
-        shift
-        command docker-machine $@
-    else
-        command docker $@
-    fi
-}
+if command -v "docker" >"/dev/null" 2>&1; then
+    docker() {
+        if [[ ("$1" = "compose") || ("$1" = "composer") ]]; then
+            shift
+            command docker-compose $@
+        elif [[ "$1" = "machine" ]]; then
+            shift
+            command docker-machine $@
+        else
+            command docker $@
+        fi
+    }
+elif command -v "podman" >"/dev/null" 2>&1; then
+    alias docker="podman"
+fi
 
 alias dterm="echo -it -e \"COLUMNS=\$(tput cols)\" -e \"LINES=\$(tput lines)\" -e TERM=xterm"
 alias alpine="docker run --rm \$(dterm) -v \"\$(pwd):\$(pwd)\" -w \"\$(pwd)\" alpine:latest sh"

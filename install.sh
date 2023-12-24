@@ -13,6 +13,8 @@ apt install -y \
     build-essential \
     ca-certificates \
     curl \
+    dconf-tools \
+    fonts-firacode \
     git \
     gnupg-agent \
     gnupg-utils \
@@ -33,21 +35,11 @@ apt install -y \
 # Docker Engine
 curl -fsSL "https://download.docker.com/linux/ubuntu/gpg" | gpg --dearmor -o "/usr/share/keyrings/docker-archive-keyring.gpg"
 echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/docker-archive-keyring.gpg] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable" | sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
-# VirtualBox
-curl -fsSL "https://www.virtualbox.org/download/oracle_vbox_2016.asc" | gpg --dearmor -o "/usr/share/keyrings/virtualbox-archive-keyring.gpg"
-echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/virtualbox-archive-keyring.gpg] https://download.virtualbox.org/virtualbox/debian $(lsb_release -cs) contrib" | sudo tee /etc/apt/sources.list.d/virtualbox.list > /dev/null
-
 apt update
 apt install -y \
     docker-ce \
     docker-ce-cli \
     containerd.io
-# VirtualBox is a special case because it requires you to accept the EULA before installing. Attempt to automatically disable user prompts and fail silently if this fails.
-DEBIAN_FRONTEND=noninteractive apt install -qy \
-    virtualbox-6.1 \
-    virtualbox-ext-pack \
-    virtualbox-guest-utils \
-    || true
 
 # These Snap packages don't conform to the secure way. Use classic installation.
 snap install --stable --classic aws-cli
@@ -67,19 +59,23 @@ snap refresh
 # Install Rust (+ Cargo)
 # Yeah, this is not good. Running an arbitrary script from the internet. Don't do this. Except for this time.
 command -v "cargo" >/dev/null 2>&1 && { \
-    curl --proto '=https' --tlsv1.2 -sSf "https://sh.rustup.rs" > "/tmp/rustup.sh"; \
-    sh /tmp/rustup.sh -qy; \
-    source "${HOME}/.cargo/env"; \
+    curl --proto '=https' --tlsv1.2 -sSf "https://sh.rustup.rs" > "/tmp/rustup.sh" && { \
+        sh /tmp/rustup.sh -qy; \
+        source "${HOME}/.cargo/env"; \
+    } || { echo >&2 "Error downloading Rustlang installation script."; } \
 } || { \
     rustup update; \
 }
 
 ### Manual Install
-cargo install bat
-cargo install exa
+command -v "cargo" >/dev/null 2>&1 && { \
+    cargo install bat; \
+    cargo install exa; \
+}
 # [Discord](https://discord.com/api/download?platform=linux&format=deb)
 # [Docker Compose](https://docs.docker.com/compose/install/)
 # [NordVPN](https://support.nordvpn.com/Connectivity/Linux/1325531132/Installing-and-using-NordVPN-on-Debian-Ubuntu-Raspberry-Pi-Elementary-OS-and-Linux-Mint.htm)
+# [VirtualBox](https://www.virtualbox.org/wiki/Linux_Downloads)
 
 # Stow Configuration Files
 SCRIPT_DIRECTORY="$(dirname "$(readlink -f "$0")")"
@@ -90,6 +86,8 @@ stow --dir="${SCRIPT_DIRECTORY}" --target="${HOME}" gnupg
 stow --dir="${SCRIPT_DIRECTORY}" --target="${HOME}" nvim
 stow --dir="${SCRIPT_DIRECTORY}" --target="${HOME}" ssh
 stow --dir="${SCRIPT_DIRECTORY}" --target="${HOME}" tmux
+
+dconf write "/org/gnome/desktop/input-sources/xkb-options" "['caps:swapescape']"
 
 # Other
 if [ ! -f "/etc/bash_completion.d/exa" ]; then

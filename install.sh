@@ -38,13 +38,16 @@ curl -fsSL "https://www.virtualbox.org/download/oracle_vbox_2016.asc" | gpg --de
 echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/virtualbox-archive-keyring.gpg] https://download.virtualbox.org/virtualbox/debian $(lsb_release -cs) contrib" | sudo tee /etc/apt/sources.list.d/virtualbox.list > /dev/null
 
 apt update
+apt install -y \
+    docker-ce \
+    docker-ce-cli \
+    containerd.io
+# VirtualBox is a special case because it requires you to accept the EULA before installing. Attempt to automatically disable user prompts and fail silently if this fails.
 DEBIAN_FRONTEND=noninteractive apt install -qy \
     virtualbox-6.1 \
     virtualbox-ext-pack \
     virtualbox-guest-utils \
-    docker-ce \
-    docker-ce-cli \
-    containerd.io \
+    || true
 
 # These Snap packages don't conform to the secure way. Use classic installation.
 snap install --stable --classic aws-cli

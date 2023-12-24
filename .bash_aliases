@@ -53,6 +53,10 @@ function f() {
 function search() {
     grep -l -c -r "$1" .
 }
+which trash >/dev/null 2>&1
+if [ $? -eq 0 ]; then
+    alias rm="trash -v"
+fi
 
 # ================ #
 # Anger Management #

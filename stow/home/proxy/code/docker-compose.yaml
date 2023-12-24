@@ -33,10 +33,19 @@ services:
               mode: 'host'
         volumes:
             - type: 'volume'
-              source: '${HOME}/.config/proxy-manager'
+              source: 'config'
               target: '/data'
               read_only: false
             - type: 'volume'
-              source: '${HOME}/.local/share/certs'
+              source: 'certs'
               target: '/etc/letsencrypt'
               read_only: false
+
+volumes:
+    config:
+        driver: 'local'
+    certs:
+        driver: 'local'
+
+# Running on Podman? Do not run in rootless.
+# DOCKER_HOST=unix:///run/podman/podman.sock sudo docker-compose up -d

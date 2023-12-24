@@ -6,7 +6,6 @@ mkdir -p \
     "${HOME}/.cargo" \
     "${HOME}/code" \
     "${HOME}/.config" \
-    "${HOME}/.local/share/certs" \
     "${HOME}/.ssh"
 
 if ! command -v "stow" >"/dev/null" 2>&1; then

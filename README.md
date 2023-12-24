@@ -1,4 +1,4 @@
-# :book: Yet Another Dotfiles Repo
+# :wrench: Yet Another Dotfiles Repo
 
 This dotfiles repository has been designed for use with OSTree operating systems
 such as Fedora Silverblue. If you are using anything else, then you will need to

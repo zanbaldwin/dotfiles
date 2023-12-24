@@ -29,20 +29,16 @@ rpm-ostree kargs \
     --append=rd.driver.blacklist=nouveau \
     --append=modprobe.blacklist=nouveau \
     --append=nvidia-drm.modeset=1
+systemctl reboot
 
 rpm-ostree install --idempotent --allow-inactive \
     akmod-nvidia xorg-x11-drv-nvidia xorg-x11-drv-nvidia-cuda \
     bridge-utils edk2-ovmf guestfs-tools qemu-kvm virt-install virt-manager virt-top \
     distrobox ncdu nss-tools podman-docker tlp tlp-rdw tmux
+systemctl reboot
 
 # The following is only if you want the runtime-dependencies of Hyprland WM.
-rpm-ostree install --idempotent --allow-inactive \
-
-```
-
-Reboot into the new deployment layer.
-```bash
-systemctl reboot
+rpm-ostree install --idempotent --allow-inactive
 ```
 
 Enable services and modify user groups.

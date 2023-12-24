@@ -19,8 +19,6 @@ alias sudo="sudo --preserve-env --"
 # execute it constantly whilst waiting for a different output.
 alias follow='watch $(history -p !!)'
 
-alias tmux="tmux attach || tmux new"
-
 # Anger Management
 alias fuck='sudo "$SHELL" -c "$(history -p !!)"'
 alias fucking="sudo"

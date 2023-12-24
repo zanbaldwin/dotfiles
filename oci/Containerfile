@@ -46,7 +46,7 @@ COPY "./usr/" "/usr/"
 RUN rpm-ostree install --idempotent --allow-inactive --releasever="${VERSION}" \
         bridge-utils edk2-ovmf guestfs-tools libvirt qemu-kvm virt-install virt-manager \
         podman-docker podman-plugins podman-tui containernetworking-plugins aardvark-dns \
-        distrobox make ncdu nss-tools neovim tlp tlp-rdw tmux \
+        distrobox make ncdu nss-tools neovim tlp tlp-rdw \
         ffmpeg-free mozilla-openh264 \
  && systemctl enable "libvirtd" \
  && systemctl enable "podman.service" \

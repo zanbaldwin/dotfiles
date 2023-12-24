@@ -2,13 +2,14 @@ ARG VERSION="${VERSION:-39}"
 ARG VARIANT="${VARIANT:-silverblue}"
 # Fedora 39 is the first to officially ship as an OCI image; before then the
 # unofficial images could be found at "quay.io/fedora-ostree-desktops/${VARIANT}".
-ARG IMAGE="${IMAGE:-registry.fedoraproject.org/fedora-${VARIANT}}"
-ARG VERSION="${VERSION:-39}"
+# At some point, they should start hosting images on "registry.fedoraproject.org/fedora/fedora-${VARIANT}".
+ARG IMAGE="${IMAGE:-quay.io/fedora/fedora-${VARIANT}}"
 
-# =====================ALACRITTY====================== #
-# There's no way I'm settling for GNOME Terminal.      #
+# ========================RUST======================== #
+# Rust is needed to build binaries for both Gnome and  #
+# Hyprland environments.                               #
 # ==================================================== #
-FROM "fedora:${VERSION}" AS alacritty
+FROM "fedora:${VERSION}" AS rust
 RUN dnf install --assumeyes \
         curl git \
         atk-devel cairo-devel cairo-gobject-devel gcc gdk-pixbuf2-devel gtk3-devel pango-devel \
@@ -16,8 +17,13 @@ RUN dnf install --assumeyes \
         gtk-layer-shell-devel \
  && curl --proto "=https" --tlsv1.2 -sSf "https://sh.rustup.rs" >"/tmp/rustup.sh" \
  && sh /tmp/rustup.sh -qy
+
+# =====================ALACRITTY====================== #
+# There's no way I'm settling for GNOME Terminal.      #
+# ==================================================== #
+FROM rust AS alacritty
 RUN source "${HOME}/.cargo/env" \
- && git clone "https://github.com/alacritty/alacritty.git" --branch "v0.12.1" "/tmp/alacritty" \
+ && git clone "https://github.com/alacritty/alacritty.git" --branch "v0.12.3" "/tmp/alacritty" \
  && (cd "/tmp/alacritty"; cargo build --release) \
  && mkdir -p "/opt/alacritty/bin" "/opt/alacritty/etc/bash_completion.d" "/opt/alacritty/share/pixmaps" "/opt/alacritty/share/applications" \
  && cp "/tmp/alacritty/target/release/alacritty" "/opt/alacritty/bin/alacritty" \
@@ -35,8 +41,7 @@ COPY "./usr/" "/usr/"
 ## I would prefer to keep all software in Flatpaks, but the firefox from Flathub doesn't honour
 ## custom certificates from MkCert and the firefox from FedoraProject doesn't have enough codecs
 ## to play media on Twitter. So fuck it, back to system package.
-# RUN rpm-ostree override remove firefox firefox-langpacks
-
+RUN rpm-ostree override remove firefox firefox-langpacks
 RUN rpm-ostree install --idempotent --allow-inactive --releasever="39" \
         bridge-utils edk2-ovmf guestfs-tools libvirt qemu-kvm virt-install virt-manager \
         podman-docker podman-plugins podman-tui containernetworking-plugins aardvark-dns \
@@ -51,6 +56,7 @@ RUN rpm-ostree install --idempotent --allow-inactive --releasever="39" \
  && cat "/etc/sudoers" | grep -v "secure_path" | tee "/etc/sudoers" >"/dev/null" \
  && rm -rf /tmp/* /var/* \
  && ostree container commit
+COPY "./usr/" "/usr/"
 COPY --from="alacritty" "/opt/alacritty/" "/usr/"
 
 # =============C/C++============ #
@@ -88,6 +94,7 @@ RUN dnf upgrade --assumeyes && dnf install --assumeyes \
         pipewire-devel \
         pixman-devel \
         qt6-qtwayland-devel \
+        sdbus-cpp-devel \
         systemd-devel \
         wayland-devel \
         wayland-protocols-devel \
@@ -95,12 +102,12 @@ RUN dnf upgrade --assumeyes && dnf install --assumeyes \
         xcb-util-renderutil-devel \
         xcb-util-wm-devel \
         xorg-x11-server-Xwayland-devel
-RUN git clone --recursive "https://github.com/hyprwm/xdg-desktop-portal-hyprland" --branch "v0.4.0" "/tmp/xdg-desktop-portal-hyprland" \
+RUN git clone --recursive "https://github.com/hyprwm/xdg-desktop-portal-hyprland" --branch "v1.2.5" "/tmp/xdg-desktop-portal-hyprland" \
  && meson setup "/tmp/xdg-desktop-portal-hyprland/build" "/tmp/xdg-desktop-portal-hyprland" --prefix="/opt/xdg-desktop-portal-hyprland" \
  && ninja -C "/tmp/xdg-desktop-portal-hyprland/build" install \
  && (cd "/tmp/xdg-desktop-portal-hyprland/hyprland-share-picker" && make all) \
  && rm -rf "/tmp/xdg-desktop-portal-hyprland"
-RUN git clone --recursive "https://github.com/hyprwm/Hyprland.git" --branch="v0.26.0" "/tmp/hyprland" \
+RUN git clone --recursive "https://github.com/hyprwm/Hyprland.git" --branch="v0.33.1" "/tmp/hyprland" \
  && make -C "/tmp/hyprland" install PREFIX="/opt/hyprland" \
  && rm -rf "/tmp/hyprland"
 RUN git clone --recursive "https://github.com/emersion/mako.git" --branch="v1.8.0" "/tmp/mako" \
@@ -117,14 +124,7 @@ RUN git clone --recursive "https://github.com/emersion/mako.git" --branch="v1.8.
 # Build Alacritty terminal emulator.                   #
 # Build Anyrun Application Launcher                    #
 # ==================================================== #
-FROM "fedora:${VERSION}" AS rust-build
-RUN dnf install --assumeyes \
-        curl git \
-        atk-devel cairo-devel cairo-gobject-devel gcc gdk-pixbuf2-devel gtk3-devel pango-devel \
-        cmake freetype-devel fontconfig-devel libxcb-devel libxkbcommon-devel g++ \
-        gtk-layer-shell-devel \
- && curl --proto "=https" --tlsv1.2 -sSf "https://sh.rustup.rs" >"/tmp/rustup.sh" \
- && sh /tmp/rustup.sh -qy
+FROM rust AS rust-build
 RUN source "${HOME}/.cargo/env" \
  && git clone "https://github.com/elkowar/eww.git" --branch "v0.4.0" "/tmp/eww" \
  && (cd "/tmp/eww"; cargo build --release --no-default-features --features="wayland") \
@@ -174,6 +174,7 @@ RUN rpm-ostree install --idempotent --allow-inactive \
         polkit-gnome \
         qt5-qtwayland \
         qt6-qtwayland \
+        sdbus-cpp \
         socat \
  && rm -rf /tmp/* /var/* \
  && ostree container commit

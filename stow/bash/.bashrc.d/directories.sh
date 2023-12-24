@@ -22,8 +22,7 @@ command -v "exa" >"/dev/null" 2>&1 && {
 if command -v "onefetch" >"/dev/null" 2>&1 && command -v "git" >"/dev/null" 2>&1; then
     LAST_REPO=""
     function cd() {
-        # shellcheck disable=SC2068
-        builtin cd $@ || return
+        builtin cd "$@" || return
         if git rev-parse --show-toplevel >"/dev/null" 2>&1; then
             NEW_REPO="$(git rev-parse --show-toplevel 2>"/dev/null")"
             if [ "${LAST_REPO}" != "${NEW_REPO}" ]; then

@@ -24,6 +24,7 @@ rpm-ostree upgrade --check
 List of software to be installed, and blacklist the _nouveau_ (non-proprietary) graphics drivers:
 - nVidia Graphics Drivers
 - Kernel-based Virtual Machine
+- Docker Compose compatibility for Podman
 - Other tools I want on my command line as a non-root user
 
 > Certain software repositories aren't available for ARM64/aarch64 architecture. Go to Software
@@ -43,7 +44,8 @@ systemctl reboot
 rpm-ostree install --idempotent --allow-inactive \
     akmod-nvidia xorg-x11-drv-nvidia xorg-x11-drv-nvidia-cuda \
     bridge-utils edk2-ovmf guestfs-tools qemu-kvm virt-install virt-manager virt-top \
-    distrobox ncdu nss-tools podman-docker tlp tlp-rdw tmux \
+    podman-docker \
+    distrobox ncdu nss-tools tlp tlp-rdw tmux \
     libdisplay-info
 systemctl reboot
 ```

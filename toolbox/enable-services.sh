@@ -14,12 +14,12 @@ function enable_services() {
     USER="${1}"
 
     if [ "$(id -u)" != "0" ]; then
-        echo >2 "Services must be enabled as root.";
+        echo >&2 "Services must be enabled as root.";
         exit 1;
     fi
 
     if ! id -u "${USER}" >"/dev/null" 2>&1; then
-        echo >2 "Invalid username to add to services.";
+        echo >&2 "Invalid username to add to services.";
         exit 1;
     fi
 
@@ -30,6 +30,11 @@ function enable_services() {
 
     grep -E '^libvirt:' "/usr/lib/group" >> "/etc/group"
     usermod -aG "libvirt" "${USER}"
+
+    # Attempting to both read and write the same file in the same pipeline; use `tee`. shellcheck disable=SC2002
+    cat "/etc/sudoers" | grep -v "secure_path" | tee "/etc/sudoers" >"/dev/null" 2>&1
 }
 
 sudo sh -c "$(declare -f enable_services); enable_services \"$(whoami)\"";
+# Rootless Podman
+systemctl --user enable --now "podman.socket"

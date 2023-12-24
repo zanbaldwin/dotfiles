@@ -1,3 +1,11 @@
+# Paths
+# =====
+
+export PATH="$PATH:$HOME/.composer/vendor/bin"
+
+# PS1
+# ===
+
 # Inputs.
 SHELL_NAME="\\v"
 TERMINAL="\\l"
@@ -9,11 +17,9 @@ NEWLINE="\\n"
 HOSTNAME_FULL="\\H"
 HOSTNAME_SHORT="\\h"
 PERMISSION_INDICATOR="\\$"
-
 # Formatting.
 TEXT_BOLD="\[$(tput bold)\]"
 TEXT_NORMAL="\[$(tput sgr0)\]"
-
 # Colours.
 EARTH="\[\033[38;5;58m\]"
 RED="\[\033[38;5;160m\]"
@@ -22,12 +28,10 @@ GREEN="\[\033[38;5;34m\]"
 LIGHT_GREY="\[\033[38;5;249m\]"
 CYAN="\[\033[38;5;39m\]"
 WHITE="\[\033[38;5;15m\]"
-
 # Git Branch Detector
 function parse_git_branch () {
     if [[ $(which git) -ne "" ]]; then
         git branch 2> /dev/null | sed -e '/^[^*]/d' -e 's/* \(.*\)/ (\1)/'
     fi
 }
-
 export PS1="$RED{$TEXT_BOLD$EXIT_CODE$TEXT_NORMAL$RED}$DARK_GREY: $GREEN$USERNAME$WHITE@$TEXT_BOLD$GREEN$HOSTNAME_FULL$WHITE$TEXT_NORMAL: $LIGHT_GREY$WORKING_DIRECTORY$EARTH\$(parse_git_branch)$WHITE$PERMISSION_INDICATOR\n$CYAN$TEXT_BOLD>$WHITE $TEXT_NORMAL\[$(tput sgr0)\]"

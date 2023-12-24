@@ -11,6 +11,7 @@ sudo dnf install --assumeyes \
     "alsa-lib-devel" \
     "cmake" \
     "gcc" \
+    "git" \
     "openssl-devel" \
     "perl" \
     "pkg-config"
@@ -57,5 +58,6 @@ cargo install "bacon"         # Background Rust Code Checker (alternative watch 
 cargo install "cargo-expand"  # Macro Source Code Expansion
 cargo install "cargo-info"    # crates.io in the terminal
 cargo install "tokio-console" # Tokio Tracing Console
+cargo install "cargo-update"  # Update all installed binaries
 
 curl -sSfL "https://get.wasmer.io" | bash

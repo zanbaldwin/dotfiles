@@ -62,12 +62,12 @@ snap refresh
 # Install Rust (+ Cargo)
 # Yeah, this is not good. Running an arbitrary script from the internet. Don't do this. Except for this time.
 command -v "cargo" >/dev/null 2>&1 && { \
+    rustup update; \
+} || { \
     curl --proto '=https' --tlsv1.2 -sSf "https://sh.rustup.rs" > "/tmp/rustup.sh" && { \
         sh /tmp/rustup.sh -qy; \
         source "${HOME}/.cargo/env"; \
     } || { echo >&2 "Error downloading Rustlang installation script."; } \
-} || { \
-    rustup update; \
 }
 
 ### Manual Install

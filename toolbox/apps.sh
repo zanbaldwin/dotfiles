@@ -10,6 +10,7 @@ flatpak install --noninteractive --assumeyes --or-update flathub \
     "org.chromium.Chromium" \
     "com.github.tchx84.Flatseal" \
     "com.mattjakeman.ExtensionManager" \
+    "org.mozilla.firefox" \
     "md.obsidian.Obsidian" \
     "org.videolan.VLC" \
     "com.visualstudio.code"

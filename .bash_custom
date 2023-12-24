@@ -13,7 +13,7 @@ export PATH="$PATH:$GOPATH/bin"
 # will use XDebug.
 alias php='php -dzend_extension=xdebug.so'
 alias phpunit='php $(which phpunit)'
-export PATH="$PATH:$HOME/.composer/vendor/bin"
+export PATH="$PATH:$HOME/.config/composer/vendor/bin:$HOME/.composer/vendor/bin"
 # Now that we have Composer package binaries on the PATH, install the useful CGR package:
 #     $ composer global require consolidation/cgr
 # Then install some useful packages:

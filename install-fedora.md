@@ -23,7 +23,7 @@ rpm-ostree install --idempotent \
 List of software to be installed:
 - nVidia Graphics Drivers
 - Kernel-based Virtual Machine
-- PHP & Nginx (so that the system libraries are accessible from Flatpak containers such as PHPStorm)
+- PHP & Nginx (so that PHP-FPM is available as a system service)
 - Other tools I want on my command line as a non-root user
 ```bash
 rpm-ostree install --idempotent --allow-inactive \

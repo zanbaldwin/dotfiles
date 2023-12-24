@@ -76,6 +76,7 @@ Import custom configuration from this repository.
 ```bash
 toolbox create stow
 toolbox run --container="stow" bash "./toolbox/stow-config.sh"
+toolbox rm -f stow
 ```
 
 Install Rust (and Cargo, and awesome command-line tools)
@@ -103,7 +104,7 @@ sudo ldconfig
 ```
 
 ### Common Terminal Tools
-Tools that can go in `~/bin` (the mutable version of `/usr/local/bin`)
+Tools that can go in `~/bin` (the user-mutable version of `/usr/bin`)
 - [`btop`](https://github.com/aristocratos/btop)
 - [`docker-compose`](https://github.com/docker/compose)
 - [`duf`](https://github.com/muesli/duf)
@@ -113,7 +114,7 @@ Tools that can go in `~/bin` (the mutable version of `/usr/local/bin`)
 - [`mkcert`](https://github.com/FiloSottile/mkcert)
 
 ### Fonts
-Download the following [Nerd Fonts](https://www.nerdfonts.com/font-downloads), extract the Zip files, and move `*Complete.(ttf|otf)` into `~/.local/share/fonts`:
+Download the following [Nerd Fonts](https://www.nerdfonts.com/font-downloads), extract the Zip files, and move `/.*Complete\.(ttf|otf)$/` into `~/.local/share/fonts`:
 - BitstreamVeraSansMono
 - Caskaydia Cove
 - FiraCode

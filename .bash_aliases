@@ -6,6 +6,7 @@
 # ============= #
 
 alias reload=". ~/.bashrc"
+alias sudo="sudo --preserve-env"
 
 # Up & down map to history search once a command has been started.
 bind '"\e[A":history-search-backward'
@@ -17,7 +18,11 @@ if [ -f ~/.bash_prompt ]; then
 fi
 
 # Do not word wrap
-alias less="less -S"
+alias less="less -S -R"
+
+# Watch the output of the last command instead of having to
+# execute it constantly whilst waiting for a different output.
+alias follow='watch $(history -p !!)'
 
 # ==================== #
 # Directory Management #
@@ -107,9 +112,12 @@ alias bksql="mysql -u root -h basekit.dev basekit"
 # Old habits die hard...
 alias docker-composer="docker-compose"
 docker() {
-    if [[ ($1 = "compose") || ($1 = "composer") ]]; then
+    if [[ ("$1" = "compose") || ("$1" = "composer") ]]; then
         shift
         command docker-compose $@
+    elif [[ "$1" = "machine" ]]; then
+        shift
+        command docker-machine $@
     else
         command docker $@
     fi

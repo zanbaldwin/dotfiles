@@ -35,10 +35,12 @@
 	# Assume (and its counterpart unassume) will "assume" files haven't changed.
 	# Use to prevent files from appearing in modified-files lists if they have
 	# changed locally. Ideal for edits in configuration that shouldn't be committed.
-	assume          = update-index --assume-unchanged
-	unassume        = update-index --no-assume-unchanged
+	hide            = update-index --assume-unchanged
+	unhide          = update-index --no-assume-unchanged
+	unhide-all      = update-index --really-refresh
 	# List assumed files
-	assumed         = "!git ls-files -v | grep ^h | cut -c 3-"
+	hidden          = "!git ls-files -v | grep ^h | cut -c 3-"
+	ignored         = "!f(){ git -C \"$GIT_PREFIX\" status -s --ignored \"$@\" | grep \"^!!\"; }; f"
 
 	# Misc
 	versions        = "!v() { git tag | grep \"^[vV]\\?[0-9.]\\+$\" | sort -V; }; v"

@@ -3,9 +3,13 @@
 To setup a new environment:
 
 ```bash
-$ cd ~
-$ git clone "git://github.com/zanbaldwin/dotfiles.git" "~/.dotfiles"
-$ ~/.dotfiles/install.sh
+cd ~
+git clone "git@github.com:zanbaldwin/dotfiles.git" "~/.dotfiles"
+
+# If on Ubuntu, run script:
+~/.dotfiles/install.sh
+
+# If on Fedora Silverblue, follow guide.
 ```
 
 ### Extras

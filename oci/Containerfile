@@ -1,0 +1,66 @@
+ARG VERSION="${VERSION:-39}"
+ARG VARIANT="${VARIANT:-silverblue}"
+ARG IMAGE="${IMAGE:-quay.io/fedora/fedora-${VARIANT}}"
+# Fedora 39 is the first to officially ship as an OCI image.
+ARG VERSION="${VERSION:-39}"
+
+FROM "fedora:${VERSION}" AS hyprland-build
+RUN dnf upgrade --assumeyes && dnf install --assumeyes \
+        cairo-devel \
+        cmake \
+        cpio \
+        gcc-c++ \
+        git \
+        hwdata-devel \
+        libavutil-free-devel \
+        libavcodec-free-devel \
+        libavformat-free-devel \
+        libdisplay-info-devel \
+        libdrm-devel \
+        libinput-devel \
+        libseat-devel \
+        libxcb-devel \
+        libxkbcommon-devel \
+        libX11-devel \
+        make \
+        mesa-libEGL-devel \
+        mesa-libgbm-devel \
+        meson \
+        ninja-build \
+        pango-devel \
+        pixman-devel \
+        systemd-devel \
+        wayland-devel \
+        wayland-protocols-devel \
+        wlroots-devel \
+        xcb-util-renderutil-devel \
+        xcb-util-wm-devel \
+        xorg-x11-server-Xwayland-devel
+RUN    git clone --recursive "https://github.com/hyprwm/Hyprland.git" --branch="v0.26.0" "/tmp/hyprland" \
+    && make -C "/tmp/hyprland" install PREFIX="/opt/hyprland" \
+    && rm -rf "/tmp/hyprland"
+
+FROM "${IMAGE}:${VERSION}" AS gnome
+MAINTAINER "Zan Baldwin"
+# RUN    flatpak remote-add --if-not-exists flathub "https://flathub.org/repo/flathub.flatpakrepo" \
+#     && flatpak remote-modify --enable flathub
+RUN    rpm-ostree override remove firefox firefox-langpacks \
+    && rpm-ostree install --idempotent --allow-inactive \
+        bridge-utils edk2-ovmf guestfs-tools libvirt qemu-kvm virt-install virt-manager virt-top \
+        podman-docker podman-plugins podman-tui \
+        distrobox ncdu nss-tools tlp tlp-rdw tmux \
+        libdisplay-info \
+    && sed -i 's/#AutomaticUpdatePolicy.*/AutomaticUpdatePolicy=check/' "/etc/rpm-ostreed.conf" \
+    && systemctl enable "podman" \
+    && systemctl enable  "podman.socket" \
+    && (systemctl enable "tlp.service" || true) \
+    && cat "/etc/sudoers" | grep -v "secure_path" | tee "/etc/sudoers" >"/dev/null" \
+    && rm -rf /tmp/* /var/* \
+    && ostree container commit
+
+FROM gnome AS hyprland
+COPY --from="hyprland-build" "/opt/hyprland/" "/usr/"
+RUN rpm-ostree install --idempotent --allow-inactive \
+        waybar \
+    && rm -rf /tmp/* /var/* \
+    && ostree container commit

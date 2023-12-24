@@ -121,7 +121,10 @@ alias fucking="sudo"
 # ======= #
 
 alias m="make"
-alias nano="nano -AES --tabsize=4"
+NANO="$(which nano 2>/dev/null)"
+if [ $? -eq 0 ]; then
+    alias nano="${NANO} -AES --tabsize=4"
+fi
 alias n="nano -AES --tabsize=4"
 alias vim="vim -N"
 alias v="vim -N"
@@ -156,6 +159,12 @@ alias fx="firefox --new-instance --profile $(mktemp -d)"
 which mycli >/dev/null 2>&1
 if [ $? -eq 0 ]; then
     alias mysql="mycli"
+fi
+
+which pgcli >/dev/null 2>&1
+if [ $? -eq 0 ]; then
+    alias psql="pgcli"
+    alias pgsql="pgcli"
 fi
 
 # ========================================================= #

@@ -8,6 +8,7 @@
 
 sudo dnf install --assumeyes \
     "alsa-lib-devel" \
+    "cmake" \
     "gcc" \
     "openssl-devel" \
     "pkg-config"

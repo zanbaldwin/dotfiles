@@ -16,6 +16,8 @@
     history     = line --follow --
     # See: https://github.com/paulirish/git-recent/blob/master/git-recent
     recent      = !git for-each-ref --color=always --count=15 --sort=-committerdate 'refs/heads/' --format='%(HEAD) %(color:yellow)%(refname:short)%(color:reset)|%(color:bold red)%(objectname:short)%(color:reset) %(color:bold green)(%(committerdate:relative))%(color:reset)|%(color:bold blue)%(authorname)%(color:reset) %(color:yellow)%(upstream:track)%(color:reset)%(color:black) %(color:reset)|%(contents:subject)%(color:black) %(color:reset)|' | column -ts '|'  | less --tabs=4 --quit-if-one-screen --RAW-CONTROL-CHARS --no-init
+    # Delete any branches that have been merged into "dev" branch. Fetch latest "dev" commits first.
+    finished    = !git branch --merged "dev" | grep -v "\\*" | xargs git branch -d
 
     # Hide changed files in the working tree from Git, like ".gitignore" for committed files.
     # Ideal for edits in configuration that shouldn't be committed.

@@ -78,3 +78,10 @@ pactl list short sources
 pactl set-default-source "${CHOSEN_SOURCE_ID}"
 
 ```
+
+#### Running a Local DNS Server
+
+SystemD automatically runs a stub DNS server on port 53. To disable this:
+1. Set `DNSStubListener` to `no` in `/etc/systemd/resolved.conf`
+2. Symbolically link this config file to `/run/systemd/resolve/resolv.conf`:
+   `sudo ln -s /run/systemd/resolve/resolv.conf /etc/systemd/resolved.conf`

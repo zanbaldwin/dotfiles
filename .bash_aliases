@@ -1,20 +1,22 @@
-alias vssh='vagrant ssh'
-alias vsync='vagrant rsync'
-alias ll='ls -lAh --color=auto --group-directories-first'
+alias vssh="vagrant ssh"
+alias vsync="vagrant rsync"
+alias ll="ls -lAh --color=auto --group-directories-first"
 
-alias c='clear'
-alias ..='cd ..'
-alias ~='cd ~'
-alias cd..='cd ..'
-alias mkdir='mkdir -pv'
-alias nano='nano -AES --tabsize=4'
-alias rm='rm -I --preserve-root -v'
-alias wget='wget -c'
+alias c="clear"
+alias ..="cd .."
+alias ~="cd ~"
+alias cd..="cd .."
+alias mkdir="mkdir -pv"
+alias chmod="chmod -Rv"
+alias chown="chown -Rv"
+alias nano="nano -AES --tabsize=4"
+alias rm="rm -I --preserve-root -v"
+alias wget="wget -c"
 alias fuck='sudo "$BASH" -c "$(history -p !!)"'
-alias fucking='sudo'
-alias vim='vim -N'
+alias fucking="sudo"
+alias vim="vim -N"
 
-alias dig='dig +nocmd any +multiline +noall +answer'
+alias dig="dig +nocmd any +multiline +noall +answer"
 
 # One of @janmoesen’s ProTip™s
 for method in GET HEAD POST PUT DELETE TRACE OPTIONS; do

@@ -55,6 +55,7 @@ RUN    rpm-ostree override remove firefox firefox-langpacks \
     && systemctl enable  "podman.socket" \
     && (systemctl enable "tlp.service" || true) \
     && cat "/etc/sudoers" | grep -v "secure_path" | tee "/etc/sudoers" >"/dev/null" \
+    && ln -s /var/nix /nix \
     && rm -rf /tmp/* /var/* \
     && ostree container commit
 

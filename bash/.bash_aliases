@@ -77,6 +77,16 @@ function search() {
     grep -l -c -r "$1" .
 }
 
+function go() {
+    DIR="$(find / -type d 2>/dev/null | grep -v 'Permission denied' | fzy)"
+    cd "${DIR}"
+}
+
+function edit() {
+    FILE="$(find / -type f 2>/dev/null | grep -v 'Permission denied' | fzy)"
+    nano "${FILE}"
+}
+
 # https://github.com/sharkdp/bat/releases
 command -v bat >/dev/null 2>&1 && {
     alias cat="bat --theme=DarkNeon";

@@ -47,9 +47,9 @@
 	# EXTERNAL TOOLING #
 	# ================ #
 
-	# Install with "go get github.com/google/git-appraise/git-appraise" (Golang
-	# tools required).
-	appraise        = !git-appraise
+	# Git Appraise is a distributed code review system for git repos, by Google. If available on the $PATH there
+	# is no need to add it as an alias. Install with "go get github.com/google/git-appraise/git-appraise" (Golang
+	# tools required). Comment left as reminder.
 
 	# Requires PHPCS; "composer global require squizlabs/php_codesniffer" (or cgr).
 	sniff           = "!git diff --name-only | grep \\\\.php\\$ | xargs --no-run-if-empty phpcs -p -v --standard=PSR2"

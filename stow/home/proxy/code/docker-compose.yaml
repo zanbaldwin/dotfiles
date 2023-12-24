@@ -1,0 +1,40 @@
+version: '3.8'
+x-logging:
+  &default-logging
+    driver: 'json-file'
+    options:
+        max-size: '5m'
+        max-file: '1'
+
+services:
+    proxy-manager:
+        image: 'jc21/nginx-proxy-manager:${PROXY_MANAGER_VERSION:-latest}'
+        restart: 'unless-stopped'
+        logging: *default-logging
+        healthcheck:
+            test: [ "CMD", "/bin/check-health" ]
+            interval: 10s
+            timeout: 3s
+        network_mode: 'host'
+        ports:
+            - target: 80
+              published: 80
+              protocol: 'tcp'
+              mode: 'host'
+            - target: 443
+              published: 443
+              protocol: 'tcp'
+              mode: 'host'
+            - target: 81
+              published: 81
+              protocol: 'tcp'
+              mode: 'host'
+        volumes:
+            - type: 'volume'
+              source: '${HOME}/.config/proxy-manager'
+              target: '/data'
+              read_only: false
+            - type: 'volume'
+              source: '${HOME}/.local/share/certs'
+              target: '/etc/letsencrypt'
+              read_only: false

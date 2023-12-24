@@ -26,6 +26,14 @@ fi
 # Work Specific #
 # ============= #
 
+export VAGRANT_DEFAULT_PROVIDER="libvirt"
+
+# ========== #
+# Monitoring #
+# ========== #
+
+alias gtop="watch -n0.2 nvidia-smi --format=csv --query-gpu=power.draw,utilization.gpu,fan.speed,temperature.gpu"
+
 # ============= #
 # Bash-specific #
 # ============= #
@@ -73,6 +81,22 @@ command -v exa >/dev/null 2>&1 && {
 } || {
     alias ll="ls -lAhHp${LL_OPTIONS}";
 };
+
+## Git Repository Information on Directory Change
+if command -v "onefetch" >"/dev/null" 2>&1 && command -v "git" >"/dev/null" 2>&1; then
+    LAST_REPO=""
+    function cd() {
+        # shellcheck disable=SC2068
+        builtin cd $@ || return
+        if git rev-parse --show-toplevel >"/dev/null" 2>&1; then
+            NEW_REPO="$(git rev-parse --show-toplevel 2>"/dev/null")"
+            if [ "${LAST_REPO}" != "${NEW_REPO}" ]; then
+                onefetch --show-logo="auto"
+                LAST_REPO="${NEW_REPO}"
+            fi
+        fi
+    }
+fi
 
 alias cp="cp -riv"
 alias mv="mv -iv"

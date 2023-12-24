@@ -3,7 +3,7 @@
     "workbench.iconTheme": "material-icon-theme",
     "files.autoSave": "onFocusChange",
     "editor.fontFamily": "'FiraCode Nerd Font', 'Fira Code', 'UbuntuMono Nerd Font', 'Ubuntu Mono', Menlo, Monaco, 'Courier New', monospace",
-    "editor.fontSize": 14,
+    "editor.fontSize": 15,
     "editor.renderWhitespace": "trailing",
     "editor.cursorStyle": "line-thin",
     "editor.cursorBlinking": "phase",
@@ -16,7 +16,7 @@
     "files.eol": "\n",
     "files.trimFinalNewlines": true,
     "files.trimTrailingWhitespace": true,
-    "workbench.colorTheme": "Visual Studio Dark",
+    "workbench.colorTheme": "Atom One Dark",
     "workbench.fontAliasing": "auto",
     "workbench.editor.autoLockGroups": {
         "mainThreadWebview-markdown.preview": true
@@ -25,5 +25,15 @@
     "rust-analyzer.inlayHints.bindingModeHints.enable": true,
     "rust-analyzer.inlayHints.lifetimeElisionHints.enable": "skip_trivial",
     "rust-analyzer.inlayHints.lifetimeElisionHints.useParameterNames": true,
-    "rust-analyzer.lens.enable": false
+    "rust-analyzer.lens.enable": false,
+    "explorer.confirmDelete": false,
+    "editor.codeActionsOnSave": {},
+    "gitlens.codeLens.scopes": [
+        "document"
+    ],
+    "gitlens.currentLine.scrollable": false,
+    "git.autofetch": "all",
+    "git.autoStash": true,
+    "extensions.ignoreRecommendations": true,
+    "git.openRepositoryInParentFolders": "never"
 }

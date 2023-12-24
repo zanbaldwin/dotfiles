@@ -22,4 +22,5 @@ stow --dir="${TOOLBOX_SCRIPT_DIRECTORY}/../stow" --target="${HOME}" --stow \
     "git" \
     "ssh" \
     "starship" \
-    "tmux"
+    "tmux" \
+    "zellig"

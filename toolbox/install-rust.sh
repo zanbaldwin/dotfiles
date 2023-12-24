@@ -30,13 +30,17 @@ cargo install "mprocs"    # Multi Process Runner
 cargo install "onefetch"  # Git Repository Overview
 cargo install "ripgrep"   # It's just fast
 cargo install "starship"  # PS1
-cargo install "zellig"    # Terminal Multiplexer
+cargo install "zellig"    # Terminal Multiplexer (tmux replacement)
+
+# The following need more testing on Linux. See `stow/bash/.bashrc.d/directories.sh`.
+cargo install "broot"     # Terminal directory browser
+cargo install "zoxide"    # `cd` alternative
 
 # Specifically for Rust development instead of general tools
-cargo install "bacon"
-cargo install "cargo-expand"
-cargo install "cargo-info"
-cargo install "sccache"
+cargo install "bacon"        # Background Rust Code Checker (alternative watch TUI)
+cargo install "cargo-expand" # Macro Source Code Expansion
+cargo install "cargo-info"   # crates.io in the terminal
+cargo install "sccache"      # Build Artifact Cache
 
 curl -sSfL "https://get.wasmer.io" | bash
 # This is mainly for reference.

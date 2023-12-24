@@ -15,20 +15,21 @@ bash "${THIS_DIR}/toolbox/apps.sh"
 bash "${THIS_DIR}/toolbox/fonts.sh"
 bash "${THIS_DIR}/toolbox/gnome.sh"
 
-toolbox create rust
-toolbox run --container="rust" bash "${THIS_DIR}/toolbox/rust.sh"
-toolbox run --container="rust" bash "${THIS_DIR}/toolbox/zellij.sh"
+toolbox create rust \
+    && toolbox run --container="rust" bash "${THIS_DIR}/toolbox/rust.sh" \
+    && toolbox run --container="rust" bash "${THIS_DIR}/toolbox/zellij.sh"
 
-toolbox create php
-toolbox run --container="php" bash "${THIS_DIR}/toolbox/php.sh"
+toolbox create php \
+    && toolbox run --container="php" bash "${THIS_DIR}/toolbox/php.sh"
 
-toolbox create stow
-toolbox run --container="stow" bash "${THIS_DIR}/toolbox/stow.sh"
+toolbox create stow \
+    && toolbox run --container="stow" bash "${THIS_DIR}/toolbox/stow.sh"
 
-podman build --target="gnome" --tag="localhost:5000/zanbaldwin/silverblue:39" "${THIS_DIR}/oci"
-podman run -d --name="registry" --publish="5000:5000" "docker.io/library/registry:2"
-podman push "localhost:5000/zanbaldwin/silverblue:39"
-rpm-ostree rebase "ostree-unverified-registry:localhost:5000/zanbaldwin/silverblue:39"
+podman build --target="gnome" --tag="localhost:5000/zanbaldwin/silverblue:39" "${THIS_DIR}/oci" \
+    && podman run -d --name="registry" --publish="5000:5000" "docker.io/library/registry:2" \
+    && podman push "localhost:5000/zanbaldwin/silverblue:39" \
+    && rpm-ostree rebase "ostree-unverified-registry:localhost:5000/zanbaldwin/silverblue:39"
+
 systemctl reboot
 
 # Things to do afterwards:

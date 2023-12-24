@@ -1,5 +1,10 @@
 # :book: Yet Another Dotfiles Repo
 
+This dotfiles repository has been designed for use with OSTree operating systems
+such as Fedora Silverblue. If you are using anything else, then you will need to
+read through the scripts and configuration and figure out how to adapt them to
+your system.
+
 ```bash
 export DOTFILES="${HOME}/.dotfiles"
 git clone "git@github.com:zanbaldwin/dotfiles.git" "${DOTFILES}"
@@ -19,9 +24,6 @@ git clone "git@github.com:zanbaldwin/dotfiles.git" "${DOTFILES}"
 > This project makes no promises regarding backwards-compatibility. There are no
 > stable releases. Things will break simply because I thought I would try
 > something different.
-
-Follow the installation steps in [`install-fedora.md`](install-fedora.md);
-if not using Silverblue, don't use `toolbox` to run scripts.
 
 If not using Fedora, then read through the toolbox scripts and figure this
 shit out yourself. User configuration has been written to at least try to

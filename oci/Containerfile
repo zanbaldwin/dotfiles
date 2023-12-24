@@ -42,9 +42,9 @@ RUN    git clone --recursive "https://github.com/hyprwm/Hyprland.git" --branch="
 
 FROM "${IMAGE}:${VERSION}" AS gnome
 MAINTAINER "Zan Baldwin"
-# RUN    flatpak remote-add --if-not-exists flathub "https://flathub.org/repo/flathub.flatpakrepo" \
-#     && flatpak remote-modify --enable flathub
+# Override OSTree until flatpak/flatpak#5452 is resolved and pushed up to Fedora Rawhide images.
 RUN    rpm-ostree override remove firefox firefox-langpacks \
+    && rpm-ostree override replace "https://bodhi.fedoraproject.org/updates/FEDORA-2023-cab8a89753" \
     && rpm-ostree install --idempotent --allow-inactive \
         bridge-utils edk2-ovmf guestfs-tools libvirt qemu-kvm virt-install virt-manager virt-top \
         podman-docker podman-plugins podman-tui \

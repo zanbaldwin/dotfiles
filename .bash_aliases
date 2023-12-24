@@ -105,7 +105,9 @@ if [ $? -eq 0 ]; then
     # Make sure that XDebug is installed but not enabled in the CLI configuration. This will make
     # sure that running commands like "composer" will NOT use XDebug, but commands like "php ..."
     # WILL use XDebug.
-    if [ -f "$(php-config --extension-dir)/xdebug.so" ]; then
+    # You need the php-dev package (php5-dev, php7.0-dev, etc) installed to use "php-config".
+    which php-config 1>/dev/null 2>&1
+    if [ $? -eq 0 && -f "$(php-config --extension-dir)/xdebug.so" ]; then
         alias php="$PHP -dzend_extension=xdebug.so"
     fi
 

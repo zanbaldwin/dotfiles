@@ -47,7 +47,7 @@ alias mkdir="mkdir -pv"
 alias chmod="chmod -Rv"
 alias chown="chown -Rv"
 # See https://github.com/sharkdp/bat/releases
-alias cat="bat"
+alias cat="bat --theme=DarkNeon"
 alias rm="rm -v"
 function f() {
     find . -name "$1" 2>&1 | grep -v 'Permission denied'
@@ -103,7 +103,7 @@ alias v="vim -N"
 # ========== #
 
 # See https://github.com/denilsonsa/prettyping
-alias ping="prettyping"
+alias ping="prettyping --nolegend"
 alias wget="wget -c"
 alias mitm="mitmproxy --transparent --host"
 alias dig="dig +nocmd any +multiline +noall +answer"
@@ -295,6 +295,9 @@ export PATH="${HOME}/.yarn/bin:${HOME}/.config/yarn/global/node_modules/.bin:${P
 ## These are not meant to be executed every time a new Bash environment is created, instead they
 ## are helpful reminders to set up autocompletion on a new system. Most assume that the associated
 ## tool has already been installed.
+
+## Kubernetes Autocompletion
+# kubectl copmletion bash | sudo tee /etc/bash_completion.d/kubectl
 
 ## Docker Compose
 # sudo curl -L https://raw.githubusercontent.com/docker/compose/$(docker-compose version --short)/contrib/completion/bash/docker-compose -o /etc/bash_completion.d/docker-compose

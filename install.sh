@@ -1,6 +1,6 @@
 # This script was designed to be run on fresh Ubuntu installations.
 
-if [ "$(id -u 2>/dev/null)" == "0" ]; then
+if [ "$(id -u 2>/dev/null)" = "0" ]; then
     echo >&2 "Do not run this installation script as root/sudo."
     echo >&2 "A reference to the original user running it is needed."
     exit 1

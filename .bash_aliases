@@ -6,6 +6,12 @@
 export PATH="${PATH}:${HOME}/.bin"
 
 # ============= #
+# Work Specific #
+# ============= #
+
+alias sq="bin/sq-cli/sq"
+
+# ============= #
 # Bash-specific #
 # ============= #
 
@@ -273,7 +279,7 @@ export PATH="${HOME}/.yarn/bin:${HOME}/.config/yarn/global/node_modules/.bin:${P
 # Rust Lang #
 # ========= #
 
-[ -f "~/.cargo/env" ] && . "~/.cargo/env"
+[ -f "${HOME}/.cargo/env" ] && . "${HOME}/.cargo/env"
 
 # =============== #
 # Auto-completion #

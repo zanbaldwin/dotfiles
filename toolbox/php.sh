@@ -1,6 +1,7 @@
 #!/bin/bash
 
 sudo dnf install --assumeyes \
+    "ansible" \
     "php" \
     "php-bcmath" \
     "php-devel" \

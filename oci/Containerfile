@@ -14,11 +14,13 @@ RUN rpm-ostree override remove firefox firefox-langpacks \
  && rpm-ostree override replace "https://bodhi.fedoraproject.org/updates/FEDORA-2023-cab8a89753" \
  && rpm-ostree install --idempotent --allow-inactive --releasever="39" \
         bridge-utils edk2-ovmf guestfs-tools libvirt qemu-kvm virt-install virt-manager \
-        podman-docker podman-plugins podman-tui \
+        podman-docker podman-plugins podman-tui containernetworking-plugins aardvark-dns \
         distrobox make ncdu nss-tools tlp tlp-rdw tmux \
  && sed -i 's/#AutomaticUpdatePolicy.*/AutomaticUpdatePolicy=check/' "/etc/rpm-ostreed.conf" \
+ && systemctl enable "libvirtd" \
  && systemctl enable "podman" \
- && systemctl enable  "podman.socket" \
+ && systemctl enable "podman.socket" \
+ && systemctl enable "podman-restart.service" \
  && (systemctl enable "tlp.service" || true) \
  && cat "/etc/sudoers" | grep -v "secure_path" | tee "/etc/sudoers" >"/dev/null" \
  && rm -rf /tmp/* /var/* \

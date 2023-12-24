@@ -1,9 +1,30 @@
 ARG VERSION="${VERSION:-39}"
 ARG VARIANT="${VARIANT:-silverblue}"
-# Use "quay.io/fedora-ostree-desktops/${VARIANT}" as the IMAGE if you want a version earlier than 39.
-ARG IMAGE="${IMAGE:-quay.io/fedora/fedora-${VARIANT}}"
-# Fedora 39 is the first to officially ship as an OCI image.
+# Fedora 39 is the first to officially ship as an OCI image; before then the
+# unofficial images could be found at "quay.io/fedora-ostree-desktops/${VARIANT}".
+ARG IMAGE="${IMAGE:-registry.fedoraproject.org/fedora-${VARIANT}}"
 ARG VERSION="${VERSION:-39}"
+
+# =====================ALACRITTY====================== #
+# There's no way I'm settling for GNOME Terminal.      #
+# ==================================================== #
+FROM "fedora:${VERSION}" AS alacritty
+RUN dnf install --assumeyes \
+        curl git \
+        atk-devel cairo-devel cairo-gobject-devel gcc gdk-pixbuf2-devel gtk3-devel pango-devel \
+        cmake freetype-devel fontconfig-devel libxcb-devel libxkbcommon-devel g++ \
+        gtk-layer-shell-devel \
+ && curl --proto "=https" --tlsv1.2 -sSf "https://sh.rustup.rs" >"/tmp/rustup.sh" \
+ && sh /tmp/rustup.sh -qy
+RUN source "${HOME}/.cargo/env" \
+ && git clone "https://github.com/alacritty/alacritty.git" --branch "v0.12.1" "/tmp/alacritty" \
+ && (cd "/tmp/alacritty"; cargo build --release) \
+ && mkdir -p "/opt/alacritty/bin" "/opt/alacritty/etc/bash_completion.d" "/opt/alacritty/share/pixmaps" "/opt/alacritty/share/applications" \
+ && cp "/tmp/alacritty/target/release/alacritty" "/opt/alacritty/bin/alacritty" \
+ && cp "/tmp/alacritty/extra/logo/alacritty-term.svg" "/opt/alacritty/share/pixmaps/Alacritty.svg" \
+ && cp "/tmp/alacritty/extra/linux/Alacritty.desktop" "/opt/alacritty/share/applications/alacritty.desktop" \
+ && cp "/tmp/alacritty/extra/completions/alacritty.bash" "/opt/alacritty/etc/bash_completion.d/alacritty" \
+ && rm -rf "/tmp/alacritty"
 
 # ================================= #
 # Build Base GNOME Silverblue Image #
@@ -15,8 +36,7 @@ COPY "./usr/" "/usr/"
 ## custom certificates from MkCert and the firefox from FedoraProject doesn't have enough codecs
 ## to play media on Twitter. So fuck it, back to system package.
 # RUN rpm-ostree override remove firefox firefox-langpacks
-## Override OSTree until flatpak/flatpak#5452 is resolved and pushed up to Fedora Rawhide images.
-RUN rpm-ostree override replace "https://bodhi.fedoraproject.org/updates/FEDORA-2023-cab8a89753"
+
 RUN rpm-ostree install --idempotent --allow-inactive --releasever="39" \
         bridge-utils edk2-ovmf guestfs-tools libvirt qemu-kvm virt-install virt-manager \
         podman-docker podman-plugins podman-tui containernetworking-plugins aardvark-dns \
@@ -31,6 +51,7 @@ RUN rpm-ostree install --idempotent --allow-inactive --releasever="39" \
  && cat "/etc/sudoers" | grep -v "secure_path" | tee "/etc/sudoers" >"/dev/null" \
  && rm -rf /tmp/* /var/* \
  && ostree container commit
+COPY --from="alacritty" "/opt/alacritty/" "/usr/"
 
 # =============C/C++============ #
 # Build Hyprland Desktop Portal  #
@@ -118,15 +139,6 @@ RUN source "${HOME}/.cargo/env" \
  && cp "/tmp/swww/target/release/swww-daemon" "/opt/swww/bin/swww-daemon" \
  && cp "/tmp/swww/completions/swww.bash" "/opt/swww/etc/bash_completion.d/swww" \
  && rm -rf "/tmp/swww"
-RUN source "${HOME}/.cargo/env" \
- && git clone "https://github.com/alacritty/alacritty.git" --branch "v0.12.1" "/tmp/alacritty" \
- && (cd "/tmp/alacritty"; cargo build --release) \
- && mkdir -p "/opt/alacritty/bin" "/opt/alacritty/etc/bash_completion.d" "/opt/alacritty/share/pixmaps" "/opt/alacritty/share/applications" \
- && cp "/tmp/alacritty/target/release/alacritty" "/opt/alacritty/bin/alacritty" \
- && cp "/tmp/alacritty/extra/logo/alacritty-term.svg" "/opt/alacritty/share/pixmaps/Alacritty.svg" \
- && cp "/tmp/alacritty/extra/linux/Alacritty.desktop" "/opt/alacritty/share/applications/alacritty.desktop" \
- && cp "/tmp/alacritty/extra/completions/alacritty.bash" "/opt/alacritty/etc/bash_completion.d/alacritty" \
- && rm -rf "/tmp/alacritty"
 # Anyrun hasn't released any stable versions/tags; checkout a known commit instead.
 RUN source "${HOME}/.cargo/env" \
  && git clone "https://github.com/Kirottu/anyrun.git" "/tmp/anyrun" \
@@ -171,5 +183,4 @@ COPY --from="c-build" "/opt/xdg-desktop-portal-hyprland/" "/usr/"
 COPY --from="c-build" "/opt/mako/" "/usr/"
 COPY --from="rust-build" "/opt/eww/" "/usr/"
 COPY --from="rust-build" "/opt/swww/" "/usr/"
-COPY --from="rust-build" "/opt/alacritty/" "/usr/"
 COPY --from="rust-build" "/opt/anyrun/" "/usr/"

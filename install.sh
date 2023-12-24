@@ -38,6 +38,7 @@ snap install --stable bitwarden
 snap install --stable chromium
 snap install --stable chromium-ffmpeg
 snap install --stable httpie
+snap install --stable multipass
 snap install --stable vlc
 
 snap refresh

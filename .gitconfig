@@ -1,100 +1,100 @@
 [alias]
 
-	# ================ #
-	# NATIVE SHORTCUTS #
-	# ================ #
+    # ================ #
+    # NATIVE SHORTCUTS #
+    # ================ #
 
-	# Keystroke Savers
-	s               = status -s
-	st              = status
-	co              = checkout
-	fa              = fetch --all
-	ft              = fetch --tags
+    # Keystroke Savers
+    s               = status -s
+    st              = status
+    co              = checkout
+    fa              = fetch --all
+    ft              = fetch --tags
     line            = log --abbrev-commit --decorate=auto --pretty=format:'%C(red)%h%C(reset)\t%C(green)%<(14)%cr%C(reset)%C(yellow)%d%C(reset) %s %C(blue)<%an>%C(reset)'
 
-	# Committing Shortcuts
-	amend           = commit --amend
-	recommit        = commit --amend --no-edit --date=now
-	uncommit        = reset --soft HEAD^
-	# Save and list working tree snapshots.
-	snapshot        = !git stash save "snapshot: $(date)" && git stash apply "stash@{0}"
-	snapshots       = !git stash list --grep snapshot
-	recent-branches = !git for-each-ref --count=15 --sort=-committerdate refs/heads/ --format='%(refname:short)'
+    # Committing Shortcuts
+    amend           = commit --amend
+    recommit        = commit --amend --no-edit --date=now
+    uncommit        = reset --soft HEAD^
+    # Save and list working tree snapshots.
+    snapshot        = !git stash save "snapshot: $(date)" && git stash apply "stash@{0}"
+    snapshots       = !git stash list --grep snapshot
+    recent-branches = !git for-each-ref --count=15 --sort=-committerdate refs/heads/ --format='%(refname:short)'
 
     # Pull Requests from GitHub
     review          = "!f() { git fetch -fu \"${2:-origin}\" \"refs/pull/${1}/head:pr/${1}\" && git checkout \"pr/${1}\"; }; f"
     reviewed        = "!git checkout \"${1:-master}\"; git for-each-ref \"refs/heads/pr/*\" --format=\"%(refname)\" | while read ref; do branch=\"${ref#refs/heads/}\"; git branch -D \"$branch\"; done"
 
-	# Rebase Shortcuts
-	continue        = rebase --continue
-	skip            = rebase --skip
-	abort           = rebase --abort
-	# Prepush opens up an interactive rebase for all the changes that haven't
-	# been pushed to the remote upstream branch yet.
-	prepush         = rebase -i @{u}
-	# If the current working tree is clean, then pull the latest "develop" and
-	# rebase it into the current branch.
-	getdev          = "!([ $(git diff-files | wc -l) -eq 0 ] || (echo 'Working directory not clean. Aborting.'; return 1)) && git checkout develop && git pull origin develop && git checkout - && git rebase develop"
+    # Rebase Shortcuts
+    continue        = rebase --continue
+    skip            = rebase --skip
+    abort           = rebase --abort
+    # Prepush opens up an interactive rebase for all the changes that haven't
+    # been pushed to the remote upstream branch yet.
+    prepush         = rebase -i @{u}
+    # If the current working tree is clean, then pull the latest "develop" and
+    # rebase it into the current branch.
+    getdev          = "!([ $(git diff-files | wc -l) -eq 0 ] || (echo 'Working directory not clean. Aborting.'; return 1)) && git checkout develop && git pull origin develop && git checkout - && git rebase develop"
 
-	# Assume (and its counterpart unassume) will "assume" files haven't changed.
-	# Use to prevent files from appearing in modified-files lists if they have
-	# changed locally. Ideal for edits in configuration that shouldn't be committed.
-	hide            = update-index --assume-unchanged
-	unhide          = update-index --no-assume-unchanged
-	unhide-all      = update-index --really-refresh
-	# List assumed files
-	hidden          = "!git ls-files -v | grep ^h | cut -c 3-"
-	ignored         = "!f(){ git -C \"$GIT_PREFIX\" status -s --ignored \"$@\" | grep \"^!!\"; }; f"
+    # Assume (and its counterpart unassume) will "assume" files haven't changed.
+    # Use to prevent files from appearing in modified-files lists if they have
+    # changed locally. Ideal for edits in configuration that shouldn't be committed.
+    hide            = update-index --assume-unchanged
+    unhide          = update-index --no-assume-unchanged
+    unhide-all      = update-index --really-refresh
+    # List assumed files
+    hidden          = "!git ls-files -v | grep ^h | cut -c 3-"
+    ignored         = "!f(){ git -C \"$GIT_PREFIX\" status -s --ignored \"$@\" | grep \"^!!\"; }; f"
 
-	# Misc
-	versions        = "!v() { git tag | grep \"^[vV]\\?[0-9.]\\+$\" | sort -V; }; v"
+    # Misc
+    versions        = "!v() { git tag | grep \"^[vV]\\?[0-9.]\\+$\" | sort -V; }; v"
 
-	# ================ #
-	# EXTERNAL TOOLING #
-	# ================ #
+    # ================ #
+    # EXTERNAL TOOLING #
+    # ================ #
 
-	# Git Appraise is a distributed code review system for git repos, by Google. If available on the $PATH there
-	# is no need to add it as an alias. Install with "go get github.com/google/git-appraise/git-appraise" (Golang
-	# tools required). Comment left as reminder.
+    # Git Appraise is a distributed code review system for git repos, by Google. If available on the $PATH there
+    # is no need to add it as an alias. Install with "go get github.com/google/git-appraise/git-appraise" (Golang
+    # tools required). Comment left as reminder.
 
-	# Requires PHPCS; "composer global require squizlabs/php_codesniffer" (or cgr).
-	sniff           = "!f() { git diff --name-only | grep \\\\.php\\$ | xargs --no-run-if-empty phpcs -p -v --standard=\"${1:-PSR2}\"; }; f"
+    # Requires PHPCS; "composer global require squizlabs/php_codesniffer" (or cgr).
+    sniff           = "!f() { git diff --name-only | grep \\\\.php\\$ | xargs --no-run-if-empty phpcs -p -v --standard=\"${1:-PSR2}\"; }; f"
 
 [user]
     name            = Zan Baldwin
     email           = hello@zanbaldwin.com
     signingkey      = F59EC254A2DA8BE0C135126A21008A6ED04D2B52
 [push]
-	default         = simple
-	followTags      = true
+    default         = simple
+    followTags      = true
 [pull]
-	rebase          = true
+    rebase          = true
 [pager]
-	# "diff-highlight" isn't installed by default, you can find it in the
-	# contrib section of the Git repo (requires Perl to be installed):
-	# https://github.com/git/git/blob/master/contrib/diff-highlight/diff-highlight
-	log             = diff-highlight | less --tabs=4 -RFX
-	show            = diff-highlight | less --tabs=4 -RFX
-	diff            = diff-highlight | less --tabs=4 -RFX
+    # "diff-highlight" isn't installed by default, you can find it in the
+    # contrib section of the Git repo (requires Perl to be installed):
+    # https://github.com/git/git/blob/master/contrib/diff-highlight/diff-highlight
+    log             = diff-highlight | less --tabs=4 -RFX
+    show            = diff-highlight | less --tabs=4 -RFX
+    diff            = diff-highlight | less --tabs=4 -RFX
 [interactive]
-	diffFilter      = diff-highlight
+    diffFilter      = diff-highlight
 [diff]
-	compactionHeuristic = true
-	algorithm           = patience
-	mnemonicprefix      = true
+    compactionHeuristic = true
+    algorithm           = patience
+    mnemonicprefix      = true
 [rerere]
-	# Remember my merges
-	# http://gitfu.wordpress.com/2008/04/20/git-rerere-rereremember-what-you-did-last-time/
-	enabled         = true
+    # Remember my merges
+    # http://gitfu.wordpress.com/2008/04/20/git-rerere-rereremember-what-you-did-last-time/
+    enabled         = true
 [help]
-	autocorrect     = 1
+    autocorrect     = 1
 [core]
-	excludesFile    = ~/.ignore
+    excludesFile    = ~/.ignore
 
 # Force Git to always download over SSH to prevent GitHub's API throttling and/or
 # asking for username and password (which is near-to-impossible to do on the
 # command-line if 2FA has been enabled).
 [url "git@github.com:"]
-	insteadOf       = https://github.com/
+    insteadOf       = https://github.com/
 [merge]
-	ff = only
+    ff = only

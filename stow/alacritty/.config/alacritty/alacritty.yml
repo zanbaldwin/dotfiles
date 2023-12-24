@@ -436,9 +436,8 @@ colors:
 #   - (Linux/BSD) user login shell
 #   - (Windows) powershell
 shell:
-  program: '/usr/bin/tmux'
-  args:
-    - '-2'
+  program: '~/.cargo/bin/zellig'
+  args: []
 
 # Startup directory
 #

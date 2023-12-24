@@ -22,6 +22,11 @@ command -v "cargo" >"/dev/null" 2>&1 && { \
 
 # Run separately instead of one command so that Cargo cleans up build files between each one.
 # Kept running into /tmp ramfs running out of space on small VMs.
+if [[ "${OSTYPE}" == "linux-gnu"* ]]; then
+    # Alacritty on macOS is poopy. Only install on Linux.
+    # iTerm2 is the best you're going to get for macOS and that's still shit.
+    cargo install "alacritty";
+fi
 cargo install "bat"       # `cat` but better
 cargo install "coreutils" # Rusty GNU
 cargo install "exa"       # `ls` but better

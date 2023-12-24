@@ -31,14 +31,18 @@ alias xx="exit"
 # ============================= #
 
 # Some systems have a version of "ls" that does not have the
-# "--group-directories-first" command-line flag, check for it
-# here before setting the alias.
-ls -lAh --color=auto --group-directories-first 1>/dev/null 2>&1
-if [ $? -eq 1 ]; then
-    alias ll="ls -lAh --color=auto"
-else
-    alias ll="ls -lAh --color=auto --group-directories-first"
+# "--group-directories-first" or "-G" command-line flags,
+# check for them here before setting the alias.
+LL_OPTIONS=""
+ls -G 1>/dev/null 2>&1
+if [ $? -eq 0 ]; then
+    LL_OPTIONS="${LL_OPTIONS}G"
 fi
+ls --group-directories-first 1>/dev/null 2>&1
+if [ $? -eq 0 ]; then
+    LL_OPTIONS="${LL_OPTIONS} --group-directories-first"
+fi
+alias ll="ls -lAhHp${LL_OPTIONS}"
 
 alias c="clear"
 alias ..="cd .."

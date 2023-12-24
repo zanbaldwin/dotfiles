@@ -52,6 +52,35 @@ RUN    git clone --recursive "https://github.com/hyprwm/Hyprland.git" --branch="
     && make -C "/tmp/hyprland" install PREFIX="/opt/hyprland" \
     && rm -rf "/tmp/hyprland"
 
+# ====================================== #
+# Build Eww (Elkowars Wacky Widgets) Bar #
+# ====================================== #
+FROM "fedora:${VERSION}" AS rust-build
+RUN    sudo dnf install --assumeyes \
+        atk-devel \
+        cairo-devel \
+        cairo-gobject-devel \
+        gcc \
+        gdk-pixbuf2-devel \
+        git \
+        gtk3-devel \
+        pango-devel \
+    && curl --proto "=https" --tlsv1.2 -sSf "https://sh.rustup.rs" >"/tmp/rustup.sh" \
+    && sh /tmp/rustup.sh -qy
+RUN    source "${HOME}/.cargo/env" \
+    && git clone "https://github.com/elkowar/eww.git" --branch "v0.4.0" "/tmp/eww" \
+    && (cd "/tmp/eww"; cargo build --release) \
+    && mkdir -p "/opt/eww" \
+    && cp "/tmp/eww/target/release/eww" "/opt/eww/eww" \
+    && rm -rf "/tmp/eww"
+RUN    source "${HOME}/.cargo/env" \
+    && git clone "https://github.com/Horus645/swww.git" --branch "v0.7.3" "/tmp/swww" \
+    && (cd "/tmp/swww"; cargo build --release) \
+    && mkdir -p "/opt/swww" \
+    && cp "/tmp/swww/target/release/swww" "/opt/swww/swww" \
+    && cp "/tmp/swww/target/release/swww-daemon" "/opt/swww/swww-daemon" \
+    && rm -rf "/tmp/swww"
+
 # ================================= #
 # Build Base GNOME Silverblue Image #
 # ================================= #

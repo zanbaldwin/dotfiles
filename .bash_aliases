@@ -170,6 +170,8 @@ command -v pgcli >/dev/null 2>&1 && {
     alias pgsql="pgcli";
 }
 
+alias nord="nordvpn"
+
 # ========================================================= #
 # GnuPG SSH Authentication                                  #
 # ========================================================= #

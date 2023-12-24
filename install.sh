@@ -58,6 +58,7 @@ cargo install bat
 cargo install exa
 # [Discord](https://discord.com/api/download?platform=linux&format=deb)
 # [Docker](https://docs.docker.com/engine/install/ubuntu/)
+# [Docker Compose](https://docs.docker.com/compose/install/)
 # [NordVPN](https://support.nordvpn.com/Connectivity/Linux/1325531132/Installing-and-using-NordVPN-on-Debian-Ubuntu-Raspberry-Pi-Elementary-OS-and-Linux-Mint.htm)
 
 # Stow Configuration Files

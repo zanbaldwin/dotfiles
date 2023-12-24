@@ -20,7 +20,7 @@
     snapshot        = !git stash save "snapshot: $(date)" && git stash apply "stash@{0}"
     snapshots       = !git stash list --grep snapshot
     # See: https://github.com/paulirish/git-recent/blob/master/git-recent
-    recent          = !git for-each-ref --color=always --count=15 --sort=-committerdate 'refs/heads/' --format='%(HEAD) %(color:yellow)%(refname:short)%(color:reset)|%(color:bold red)%(objectname:short)%(color:reset) %(color:bold green)(%(committerdate:relative))%(color:reset) %(color:bold blue)%(authorname)%(color:reset) %(color:yellow)%(upstream:track)%(color:reset)%(color:black) %(color:reset)|%(contents:subject)%(color:black) %(color:reset)|' | column -ts '|'  | less --tabs=4 --quit-if-one-screen --RAW-CONTROL-CHARS --no-init
+    recent          = !git for-each-ref --color=always --count=15 --sort=-committerdate 'refs/heads/' --format='%(HEAD) %(color:yellow)%(refname:short)%(color:reset)|%(color:bold red)%(objectname:short)%(color:reset) %(color:bold green)(%(committerdate:relative))%(color:reset)|%(color:bold blue)%(authorname)%(color:reset) %(color:yellow)%(upstream:track)%(color:reset)%(color:black) %(color:reset)|%(contents:subject)%(color:black) %(color:reset)|' | column -ts '|'  | less --tabs=4 --quit-if-one-screen --RAW-CONTROL-CHARS --no-init
 
     # Pull Requests from GitHub
     review          = "!f() { git fetch -fu \"${2:-origin}\" \"refs/pull/${1}/head:pr/${1}\" && git checkout \"pr/${1}\"; }; f"

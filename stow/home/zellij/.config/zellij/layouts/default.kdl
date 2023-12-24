@@ -1,0 +1,31 @@
+// Override the default layout to add an initial tab in the background running `btop`.
+
+layout {
+
+    default_tab_template {
+        pane size=1 borderless=true {
+            plugin location="zellij:tab-bar"
+        }
+        children
+        pane size=2 borderless=true {
+            plugin location="zellij:status-bar"
+        }
+    }
+
+    tab name="System" {
+        pane {
+            focus true
+            name "BTOP"
+            cwd "/"
+            command "btop"
+        }
+    }
+
+    tab name="New Tab" focus=true {
+        pane {
+            focus true
+            name "Pane #1"
+        }
+    }
+
+}

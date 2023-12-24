@@ -23,3 +23,9 @@ flatpak install --noninteractive --assumeyes --or-update flathub \
     "com.syntevo.SmartGit" \
     "com.spotify.Client" \
     "us.zoom.Zoom"
+
+# Notes:
+
+# PHPStorm version 2023.1.3 is borked.
+# Disable `ide.browser.jcef.sandbox.enable` in PHPStorm's registry.
+# See https://youtrack.jetbrains.com/issue/IDEA-317347/After-last-flatpak-update-idea-crashed#focus=Comments-27-7253679.0-0

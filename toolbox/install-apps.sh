@@ -14,15 +14,12 @@ flatpak install --noninteractive --assumeyes --or-update flathub \
     "org.videolan.VLC" \
     "com.visualstudio.code"
 
-if [ "$(uname -i)" == "x86_64" ]; then
-    # The following Flatpaks are not available on ARM64/aarch64 architecture, as of 2023-06-02.
-    flatpak install --noninteractive --assumeyes --or-update flathub \
-        "com.jetbrains.CLion" \
-        "com.discordapp.Discord" \
-        "com.jetbrains.PhpStorm" \
-        "com.skype.Client" \
-        "com.slack.Slack" \
-        "com.syntevo.SmartGit" \
-        "com.spotify.Client" \
-        "us.zoom.Zoom"
-fi
+# The following Flatpaks are not available on ARM64/aarch64 architecture, as of 2023-06-02.
+flatpak install --noninteractive --assumeyes --or-update flathub \
+    "com.discordapp.Discord" \
+    "com.jetbrains.PhpStorm" \
+    "com.skype.Client" \
+    "com.slack.Slack" \
+    "com.syntevo.SmartGit" \
+    "com.spotify.Client" \
+    "us.zoom.Zoom"

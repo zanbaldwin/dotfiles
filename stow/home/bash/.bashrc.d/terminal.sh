@@ -1,13 +1,20 @@
 #!/bin/bash
 
+# WARNING!
+# If using both Starship and Atuin, then Starship *MUST* be initialized *FIRST*.
+
 # Starship PS1 Prompt
 command -v starship >"/dev/null" 2>&1 && {
     eval "$(starship init bash)"
 }
 
-# Speedup "ls" command by specifying we don't care about the colour
-# output based on file permissions.
-export LS_COLORS='ex=00:su=00:sg=00:ca=00:'
+# History
+command -v "atuin" >"/dev/null" 2>&1 && {
+    eval "$(atuin init bash --disable-up-arrow)" 2>"/dev/null"
+}
+# Up & down map to history search once a command has been started.
+bind '"\e[A":history-search-backward' 2>"/dev/null"
+bind '"\e[B":history-search-forward' 2>"/dev/null"
 
 alias c="clear"
 alias xx="exit"

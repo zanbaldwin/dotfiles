@@ -2,20 +2,29 @@
 # To use this file, symlink it to ~/.bash_aliases (it should already be included
 # in ~/.bashrc).
 
+# ========================= #
+# Working with Shitty macOS #
+# ========================= #
+
 # Problems with common *nix PATHs on macOS.
-export PATH="${PATH}:${HOME}/.bin"
+export PATH="${HOME}:/.bin:${PATH}"
+
+# Set PATH, MANPATH, etc., for Homebrew.
+if [ -f "/opt/homebrew/bin/brew" ]; then
+    eval "$(/opt/homebrew/bin/brew shellenv)"
+    # Override Make 3.81 that comes as default with macOS with one that's not nearly 2 decades old..
+    export PATH="/opt/homebrew/opt/make/libexec/gnubin:$PATH"
+fi
+
+# ========= #
+# Rust Lang #
+# ========= #
+
+[ -f "${HOME}/.cargo/env" ] && . "${HOME}/.cargo/env"
 
 # ============= #
 # Work Specific #
 # ============= #
-
-alias sq="bin/sq-cli/sq"
-
-# ========== #
-# Monitoring #
-# ========== #
-
-alias gtop="watch -n0.2 nvidia-smi --format=csv --query-gpu=power.draw,utilization.gpu,fan.speed,temperature.gpu"
 
 # ============= #
 # Bash-specific #
@@ -28,9 +37,11 @@ alias sudo="sudo --preserve-env"
 bind '"\e[A":history-search-backward'
 bind '"\e[B":history-search-forward'
 # If a file specifying a custom prompt exists, include it.
-if [ -f ~/.bash_prompt ]; then
-    . ~/.bash_prompt
-fi
+command -v starship >"/dev/null" 2>&1 && {
+    eval "$(starship init bash)"
+} || {
+    . "${HOME}/.bash_prompt"
+}
 alias tmux="tmux attach || tmux new"
 # Watch the output of the last command instead of having to
 # execute it constantly whilst waiting for a different output.
@@ -56,9 +67,12 @@ fi
 if ls --group-directories-first 1>/dev/null 2>&1; then
     LL_OPTIONS="${LL_OPTIONS} --group-directories-first"
 fi
-alias ll="ls -lAhHp${LL_OPTIONS}"
 
-command -v exa >/dev/null 2>&1 && { alias ll="exa -labUh --git --group-directories-first"; }
+command -v exa >/dev/null 2>&1 && {
+    alias ll="exa -labUh --git --group-directories-first";
+} || {
+    alias ll="ls -lAhHp${LL_OPTIONS}";
+};
 
 alias cp="cp -riv"
 alias mv="mv -iv"
@@ -224,12 +238,6 @@ command -v "php" >/dev/null 2>&1 && {
     # Add global Composer package binaries to $PATH.
     command -v "composer" >/dev/null 2>&1 && { export PATH="${PATH}:$(composer global config bin-dir --absolute 2>/dev/null)"; }
 }
-
-# ========= #
-# Rust Lang #
-# ========= #
-
-[ -f "${HOME}/.cargo/env" ] && . "${HOME}/.cargo/env"
 
 # =============== #
 # Auto-completion #

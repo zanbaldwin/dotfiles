@@ -58,10 +58,10 @@
 	# tools required). Comment left as reminder.
 
 	# Requires PHPCS; "composer global require squizlabs/php_codesniffer" (or cgr).
-	sniff           = "!git diff --name-only | grep \\\\.php\\$ | xargs --no-run-if-empty phpcs -p -v --standard=PSR2"
+	sniff           = "!f() { git diff --name-only | grep \\\\.php\\$ | xargs --no-run-if-empty phpcs -p -v --standard=\"${1:-PSR2}\"; }; f"
 
 [user]
-    name = Zan Baldwin
+    name            = Zan Baldwin
     email           = hello@zanbaldwin.com
     signingkey      = F59EC254A2DA8BE0C135126A21008A6ED04D2B52
 [push]

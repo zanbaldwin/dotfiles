@@ -1,6 +1,8 @@
 add_to_path "${HOME}/.phpenv/bin"
 add_to_path "${HOME}/.phpenv/shims"
 
+export PHP_BUILD_CONFIGURE_OPTS="--with-zlib-dir=$(brew --prefix zlib) --with-bz2=$(brew --prefix bzip2) --with-iconv=$(brew --prefix libiconv) --with-readline=$(brew --prefix readline) --with-libedit=$(brew --prefix libedit) --with-tidy=$(brew --prefix tidy-html5) --with-pdo-pgsql=$(brew --prefix postgresql@12) --with-pear" \
+
 if [ -f "${HOME}/.phpenv/completions/phpenv.bash" ]; then
     source "${HOME}/.phpenv/completions/phpenv.bash"
     phpenv rehash 2>/dev/null

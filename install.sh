@@ -41,6 +41,9 @@ apt install -y \
     docker-ce-cli \
     containerd.io
 
+usermod -aG "docker" "${USER}"
+newgrp docker
+
 # These Snap packages don't conform to the secure way. Use classic installation.
 snap install --stable --classic aws-cli
 snap install --stable --classic phpstorm

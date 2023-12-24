@@ -6,7 +6,7 @@ function add_to_path() {
         *:"${ADD}":*)
             ;;
         *)
-            # Prepending path in case a system-installed rustc needs to be overridden
+            # Prepending path in case it's to override system-wide executables.
             export PATH="${ADD}:${PATH}"
             ;;
     esac

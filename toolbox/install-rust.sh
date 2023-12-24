@@ -6,7 +6,8 @@ sudo dnf group install --assumeyes \
     "Development Tools"
 
 sudo dnf install --assumeyes \
-    "cmake"
+    "cmake" \
+    "mold"
 
 # Yeah, this is not good. Running an arbitrary script from the internet.
 # Only doing this because Rust does not provide signatures for installing Rust in a version-agnostic way.
@@ -21,14 +22,23 @@ command -v "cargo" >"/dev/null" 2>&1 && { \
 
 # Run separately instead of one command so that Cargo cleans up build files between each one.
 # Kept running into /tmp ramfs running out of space on small VMs.
-cargo install "bat"
-cargo install "exa"
-cargo install "git-delta"
-cargo install "onefetch"
-cargo install "starship"
+cargo install "bat"       # `cat` but better
+cargo install "coreutils" # Rusty GNU
+cargo install "exa"       # `ls` but better
+cargo install "git-delta" # Better Diffing
+cargo install "mprocs"    # Multi Process Runner
+cargo install "onefetch"  # Git Repository Overview
+cargo install "ripgrep"   # It's just fast
+cargo install "starship"  # PS1
+cargo install "zellig"    # Terminal Multiplexer
+
+# Specifically for Rust development instead of general tools
+cargo install "bacon"
+cargo install "cargo-expand"
+cargo install "cargo-info"
+cargo install "sccache"
 
 curl -sSfL "https://get.wasmer.io" | bash
-
 # This is mainly for reference.
 # Wasmer does not provide signatures for its installer which it expects
 # you to just pipe into shell; this method is for compiling from source.

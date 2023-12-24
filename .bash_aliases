@@ -178,9 +178,12 @@ command -v gpgconf >/dev/null 2>&1 && {
     export SSH_AUTH_SOCK="$(gpgconf --list-dirs agent-ssh-socket)";
     gpgconf --launch gpg-agent;
 }
+
 # Sometimes the GPG agent get in a weird state that means that using GPG
 # for Git Clone/Push/Pull over SSH stops working.
-command -v gpg-connect-agent >/dev/null 2>&1 && { echo UPDATESTARTUPTTY | gpg-connect-agent; }
+command -v gpg-connect-agent >/dev/null 2>&1 && {
+    echo UPDATESTARTUPTTY | gpg-connect-agent >/dev/null 2>&1;
+}
 
 # ======= #
 # Vagrant #

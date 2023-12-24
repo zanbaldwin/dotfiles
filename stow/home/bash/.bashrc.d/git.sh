@@ -12,3 +12,21 @@ latest_stable_version () {
         | sort --version-sort \
         | tail -n1
 }
+
+# `git <arg>` runs `git <arg>`
+# `git` (in a Git repository) runs `gitui`
+# `git` (not in a Git repository) runs `git --help`
+command -v "gitui" >"/dev/null" 2>&1 && {
+    function git {
+        if [ $# -eq 0 ]; then
+            GIT_DIR="$(git rev-parse --git-dir)"
+            if [ -d "${GIT_DIR}" ]; then
+                gitui --watcher --directory="${GIT_DIR}"
+            else
+                command git --help
+            fi
+        else
+            command git "$@"
+        fi
+    }
+}

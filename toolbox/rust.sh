@@ -60,4 +60,7 @@ cargo install "cargo-info"    # crates.io in the terminal
 cargo install "tokio-console" # Tokio Tracing Console
 cargo install "cargo-update"  # Update all installed binaries
 
+# Other tools that I want to try to start using more
+cargo install "gitui"         # Git TUI
+
 curl -sSfL "https://get.wasmer.io" | bash

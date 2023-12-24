@@ -1,13 +1,17 @@
 # :book: Yet Another Dotfiles Repo
 
-To setup a new environment:
-
 ```bash
-cd ~
-git clone "git@github.com:zanbaldwin/dotfiles.git" "~/.dotfiles"
+export DOTFILES="${HOME}/.dotfiles"
+git clone "git@github.com:zanbaldwin/dotfiles.git" "${DOTFILES}"
 ```
 
-Follow the installation steps in [`install-fedora.md`](install-fedora.md); if not using Silverblue, ignore all `toolbox` container manager commands.
-If not using Fedora, then read through the toolbox scripts and figure this shit out yourself.
+- User configuration files are stored in [`stow/`](./stow)
+- Environment setup scripts are stored in [`toolbox/`](./toolbox)
+- Various notes, reminders and archived stuff are in [`notes/`](./notes)
 
-The old, archived, _unmaintained_ [Debian-based setup script](archive/install-ubuntu.sh) from when I used Ubuntu is still around.
+Follow the installation steps in [`install-fedora.md`](install-fedora.md);
+if not using Silverblue, don't use `toolbox` to run scripts.
+
+If not using Fedora, then read through the toolbox scripts and figure this
+shit out yourself. User configuration has been written to at least try to
+work well on macOS, but there are no guarantees.

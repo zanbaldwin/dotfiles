@@ -7,11 +7,19 @@ Still left to figure out:
 
 ## System (Immutable) Setup
 
-### Image Layers
+### Image Update Settings
+Edit `/etc/rpm-ostreed.conf` to make sure that Silverblue will automatically check for new updates.
+```conf
+[Daemon]
+AutomaticUpdatePolicy=check
+```
+
 Check for any system updates, especially any security advisories.
 ```bash
 rpm-ostree upgrade --check
 ```
+
+### Image Layers
 
 List of software to be installed, and blacklist the _nouveau_ (non-proprietary) graphics drivers:
 - nVidia Graphics Drivers
@@ -23,7 +31,6 @@ List of software to be installed, and blacklist the _nouveau_ (non-proprietary) 
 > - `phracek-PyCharm`
 > - `rpmfusion-nonfree-steam`
 
-> **TODO:** Figure out nVidia drivers for Wayland.
 ```bash
 rpm-ostree kargs \
     --append=rd.driver.blacklist=nouveau \
@@ -43,19 +50,10 @@ systemctl reboot
 
 Enable services and modify user groups.
 ```bash
-bash "./toolbox/enable-services.sh"
-```
-
-### Image Update Settings
-Edit `/etc/rpm-ostreed.conf` to make sure that Silverblue will automatically check for new updates.
-```conf
-[Daemon]
-AutomaticUpdatePolicy=check
+bash "${DOTFILES}/toolbox/enable-services.sh"
 ```
 
 ## User (Mutable) Setup
-
-> `cd` into the directory this repository was cloned into. Usually something like `~/.dotfiles`.
 
 Install software from Flathub: _BitWarden, Chromium, CLion, Discord, Flatseal,
 GNOME Extension Manager, Obsidian, PHPStorm, Skype, Slack, SmartGit, Spotify,
@@ -64,37 +62,37 @@ VLC, VS Code, Zoom._
 > Don't forget to allow PHPStorm access to `/tmp` via Flatseal.
 
 ```bash
-bash "./toolbox/install-apps.sh"
+bash "${DOTFILES}/toolbox/install-apps.sh"
 ```
 
 Configure GNOME Desktop
 ```bash
-bash "./toolbox/setup-gnome.sh"
+bash "${DOTFILES}/toolbox/setup-gnome.sh"
 ```
 
 Import custom configuration from this repository.
 ```bash
 toolbox create stow
-toolbox run --container="stow" bash "./toolbox/stow-config.sh"
+toolbox run --container="stow" bash "${DOTFILES}/toolbox/stow-config.sh"
 toolbox rm -f stow
 ```
 
 Install Rust (and Cargo, and awesome command-line tools)
 ```bash
 toolbox create rust
-toolbox run --container="rust" bash "./toolbox/install-rust.sh"
+toolbox run --container="rust" bash "${DOTFILES}/toolbox/install-rust.sh"
 ```
 
 Setup PHP Environment
 ```bash
 toolbox create php
-toolbox run --container="php" bash "./toolbox/install-php.sh"
+toolbox run --container="php" bash "${DOTFILES}/toolbox/install-php.sh"
 ```
 
 Setup Hyprland WM
 ```bash
 toolbox create hyprland
-toolbox run --container="hyprland" bash "./toolbox/build-hyprland.sh"
+toolbox run --container="hyprland" bash "${DOTFILES}/toolbox/build-hyprland.sh"
 toolbox rm -f hyprland
 sudo rsync --archive --whole-file "${HOME}/.hyprland-build/" "/usr/local/"
 rm -rf "${HOME}/.hyprland-build"

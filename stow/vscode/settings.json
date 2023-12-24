@@ -1,0 +1,29 @@
+{
+    "editor.guides.bracketPairs": "active",
+    "workbench.iconTheme": "material-icon-theme",
+    "files.autoSave": "onFocusChange",
+    "editor.fontFamily": "'FiraCode Nerd Font', 'Fira Code', 'UbuntuMono Nerd Font', 'Ubuntu Mono', Menlo, Monaco, 'Courier New', monospace",
+    "editor.fontSize": 14,
+    "editor.renderWhitespace": "trailing",
+    "editor.cursorStyle": "line-thin",
+    "editor.cursorBlinking": "phase",
+    "editor.find.autoFindInSelection": "multiline",
+    "editor.fontLigatures": true,
+    "editor.formatOnSave": true,
+    "diffEditor.codeLens": true,
+    "diffEditor.ignoreTrimWhitespace": false,
+    "editor.minimap.renderCharacters": false,
+    "files.eol": "\n",
+    "files.trimFinalNewlines": true,
+    "files.trimTrailingWhitespace": true,
+    "workbench.colorTheme": "Visual Studio Dark",
+    "workbench.fontAliasing": "auto",
+    "workbench.editor.autoLockGroups": {
+        "mainThreadWebview-markdown.preview": true
+    },
+    "rust-analyzer.inlayHints.parameterHints": true,
+    "rust-analyzer.inlayHints.bindingModeHints.enable": true,
+    "rust-analyzer.inlayHints.lifetimeElisionHints.enable": "skip_trivial",
+    "rust-analyzer.inlayHints.lifetimeElisionHints.useParameterNames": true,
+    "rust-analyzer.lens.enable": false
+}

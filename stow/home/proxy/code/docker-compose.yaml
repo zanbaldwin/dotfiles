@@ -9,7 +9,9 @@ x-logging:
 services:
     proxy-manager:
         image: 'jc21/nginx-proxy-manager:${PROXY_MANAGER_VERSION:-latest}'
-        restart: 'unless-stopped'
+        # When using Podman, containers only get restarted after a reboot if
+        # the restart policy is set to "always". Do not use "unless-stopped".
+        restart: 'always'
         logging: *default-logging
         healthcheck:
             test: [ "CMD", "/bin/check-health" ]

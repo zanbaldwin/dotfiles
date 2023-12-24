@@ -7,7 +7,10 @@
 #     "Development Tools"
 
 sudo dnf install --assumeyes \
-    "gcc"
+    "alsa-lib-devel" \
+    "gcc" \
+    "openssl-devel" \
+    "pkg-config"
 
 # Yeah, this is not good. Running an arbitrary script from the internet.
 # Only doing this because Rust does not provide signatures for installing Rust in a version-agnostic way.
@@ -36,6 +39,11 @@ cargo install "mprocs"    # Multi Process Runner
 cargo install "onefetch"  # Git Repository Overview
 cargo install "ripgrep"   # It's just fast
 cargo install "zellij"    # Terminal Multiplexer (tmux replacement)
+
+# Control Spotify from command line, instead of through Flatpak. Used for Eww.
+# `secret-tool store --label='spotifyd' application rust-keyring service spotifyd username zanbaldwin`
+cargo install "spotifyd" --features "dbus_keyring"
+cargo install "spotify-tui"
 
 # The following need more testing on Linux. See `stow/bash/.bashrc.d/directories.sh`.
 cargo install "broot"     # Terminal directory browser

@@ -7,8 +7,6 @@
 #     "Development Tools"
 
 sudo dnf install --assumeyes \
-    "cmake" \
-    "fontconfig-devel" \
     "gcc"
 
 # Yeah, this is not good. Running an arbitrary script from the internet.
@@ -32,11 +30,6 @@ cargo install "exa"       # `ls` but better
 cargo install "starship"  # PS1
 
 # Useful Rust binaries that I want on my machine, but I'll cancel the script about here when running in VMs.
-if [[ "${OSTYPE}" == "linux-gnu"* ]]; then
-    # Alacritty on macOS is poopy. Only install on Linux.
-    # iTerm2 is the best you're going to get for macOS and that's still shit.
-    cargo install "alacritty";
-fi
 cargo install "coreutils" # Rusty GNU
 cargo install "git-delta" # Better Diffing
 cargo install "mprocs"    # Multi Process Runner

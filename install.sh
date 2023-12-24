@@ -86,7 +86,6 @@ stow --dir="${SCRIPT_DIRECTORY}" --target="${HOME}" bash
 stow --dir="${SCRIPT_DIRECTORY}" --target="${HOME}" editor
 stow --dir="${SCRIPT_DIRECTORY}" --target="${HOME}" git
 stow --dir="${SCRIPT_DIRECTORY}" --target="${HOME}" gnupg
-stow --dir="${SCRIPT_DIRECTORY}" --target="${HOME}" nvim
 stow --dir="${SCRIPT_DIRECTORY}" --target="${HOME}" ssh
 stow --dir="${SCRIPT_DIRECTORY}" --target="${HOME}" tmux
 

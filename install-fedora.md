@@ -44,33 +44,14 @@ AutomaticUpdatePolicy=check
 ```
 
 ## User (Mutable) Setup
-Software from official Fedora Repositories:
-- Dconf Editor (`ca.desrt.dconf-editor`)
-
 Software from FlatHub:
-- BitWarden (`com.bitwarden.desktop`)
-- Chromium (`org.chromium.Chromium`)
-- CLion (`com.jetbrains.CLion`)
-- Discord (`com.discordapp.Discord`)
-- Flatseal (`com.github.tchx84.Flatseal`)
-- GNOME Extension Manager (`com.mattjakeman.ExtensionManager`)
-- Obsidian (`md.obsidian.Obsidian`)
-- PHPStorm (`com.jetbrains.PhpStorm`)
-- Skype (`com.skype.Client`)
-- Slack (`com.slack.Slack`)
-- SmartGit (`com.syntevo.SmartGit`)
-- Spotify (`com.spotify.Client`)
-- VLC (`org.videolan.VLC`)
-- VS Code (`com.visualstudio.code`)
-- Zoom (`us.zoom.Zoom`)
+
+BitWarden, Chromium, CLion, Discord, Flatseal, GNOME Extension Manager,
+Obsidian, PHPStorm, Skype, Slack, SmartGit, Spotify, VLC, VS Code, Zoom.
 
 ```bash
 flatpak remote-add --if-not-exists flathub https://flathub.org/repo/flathub.flatpakrepo
 flatpak remote-modify --enable flathub
-
-# Might not need this? Is dconf-cli already installed?
-flatpak install --noninteractive --assumeyes --or-update fedora \
-    ca.desrt.dconf-editor
 
 flatpak install --noninteractive --assumeyes --or-update flathub \
     com.bitwarden.desktop \
@@ -92,74 +73,23 @@ flatpak install --noninteractive --assumeyes --or-update flathub \
 
 Configure GNOME Desktop
 ```bash
-dconf write "/org/gnome/desktop/input-sources/xkb-options" "['caps:swapescape']"
-dconf write "/org/gnome/desktop/calendar/show-weekdate" "false"
-dconf write "/org/gnome/desktop/interface/clock-show-weekday" "true"
-# Following is a string and must be quoted as such.
-dconf write "/org/gnome/desktop/wm/preferences/button-layout" "'appmenu:minimize,maximize,close'"
-dconf write "/org/gnome/system/location/enabled" "false"
+toolbox create dconf
+toolbox enter dconf
+bash "./toolbox/install-dconf.sh"
 ```
 
-Install Rust (and Cargo)
+Install Rust (and Cargo, and awesome command-line tools)
 ```bash
 toolbox create rust
 toolbox enter rust
-
-sudo dnf group install \
-    "C Development Tools and Libraries" \
-    "Development Libraries" \
-    "Development Tools"
-
-# Yeah, this is not good. Running an arbitrary script from the internet.
-# Only doing this because Rust does not provide signatures for installing Rust in a version-agnostic way.
-command -v "cargo" >"/dev/null" 2>&1 && { \
-    rustup update; \
-} || { \
-    curl --proto '=https' --tlsv1.2 -sSf "https://sh.rustup.rs" >"/tmp/rustup.sh" && { \
-        sh /tmp/rustup.sh -qy --no-modify-path; \
-        source "${HOME}/.cargo/env"; \
-    } || { echo >&2 "Error downloading Rustlang installation script."; } \
-}
+bash "./toolbox/install-rust.sh"
 ```
 
-Install Awesome Command-line Tools from Crates
-```bash
-toolbox enter rust
-
-# Install Tools from Rustland/Crates
-# This requires build-essential tools, so make sure you're inside the rust toolbox.
-command -v "cargo" >"/dev/null" 2>&1 && { \
-    cargo install bat; \
-    cargo install exa; \
-    cargo install git-delta; \
-    cargo install onefetch; \
-    cargo install starship; \
-}
-```
-
-Explicitly create directories that shouldn't be made into symbolic links:
-```bash
-mkdir -p \
-    "${HOME}/bin" \
-    "${HOME}/.config" \
-    "${HOME}/.ssh"
-```
-
-From the root of this repository, import custom configuration files.
+Import custom configuration from this repository.
 ```bash
 toolbox create stow
 toolbox enter stow
-
-sudo dnf install stow
-
-stow --target="${HOME}" --stow \
-    bash \
-    cargo \
-    editor \
-    git \
-    ssh \
-    starship \
-    tmux
+bash "./toolbox/install-stow.sh"
 ```
 
 ### Common Terminal Tools

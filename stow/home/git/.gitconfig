@@ -73,6 +73,8 @@
 	recurseSubmodules = check
 [pull]
     rebase = true
+[rebase]
+    autoStash = true
 [pager]
     # "diff-highlight" isn't installed by default, you can find it in the
     # contrib section of the Git repo (requires Perl to be installed):
@@ -101,7 +103,8 @@
 
 # Force Git to always download over SSH to prevent GitHub's API throttling and/or
 # asking for username and password (which is near-to-impossible to do on the
-# command-line if 2FA has been enabled).
+# command-line if 2FA has been enabled). This is a massive pain when you're cloning
+# repositories on a machine you haven't set SSH up on yet.
 #[url "git@github.com:"]
 #    insteadOf  = https://github.com/
 [merge]

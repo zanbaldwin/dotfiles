@@ -24,6 +24,8 @@ alias less="less -S -R"
 # execute it constantly whilst waiting for a different output.
 alias follow='watch $(history -p !!)'
 
+alias xx="exit"
+
 # ============================= #
 # Directory and File Management #
 # ============================= #
@@ -291,6 +293,12 @@ export PATH="${HOME}/.yarn/bin:${HOME}/.config/yarn/global/node_modules/.bin:${P
 # =============== #
 # Auto-completion #
 # =============== #
+
+which mosh >/dev/null 2>&1
+if [ $? -eq 0 ]; then
+    # Use the same bash-completion rules for Mosh as are registered to SSH.
+    $(complete -p ssh) mosh
+fi
 
 ## These are not meant to be executed every time a new Bash environment is created, instead they
 ## are helpful reminders to set up autocompletion on a new system. Most assume that the associated

@@ -60,7 +60,6 @@ RUN rpm-ostree install --idempotent --allow-inactive --releasever="39" \
  && cat "/etc/sudoers" | grep -v "secure_path" | tee "/etc/sudoers" >"/dev/null" \
  && rm -rf /tmp/* /var/* \
  && ostree container commit
-COPY "./usr/" "/usr/"
 COPY --from="alacritty" "/opt/alacritty/" "/usr/"
 
 # === RUST === #

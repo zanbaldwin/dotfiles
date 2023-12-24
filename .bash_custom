@@ -1,34 +1,67 @@
-# ===== #
-# Paths #
-# ===== #
+# ======== #
+# Go! Lang #
+# ======== #
 
 # Golang
 export GOROOT="/usr/lib/go"
 export GOPATH="$HOME/code/golang"
 export PATH="$PATH:$GOPATH/bin"
 
-# PHP+Composer+Puli
-# Make sure that XDebug is installed but not enabled in the CLI configuration. This will make
-# sure that running commands like "composer" will not use XDebug, but commands like "php ..."
-# will use XDebug.
-alias php='php -dzend_extension=xdebug.so'
-alias phpunit='php $(which phpunit)'
-alias puli='set -f;puli';puli(){ command puli "$@";set +f;}
-export PATH="$PATH:$HOME/.config/composer/vendor/bin:$HOME/.composer/vendor/bin"
-# For parallel package downloading in Composer (!!!) install the following global package:
-#     $ composer global require hirak/prestissimo
-# Now that we have Composer package binaries on the PATH, install the useful CGR package:
-#     $ composer global require consolidation/cgr
-# Then install some useful packages:
-#     $ cgr bamarni/symfony-console-autocomplete
-#     $ cgr phpunit/phpunit
-#     $ cgr squizlabs/php_codesniffer
-#     $ cgr puli/cli:^1.0
-# And then initialise them:
-SAPATH=$(which symfony-autocomplete)
+# === #
+# PHP #
+# === #
+
+PHP=$(which php)
 if [ $? -eq 0 ]; then
-    eval "$($SAPATH)"
+
+    # Make sure that XDebug is installed but not enabled in the CLI configuration. This will make
+    # sure that running commands like "composer" will NOT use XDebug, but commands like "php ..."
+    # WILL use XDebug.
+    # NOTE: Because XDebug is not enabled in the configuration we cannot check for it's existence,
+    #       delete the following line if XDebug is not installed (available in the extension
+    #       directory located at `php-config --extension-dir`).
+    alias php='php -dzend_extension=xdebug.so'
+
+    # Vulcan Logic Disassembler
+    # To install: `pecl install vld` (currently in beta only, so install vld-beta instead).
+    alias vld='php -d vld.active=1 -d vld.execute=0 -d vld.dump_paths=1 -d vld.save_paths=1 -d vld.verbosity=0'
+
+    # Add global Composer package binaries to $PATH.
+    export PATH="$PATH:$HOME/.config/composer/vendor/bin:$HOME/.composer/vendor/bin"
+
+    # For parallel package downloading in Composer (!!!) install the following global package:
+    #     $ composer global require hirak/prestissimo
+    # Now that we have Composer package binaries on the PATH, install the useful CGR package:
+    #     $ composer global require consolidation/cgr
+    # Then install some useful packages:
+    #     $ cgr bamarni/symfony-console-autocomplete
+    #     $ cgr phpunit/phpunit
+    #     $ cgr squizlabs/php_codesniffer
+    #     $ cgr puli/cli
+    # And then initialise them:
+
+    SAPATH=$(which symfony-autocomplete)
+    if [ $? -eq 0 ]; then
+        eval "$($SAPATH)"
+    fi
+
+    # PHPUnit (this enables XDebug automatically on the CLI).
+    PHPUNIT=$(which phpunit)
+    if [ $? -eq 0 ]; then
+        alias phpunit="php $PHPUNIT"
+    fi
+
+    # Puli Universal Packages Manager.
+    PULI=$(which puli)
+    if [ $? -eq 0 ]; then
+        alias puli='set -f;puli';puli(){ command puli "$@";set +f;}
+    fi
+
 fi
+
+# === #
+# AWS #
+# === #
 
 # AWS Autocompletion
 if [[ -f /usr/local/bin/aws_completer ]]; then

@@ -19,6 +19,7 @@ alias fuck='sudo "$BASH" -c "$(history -p !!)"'
 alias fucking="sudo"
 alias vim="vim -N"
 alias v="vim -N"
+# Old habits die hard...
 alias docker-composer="docker-compose"
 
 alias dig="dig +nocmd any +multiline +noall +answer"

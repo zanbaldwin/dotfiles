@@ -12,7 +12,7 @@ if ls --group-directories-first >"/dev/null" 2>&1; then
 fi
 
 command -v "exa" >"/dev/null" 2>&1 && {
-    alias ll="exa -labUh --git --group-directories-first";
+    alias ll="exa -labUh --git --group-directories-first --icons";
 } || {
     # shellcheck disable=SC2139
     alias ll="ls -lAhHp${LL_OPTIONS}";

@@ -13,6 +13,7 @@ flatpak install --noninteractive --assumeyes --or-update fedora \
     "org.mozilla.Firefox"
 flatpak install --noninteractive --assumeyes --or-update flathub \
     "com.bitwarden.desktop" \
+    "com.mongodb.Compass" \
     "com.github.tchx84.Flatseal" \
     "com.mattjakeman.ExtensionManager" \
     "org.freedesktop.Platform.ffmpeg-full" \

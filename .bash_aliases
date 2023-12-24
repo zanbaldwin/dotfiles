@@ -27,6 +27,8 @@ alias follow='watch $(history -p !!)'
 
 alias xx="exit"
 
+title() { print -Pn "\e]2;$@\a" }
+
 # ============================= #
 # Directory and File Management #
 # ============================= #
@@ -45,11 +47,17 @@ if [ $? -eq 0 ]; then
 fi
 alias ll="ls -lAhHp${LL_OPTIONS}"
 
+alias cp="cp -iv"
+alias mv="mv -iv"
+alias rmdir="rmdir -v"
+alias ln="ln -v"
+
 alias c="clear"
 alias ..="cd .."
 alias ~="cd ~"
 alias cd..="cd .."
 alias back="cd -"
+alias cdgit='cd $(git rev-parse --show-toplevel)'
 alias mkdir="mkdir -pv"
 alias chmod="chmod -Rv"
 alias chown="chown -Rv"
@@ -136,6 +144,7 @@ function whois() {
 }
 
 alias freenode="irssi --connect=chat.freenode.net --nick=ZanBaldwin"
+alias fx="firefox --new-instance --profile $(mktemp -d)"
 
 # ========================================================= #
 # GnuPG SSH Authentication                                  #

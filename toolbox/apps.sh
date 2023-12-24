@@ -6,11 +6,11 @@ flatpak update --appstream
 flatpak update
 
 # Chromium/Chrome is fucky on Hyprland/Wayland. Firefox is much more stable.
-# Install the Firefox Flatpak from Fedora's repositories, otherwise the system
-# trust store will not be mounted into the Flatpak and Firefox will not trust
-# MkCert certificates for local development.
-flatpak install --noninteractive --assumeyes --or-update fedora \
-    "org.mozilla.Firefox"
+# However, the Firefox from Fedora's repositories isn't able to play media on
+# sites like Twitter, and the Firefox from Flathub's repositories doesn't
+# respect the system-wide trust store so development certificates from MkCert
+# don't work. Use the non-Flatpak version of Firefox that comes with the system.
+
 flatpak install --noninteractive --assumeyes --or-update flathub \
     "com.bitwarden.desktop" \
     "com.mongodb.Compass" \

@@ -39,13 +39,10 @@ RUN source "${HOME}/.cargo/env" \
 FROM "${IMAGE}:${VERSION}" AS gnome
 MAINTAINER "Zan Baldwin"
 COPY "./usr/" "/usr/"
-## I would prefer to keep all software in Flatpaks, but the firefox from Flathub doesn't honour
-## custom certificates from MkCert and the firefox from FedoraProject doesn't have enough codecs
-## to play media on Twitter. So fuck it, back to system package.
-## When installing Firefox as a Flatpak, you *MUST* download it from the Fedora
-## repositories and not from Flathub - otherwise it won't respect the system-wide
-## CA Trust stores.
-RUN rpm-ostree override remove firefox firefox-langpacks
+## I would prefer to keep all software in Flatpaks, but the firefox from Flathub
+## doesn't honour custom certificates from MkCert and the firefox from
+## FedoraProject doesn't have enough codecs to play media on Twitter. So that's
+## why we're keeping the system package.
 RUN rpm-ostree install --idempotent --allow-inactive --releasever="39" \
         bridge-utils edk2-ovmf guestfs-tools libvirt qemu-kvm virt-install virt-manager \
         podman-docker podman-plugins podman-tui containernetworking-plugins aardvark-dns \

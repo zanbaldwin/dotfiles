@@ -2,6 +2,8 @@
 # =====
 
 export PATH="$PATH:$HOME/.composer/vendor/bin"
+# composer global require bamarni/symfony-console-autocomplete
+# eval "$(symfony-autocomplete)"
 export GOROOT="/usr/lib/go"
 export GOPATH="$HOME/code/golang"
 

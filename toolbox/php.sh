@@ -20,7 +20,8 @@ sudo dnf install --assumeyes \
     "php-pgsql" \
     "php-process" \
     "php-soap" \
-    "php-xml"
+    "php-xml" \
+    "wkhtmltopdf"
 
 { \
     echo "[XDebug]"; \

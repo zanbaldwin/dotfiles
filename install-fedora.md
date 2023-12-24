@@ -106,10 +106,10 @@ Install Rust (and Cargo)
 ```bash
 # Yeah, this is not good. Running an arbitrary script from the internet.
 # Only doing this because Rust does not provide signatures for installing Rust in a version-agnostic way.
-command -v "cargo" >/dev/null 2>&1 && { \
+command -v "cargo" >"/dev/null" 2>&1 && { \
     rustup update; \
 } || { \
-    curl --proto '=https' --tlsv1.2 -sSf "https://sh.rustup.rs" > "/tmp/rustup.sh" && { \
+    curl --proto '=https' --tlsv1.2 -sSf "https://sh.rustup.rs" >"/tmp/rustup.sh" && { \
         sh /tmp/rustup.sh -qy --no-modify-path; \
         source "${HOME}/.cargo/env"; \
     } || { echo >&2 "Error downloading Rustlang installation script."; } \
@@ -120,7 +120,7 @@ Install Awesome Command-line Tools from Crates
 ```bash
 # Install Tools from Rustland/Crates
 # This requires build-essential tools, so must be done after system/rpm-ostree.
-command -v "cargo" >/dev/null 2>&1 && { \
+command -v "cargo" >"/dev/null" 2>&1 && { \
     cargo install bat; \
     cargo install exa; \
     cargo install git-delta; \
@@ -129,11 +129,34 @@ command -v "cargo" >/dev/null 2>&1 && { \
 }
 ```
 
+Explicitly create directories that shouldn't be made into symbolic links:
+```bash
+mkdir -p \
+    "${HOME}/.bin" \
+    "${HOME}/.config" \
+    "${HOME}/.ssh"
+```
+
+From the root of this repository, import custom configuration files.
+```bash
+stow --target="${HOME}" --stow \
+    bash \
+    cargo \
+    editor \
+    git \
+    ssh \
+    starship \
+    tmux
+```
+
 ### Common Terminal Tools
 Tools that can go in `~/.bin` (the mutable version of `/usr/local/bin`)
 - [`btop`](https://github.com/aristocratos/btop)
 - [`composer`](https://getcomposer.org)
 - [`duf`](https://github.com/muesli/duf)
+- [`docker-compose`](https://github.com/docker/compose)
+- `mkcert`
+- `box`
 
 ## Toolboxes
 

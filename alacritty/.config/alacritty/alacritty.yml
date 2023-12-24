@@ -434,9 +434,9 @@ colors:
 #   - (Linux/BSD) user login shell
 #   - (Windows) powershell
 shell:
-  program: 'tmux'
+  program: '/usr/bin/tmux'
   args:
-    - 'attach'
+    - '-2'
 
 # Startup directory
 #

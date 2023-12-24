@@ -134,13 +134,16 @@ command -v nano >/dev/null 2>&1 && {
 # Do not word wrap
 alias less="less -S -R -N"
 
+alias copy="xclip -sel clip"
+alias paste="xclip -out -sel clip"
+
 # ========== #
 # Networking #
 # ========== #
 
 alias utc='date -u "+%Y%m%dT%H%M%SZ"'
 ## SSH
-alias hosts="cat \"\${HOME}/.ssh/config\" | grep 'Host ' | cut -d' ' -f2 | sort"
+alias hosts="cat \"\${HOME}/.ssh/config\" \${HOME}/.ssh/conf.d/* | grep 'Host ' | tr -s ' ' | cut -d' ' -f2 | sort"
 alias ssh-config="${EDITOR} \"\${HOME}/.ssh/config\""
 ## HTTP/S
 alias wget="wget -c"

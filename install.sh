@@ -37,7 +37,8 @@ install_as_sudo() {
         scdaemon \
         sl \
         stow \
-        tmux
+        tmux \
+        xclip
     ## Snap Repository Software
     snap install --stable --classic aws-cli
     snap install --stable --classic phpstorm
@@ -90,6 +91,7 @@ install_as_sudo() {
     # array inside already existing JSON, defaulting to an empty object when the
     # file does not exist or is invalid JSON.
     TEMPFILE="$(mktemp)" # (to prevent race conditions inside pipelines)
+    mkdir -p "/etc/opt/chrome/policies/managed"
     (cat "/etc/opt/chrome/policies/managed/policies.json" 2>/dev/null || echo '{}') \
         | (grep "." || echo '{}') \
         | (jq 2>/dev/null || echo '{}') \
@@ -132,6 +134,7 @@ install_as_user() {
     command -v "cargo" >/dev/null 2>&1 && { \
         cargo install bat; \
         cargo install exa; \
+        cargo install git-delta; \
     }
 
     # Pre-create some directories so that GNU stash symlinks the files that go in them rather

@@ -5,6 +5,8 @@
 # Bash-specific #
 # ============= #
 
+alias reload=". ~/.bashrc"
+
 # Up & down map to history search once a command has been started.
 bind '"\e[A":history-search-backward'
 bind '"\e[B":history-search-forward'
@@ -106,6 +108,11 @@ docker() {
         command docker $@
     fi
 }
+
+alias v1="docker-compose -f docker-compose.yml"
+alias v2="docker-compose -f docker-compose-v2.yml"
+alias v3="docker-compose -f docker-compose-v3.yml"
+alias v4="docker-compose -f docker-compose-v4.yml"
 
 # === #
 # PHP #

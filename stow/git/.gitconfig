@@ -60,6 +60,7 @@
 [user]
     name = Zan Baldwin
     email = hello@zanbaldwin.com
+	signingkey = 8487AAE3D763501F
 [init]
 	defaultBranch = main
 [push]
@@ -124,7 +125,7 @@
     line-numbers-left-format = "{nm:>4}┊"
     line-numbers-right-format = "{np:>4}│"
 [commit]
-	gpgSign = false
+	gpgsign = false
 [gui]
 	pruneduringfetch = true
 [smartgit "submodule"]

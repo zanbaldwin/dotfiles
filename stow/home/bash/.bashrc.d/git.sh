@@ -1,5 +1,7 @@
 #!/bin/bash
 
+export GIT_DISCOVERY_ACROSS_FILESYSTEM=0
+
 # This function relies on Git repositories having sensible tag names. Do not rely on it.
 latest_stable_version () {
     #local GIT_DIR="${1:-$(pwd)}"

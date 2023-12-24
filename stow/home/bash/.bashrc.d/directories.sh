@@ -60,8 +60,6 @@ alias back="cd -"
 alias cdgit='cd $(git rev-parse --show-toplevel)'
 alias mkdir="mkdir -pv"
 
-export GIT_DISCOVERY_ACROSS_FILESYSTEM=0
-
 command -v "broot" >"/dev/null" 2>&1 && {
     # This function starts broot and executes the command it produces, if any.
     # It's needed because some shell commands, like `cd`, have no useful effect if executed in a subshell.

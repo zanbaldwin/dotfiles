@@ -53,7 +53,6 @@ alias mkdir="mkdir -pv"
 alias chmod="chmod -Rv"
 alias chown="chown -Rv"
 # See https://github.com/sharkdp/bat/releases
-alias cat="bat --theme=DarkNeon"
 alias rm="rm -v"
 function f() {
     find . -name "$1" 2>&1 | grep -v 'Permission denied'
@@ -61,6 +60,13 @@ function f() {
 function search() {
     grep -l -c -r "$1" .
 }
+
+which bat >/dev/null 2>&1
+if [ $? -eq 0 ]; then
+    # https://github.com/sharkdp/bat/releases
+    alias cat="bat --theme=DarkNeon"
+fi
+
 which trash >/dev/null 2>&1
 if [ $? -eq 0 ]; then
     alias rm="trash -v"
@@ -286,6 +292,12 @@ export PATH="${PATH}:${GOROOT}/bin:${GOPATH}/bin"
 # ====== #
 
 export PATH="${HOME}/.yarn/bin:${HOME}/.config/yarn/global/node_modules/.bin:${PATH}"
+
+# ========= #
+# Rust Lang #
+# ========= #
+
+[ -f "~/.cargo/env" ] && . "~/.cargo/env"
 
 # =============== #
 # Auto-completion #

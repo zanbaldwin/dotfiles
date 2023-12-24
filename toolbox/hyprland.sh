@@ -44,6 +44,7 @@ sudo dnf install --assumeyes \
     mesa-libGL-devel \
     mingw64-vulkan-headers \
     mingw64-vulkan-loader \
+    ninja-build \
     pip \
     vulkan-headers \
     vulkan-loader-devel \

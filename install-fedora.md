@@ -70,17 +70,18 @@ Configure GNOME Desktop
 bash "${DOTFILES}/toolbox/setup-gnome.sh"
 ```
 
+Install Rust (and Cargo, and awesome command-line tools). _Run this before `stow`
+since custom configuration references binaries installed in via Rust._
+```bash
+toolbox create rust
+toolbox run --container="rust" bash "${DOTFILES}/toolbox/install-rust.sh"
+```
+
 Import custom configuration from this repository.
 ```bash
 toolbox create stow
 toolbox run --container="stow" bash "${DOTFILES}/toolbox/stow-config.sh"
 toolbox rm -f stow
-```
-
-Install Rust (and Cargo, and awesome command-line tools)
-```bash
-toolbox create rust
-toolbox run --container="rust" bash "${DOTFILES}/toolbox/install-rust.sh"
 ```
 
 Setup PHP Environment

@@ -14,6 +14,16 @@ $ ln -s dotfiles/.tmux.conf .tmux.conf
 
 ### Extras
 
+#### Swapping Caps Lock with Escape
+
+1. `sudo apt install dconf-tools`
+2. `dconf write /org/gnome/desktop/input-sources/xkb-options "['caps:swapescape']"`
+
+Alternatively, you can use the `dconf-editor` GUI once DConf tools are installed.
+
+> Use `caps:escape` instead if you want to just set Caps Lock to Escape instead
+> of swapping the functionality of the keys.
+
 #### Remapping Keyboard Keys
 
 > :no_entry: Beware! :dragon_face: here be dragons!

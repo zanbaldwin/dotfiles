@@ -23,6 +23,7 @@ apt install -y \
     ncdu \
     neofetch \
     rsync \
+    scdaemon \
     sl \
     stow \
     tmux \

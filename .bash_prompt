@@ -11,9 +11,9 @@
 # to /etc/profile.d/git-prompt.sh for it to be available globally:
 # https://raw.github.com/git/git/master/contrib/completion/git-prompt.sh
 
-if [ -f "./.git-prompt.sh" ]; then
+if [ -f "$HOME/.git-prompt.sh" ]; then
     # In case it can't be installed to a location that's loaded automatically (grrr, Mac OS)
-    source "./.git-prompt.sh"
+    source "$HOME/.git-prompt.sh"
 fi
 
 # Inputs.

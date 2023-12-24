@@ -37,16 +37,15 @@ install_as_sudo() {
         tmux
 
     # Docker Engine
-    curl -fsSL "https://download.docker.com/linux/ubuntu/gpg" | gpg --dearmor >"/usr/share/keyrings/docker-archive-keyring.gpg"
+    curl -fsSL "https://download.docker.com/linux/ubuntu/gpg" \
+        | gpg --dearmor >"/usr/share/keyrings/docker-archive-keyring.gpg"
     echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/docker-archive-keyring.gpg] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable" >"/etc/apt/sources.list.d/docker.list"
     apt update
     apt install -y \
         docker-ce \
         docker-ce-cli \
         containerd.io
-
     usermod -aG "docker" "${ORIGINAL_USER}"
-    newgrp "docker"
 
     snap install --stable --classic aws-cli
     snap install --stable --classic phpstorm
@@ -65,7 +64,8 @@ install_as_sudo() {
         curl -fsSL "https://raw.githubusercontent.com/ogham/exa/master/completions/bash/exa" >"/etc/bash_completion.d/exa"
     fi
 
-    # Force Chromium to always allow Unsecured HTTP for Localhost, without force redirecting to HTTPS.
+    # Force Chromium to always allow Unsecured HTTP for Localhost, without force
+    # redirecting to HTTPS.
     if [ ! -f "/etc/opt/chrome/policies/managed/policies.json" ]; then
         mkdir -p "/etc/opt/chrome/policies/managed"
         touch "/etc/opt/chrome/policies/managed/policies.json"
@@ -75,7 +75,8 @@ install_as_sudo() {
 
 install_as_user() {
     # Install Rust (+ Cargo)
-    # Yeah, this is not good. Running an arbitrary script from the internet. Don't do this. Except for this time.
+    # Yeah, this is not good. Running an arbitrary script from the internet.
+    # Don't do this. Except for this time.
     command -v "cargo" >/dev/null 2>&1 && { \
         rustup update; \
     } || { \
@@ -104,16 +105,25 @@ install_as_user() {
 }
 
 echo >&2 "This installation script needs root access to install system packages."
-# These things need to be installed as the root user (pass in a reference to the current user).
+# These things need to be installed as the root user (pass in a reference to
+# the current user).
 sudo sh -c "$(declare -f install_as_sudo); install_as_sudo \"${USER}\"";
-# The rest need to be installed as the current user so they affect that user's home directory and environment.
+# The rest need to be installed as the current user so they affect that user's
+# home directory and environment.
 install_as_user
 
-# [Discord](https://discord.com/api/download?platform=linux&format=deb)
-# [Docker Compose](https://docs.docker.com/compose/install/)
-# [NordVPN](https://support.nordvpn.com/Connectivity/Linux/1325531132/Installing-and-using-NordVPN-on-Debian-Ubuntu-Raspberry-Pi-Elementary-OS-and-Linux-Mint.htm)
-# [VirtualBox](https://www.virtualbox.org/wiki/Linux_Downloads); use deb file instead of repository.
+# ================================================== #
+# Other Software (best left for manual installation) #
+# ================================================== #
 
+# - Discord
+#   https://discord.com/api/download?platform=linux&format=deb
 
+# - Docker Compose
+#   https://docs.docker.com/compose/install/
 
+# - NordVPN
+#   https://support.nordvpn.com/Connectivity/Linux/1325531132/Installing-and-using-NordVPN-on-Debian-Ubuntu-Raspberry-Pi-Elementary-OS-and-Linux-Mint.htm
 
+# - VirtualBox (use deb file instead of repository)
+#   https://www.virtualbox.org/wiki/Linux_Downloads

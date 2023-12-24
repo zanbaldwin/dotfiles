@@ -153,6 +153,11 @@ function whois() {
 alias freenode="irssi --connect=chat.freenode.net --nick=ZanBaldwin"
 alias fx="firefox --new-instance --profile $(mktemp -d)"
 
+which mycli >/dev/null 2>&1
+if [ $? -eq 0 ]; then
+    alias mysql="mycli"
+fi
+
 # ========================================================= #
 # GnuPG SSH Authentication                                  #
 # ========================================================= #
@@ -175,10 +180,6 @@ fi
 
 alias vssh="vagrant ssh"
 alias vsync="vagrant rsync"
-
-# For the following shortcut to the VM DB, you will need:
-#  mysql-client, .dev DNSMasq config, a working VM, all privileges granted to "root@%".
-alias bksql="mysql -u root -h basekit.dev basekit"
 
 # ====== #
 # Docker #

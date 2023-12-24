@@ -1,7 +1,8 @@
 # Setting Up Fedora Silverblue
 
 Still left to figure out:
-- [ ] Getting PHPStorm inside a Flatpak container to access PHP, either `toolbox` or `rpm-ostree`, using `flatpak-spawn`?
+- [x] Getting PHPStorm inside a Flatpak container to access PHP, either `toolbox` or `rpm-ostree`, using `flatpak-spawn`?
+  (must give PHPStorm Flatpak container access to `/tmp`)
 - [ ] Getting Docker Compose to work with Podman, using `podman-docker`?
 
 ## System (Immutable) Setup
@@ -20,7 +21,7 @@ rpm-ostree install --idempotent \
     "https://mirrors.rpmfusion.org/nonfree/fedora/rpmfusion-nonfree-release-$(rpm -E %fedora).noarch.rpm"
 ```
 
-List of software to be installed:
+List of software to be installed, and blacklist the _nouveau_ (non-proprietary) graphics drivers:
 - nVidia Graphics Drivers
 - Kernel-based Virtual Machine
 - PHP & Nginx (so that PHP-FPM is available as a system service)
@@ -28,17 +29,23 @@ List of software to be installed:
 ```bash
 rpm-ostree install --idempotent --allow-inactive \
     akmod-nvidia xorg-x11-drv-nvidia xorg-x11-drv-nvidia-cuda \
-    bridge-utils edk2-ovmf guestfs-tools libguestfs-tools libvirt-daemon-config-network libvirt-daemon-kvm libvirt-devel qemu-kvm virt-install virt-manager virt-top virt-viewer \
-    php php-bcmath php-devel php-fpm php-gd php-mbstring php-mysqlnd php-pdo php-pear php-pgsql php-pecl-amqp php-pecl-apcu php-pecl-redis5 php-pecl-xdebug3 php-pecl-zip php-pgsql php-process php-soap php-xml nginx \
+    bridge-utils edk2-ovmf guestfs-tools qemu-kvm virt-install virt-manager virt-top \
     distrobox nss-tools podman-docker tmux
-```
 
-Blacklist the _nouveau_ (non-proprietary) graphics drivers.
-```bash
 rpm-ostree kargs \
     --append=rd.driver.blacklist=nouveau \
     --append=modprobe.blacklist=nouveau \
     --append=nvidia-drm.modeset=1
+```
+
+Reboot into the new deployment layer.
+```bash
+systemctl reboot
+```
+
+Enable services and modify user groups.
+```bash
+bash "./toolbox/enable-services.sh"
 ```
 
 ### Image Update Settings
@@ -49,31 +56,14 @@ AutomaticUpdatePolicy=check
 ```
 
 ## User (Mutable) Setup
-Software from FlatHub:
+Install software from Flathub: _BitWarden, Chromium, CLion, Discord, Flatseal,
+GNOME Extension Manager, Obsidian, PHPStorm, Skype, Slack, SmartGit, Spotify,
+VLC, VS Code, Zoom._
 
-BitWarden, Chromium, CLion, Discord, Flatseal, GNOME Extension Manager,
-Obsidian, PHPStorm, Skype, Slack, SmartGit, Spotify, VLC, VS Code, Zoom.
+> Don't forget to allow PHPStorm access to `/tmp` via Flatseal.
 
 ```bash
-flatpak remote-add --if-not-exists flathub https://flathub.org/repo/flathub.flatpakrepo
-flatpak remote-modify --enable flathub
-
-flatpak install --noninteractive --assumeyes --or-update flathub \
-    com.bitwarden.desktop \
-    org.chromium.Chromium \
-    com.jetbrains.CLion \
-    com.discordapp.Discord \
-    com.github.tchx84.Flatseal \
-    com.mattjakeman.ExtensionManager \
-    md.obsidian.Obsidian \
-    com.jetbrains.PhpStorm \
-    com.skype.Client \
-    com.slack.Slack \
-    com.syntevo.SmartGit \
-    com.spotify.Client \
-    org.videolan.VLC \
-    com.visualstudio.code \
-    us.zoom.Zoom
+bash "./toolbox/install-apps.sh"
 ```
 
 Configure GNOME Desktop
@@ -83,11 +73,11 @@ toolbox enter dconf
 bash "./toolbox/install-dconf.sh"
 ```
 
-Setup PHP Environment
+Import custom configuration from this repository.
 ```bash
-toolbox create php
-toolbox enter php
-bash "./toolbox/install-php.sh"
+toolbox create stow
+toolbox enter stow
+bash "./toolbox/install-stow.sh"
 ```
 
 Install Rust (and Cargo, and awesome command-line tools)
@@ -97,17 +87,16 @@ toolbox enter rust
 bash "./toolbox/install-rust.sh"
 ```
 
-Import custom configuration from this repository.
+Setup PHP Environment
 ```bash
-toolbox create stow
-toolbox enter stow
-bash "./toolbox/install-stow.sh"
+toolbox create php
+toolbox enter php
+bash "./toolbox/install-php.sh"
 ```
 
 ### Common Terminal Tools
 Tools that can go in `~/bin` (the mutable version of `/usr/local/bin`)
 - [`btop`](https://github.com/aristocratos/btop)
-- [`composer`](https://getcomposer.org) (may be moved to `php` toolbox if I can get PHPStorm working with Flatpak)
 - [`docker-compose`](https://github.com/docker/compose)
 - [`duf`](https://github.com/muesli/duf)
 - [`glow`](https://github.com/charmbracelet/glow)

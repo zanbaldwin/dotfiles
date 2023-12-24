@@ -74,3 +74,10 @@ stow tmux
 if [ ! -f "/etc/bash_completion.d/exa" ]; then
     curl "https://raw.githubusercontent.com/ogham/exa/master/completions/bash/exa" | sudo tee "/etc/bash_completion.d/exa
 fi
+
+# Force Chromium to always allow Unsecured HTTP for Localhost, without force redirecting to HTTPS.
+if [ ! -f "/etc/opt/chrome/policies/managed/policies.json" ]; then
+    mkdir -p "/etc/opt/chrome/policies/managed"
+    touch "/etc/opt/chrome/policies/managed/policies.json"
+fi
+echo '{"HSTSPolicyBypassList":["localhost"]}' > "/etc/opt/chrome/policies/managed/policies.json"

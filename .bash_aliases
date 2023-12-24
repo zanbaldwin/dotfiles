@@ -94,6 +94,19 @@ function whois() {
 
 alias freenode="irssi --connect=chat.freenode.net --nick=ZanBaldwin"
 
+# ========================================================= #
+# GnuPG SSH Authentication                                  #
+# ========================================================= #
+# - Install "gnupg2".                                       #
+# - Add "enable-ssh-support" to "~/.gnupg/gpg-agent.conf"   #
+#   - Or copy existing config from this repository          #
+# - Find [A]uthentication keygrips "gpg -K --with-keygrips" #
+# - Add appropriate keygrips to "~/.gnupg/sshcontrol"       #
+# ========================================================= #
+
+export SSH_AUTH_SOCK=$(gpgconf --list-dirs agent-ssh-socket)
+gpgconf --launch gpg-agent
+
 # ======= #
 # Vagrant #
 # ======= #

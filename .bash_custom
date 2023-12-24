@@ -2,6 +2,8 @@
 # =====
 
 export PATH="$PATH:$HOME/.composer/vendor/bin"
+export GOROOT="/usr/lib/go"
+export GOPATH="$HOME/code/golang"
 
 # PS1
 # ===

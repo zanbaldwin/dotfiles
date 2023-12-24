@@ -5,9 +5,15 @@ export DOTFILES="${HOME}/.dotfiles"
 git clone "git@github.com:zanbaldwin/dotfiles.git" "${DOTFILES}"
 ```
 
-- User configuration files are stored in [`stow/`](./stow) and can be installed
-  via the [`stow-config.sh`](toolbox/stow-config.sh) script.
+- Based on [Fedora Silverblue](https://silverblue.fedoraproject.org/), the
+  custom operating system base is built using an OCI image definition. See the
+  [README in the `oci/` directory](./oci) for build and rebasing instructions.
+- Customised keymap firmware for a Corne keyboard can be found in
+  [`qmk/`](./qmk) and the script to set that up can be found at
+  [`toolbox/qmk.sh`](./toolbox/qmk.sh).
 - Environment setup scripts are stored in [`toolbox/`](./toolbox)
+- User configuration files are stored in [`stow/home/`](./stow/home) and can be
+  installed via the [`stow.sh`](toolbox/stow.sh) script.
 - Various notes, reminders and archived stuff are in [`notes/`](./notes)
 
 > This project makes no promises regarding backwards-compatibility. There are no

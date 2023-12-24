@@ -41,15 +41,16 @@ RUN source "${HOME}/.cargo/env" \
 FROM "${IMAGE}:${VERSION}" AS gnome
 MAINTAINER "Zan Baldwin"
 COPY "./usr/" "/usr/"
-## I would prefer to keep all software in Flatpaks, but the firefox from Flathub
-## doesn't honour custom certificates from MkCert and the firefox from
-## FedoraProject doesn't have enough codecs to play media on Twitter. So that's
-## why we're keeping the system package.
+## Okay, so it turns out that the Flathub version of Firefox works fine with both
+## the system-wide trust store, and media codecs. BUT ONLY WHEN THE SYSTEM
+## FIREFOX PACKAGE IS INSTALLED. The system RPM package of Firefox is the only
+## one to correctly detect system trust stores and have the correct media
+## codecs, independently.
+#RUN rpm-ostree override remove firefox firefox-langpacks
 RUN rpm-ostree install --idempotent --allow-inactive --releasever="${VERSION}" \
         bridge-utils edk2-ovmf guestfs-tools libvirt qemu-kvm virt-install virt-manager \
         podman-docker podman-plugins podman-tui containernetworking-plugins aardvark-dns \
-        distrobox fzf make ncdu nss-tools neovim tlp tlp-rdw \
-        ffmpeg-free mozilla-openh264 \
+        distrobox ffmpeg-free fzf make ncdu nss-tools neovim tlp tlp-rdw \
  && systemctl enable "libvirtd" \
  && systemctl enable "podman.service" \
  && systemctl enable "podman.socket" \

@@ -7,8 +7,10 @@ mkdir -p \
     "${HOME}/.config" \
     "${HOME}/.ssh"
 
-sudo dnf install --assumeyes \
-    "stow"
+if ! command -v "stow" >"/dev/null" 2>&1; then
+    sudo dnf install --assumeyes \
+        "stow"
+fi
 
 TOOLBOX_SCRIPT_DIRECTORY="$(dirname "$(readlink -f "$0")")"
 stow --dir="${TOOLBOX_SCRIPT_DIRECTORY}/../stow" --target="${HOME}" --stow \

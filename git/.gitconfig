@@ -70,6 +70,8 @@
     # "diff-highlight" isn't installed by default, you can find it in the
     # contrib section of the Git repo (requires Perl to be installed):
     # https://github.com/git/git/tree/master/contrib/diff-highlight
+
+    # Delta diff tool: https://github.com/dandavison/delta
     log         = delta
     show        = delta
     diff        = delta
@@ -87,9 +89,8 @@
 [help]
     autocorrect = 1
 [core]
-    excludesFile = ~/.gitignore
+    excludesFile = ~/.ignore
     editor       = "nano -AES --tabsize=4"
-    diffFilter   = delta
 
 # Force Git to always download over SSH to prevent GitHub's API throttling and/or
 # asking for username and password (which is near-to-impossible to do on the
@@ -102,7 +103,6 @@
 [delta]
     features = unobtrusive-line-numbers decorations
     side-by-side = false
-    line-numbers = true
     color-only = false
     light = false
 [delta "interactive"]

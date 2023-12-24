@@ -61,7 +61,8 @@ window:
   # Values for `decorations` (macOS only):
   #     - transparent: Title bar, transparent background and title bar buttons
   #     - buttonless: Title bar, transparent background and no title bar buttons
-  decorations: 'none'
+  # Use "none" for laptop display (always want it maximized), and "full" for 4K monitors (want it half screen).
+  decorations: 'full'
 
   # Background opacity
   #
@@ -156,7 +157,8 @@ font:
     #style: Bold Italic
 
   # Point size
-  size: 11.0
+  # Use 11.0 for laptop screen, and 13.0 for 4K monitors.
+  size: 13.0
 
   # Offset is the extra space around each character. `offset.y` can be thought
   # of as modifying the line spacing, and `offset.x` as modifying the letter

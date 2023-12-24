@@ -55,3 +55,26 @@ This will **not** change the behaviour of the PrtScr button:
    - `sudo nano /etc/default/grub`
    - Add `nomodeset` to `GRUB_CMDLINE_LINUX_DEFAULT`
    - `sudo update-grub`
+
+#### Default Audio Output
+
+Using PulseAudio control, list the audio devices registered and set your chosen one as the default.
+
+##### Output Devices
+
+```shell
+# List all audio output devices registered with system
+pactl list short sinks
+# Set an ID from the list as the default (eg, "alsa_output.pci-0000_00_1f.3-platform-skl_hda_dsp_generic.HiFi__hw_sofhdadsp__sink")
+pactl set-default-sink "${CHOSEN_SINK_ID}"
+```
+
+##### Input Devices
+
+```shell
+# List all audio input devices registered with system
+pactl list short sources
+# Set an ID from the list as the default (eg, "alsa_input.usb-Blue_Microphones_Yeti_X_2102SG013BE8_888-000316110306-00.analog-stereo")
+pactl set-default-source "${CHOSEN_SOURCE_ID}"
+
+```

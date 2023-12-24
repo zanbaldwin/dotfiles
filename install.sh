@@ -1,3 +1,4 @@
+#!/bin/bash
 # This script was designed to be run on fresh Ubuntu installations.
 
 if [ "$(id -u 2>/dev/null)" = "0" ]; then

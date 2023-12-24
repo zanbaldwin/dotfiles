@@ -41,12 +41,6 @@ RUN source "${HOME}/.cargo/env" \
 FROM "${IMAGE}:${VERSION}" AS gnome
 MAINTAINER "Zan Baldwin"
 COPY "./usr/" "/usr/"
-## Okay, so it turns out that the Flathub version of Firefox works fine with both
-## the system-wide trust store, and media codecs. BUT ONLY WHEN THE SYSTEM
-## FIREFOX PACKAGE IS INSTALLED. The system RPM package of Firefox is the only
-## one to correctly detect system trust stores and have the correct media
-## codecs, independently.
-#RUN rpm-ostree override remove firefox firefox-langpacks
 RUN rpm-ostree install --idempotent --allow-inactive --releasever="${VERSION}" \
         bridge-utils edk2-ovmf guestfs-tools libvirt qemu-kvm virt-install virt-manager \
         podman-docker podman-plugins podman-tui containernetworking-plugins aardvark-dns \
@@ -57,10 +51,15 @@ RUN rpm-ostree install --idempotent --allow-inactive --releasever="${VERSION}" \
  && systemctl enable "podman-restart.service" \
  && systemctl enable "flatpak-update.service" \
  && (systemctl enable "tlp.service" || true) \
- && cat "/etc/sudoers" | grep -v "secure_path" | tee "/etc/sudoers" >"/dev/null" \
  && rm -rf /tmp/* /var/* \
  && ostree container commit
 COPY --from="alacritty" "/opt/alacritty/" "/usr/"
+# I truncated the sudoers file to zero by accident when I included this snippet
+# in the RUN layer above. "<user> is not in the sudoers file" is not a message
+# you want to receive.
+RUN if grep "secure_path" "/etc/sudoers" >"/dev/null" 2>&1; then \
+        cat "/etc/sudoers" | grep -v "secure_path" | tee "/etc/sudoers" >"/dev/null" 2>&1; \
+    fi
 
 # === RUST === #
 FROM rust AS rust-build

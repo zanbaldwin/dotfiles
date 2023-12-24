@@ -33,7 +33,7 @@ fi
 # For installation on a new machine, always use the same version of Fedora as is
 # currently running. Can upgrade to `latest` at the later date if need be.
 VERSION="${VERSION_ID:-latest}"
-podman build --target="gnome" --build-arg="VERSION=${VERSION}" --tag="localhost:5000/zanbaldwin/silverblue" "${THIS_DIR}/oci" \
+podman build --pull="newer" --target="gnome" --build-arg="VERSION=${VERSION}" --tag="localhost:5000/zanbaldwin/silverblue" "${THIS_DIR}/oci" \
     && podman run -d --name="registry" --publish="5000:5000" "docker.io/library/registry:2" \
     && podman push "localhost:5000/zanbaldwin/silverblue:39" \
     && rpm-ostree rebase "ostree-unverified-registry:localhost:5000/zanbaldwin/silverblue"

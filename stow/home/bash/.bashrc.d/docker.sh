@@ -42,6 +42,14 @@ elif [[ -f "/run/.containerenv" || -f "/run/.toolboxenv" ]]; then
     }
 fi
 
+function podman {
+    if [ $# -eq 0 ] && command -v "podman-tui" >"/dev/null" 2>&1; then
+        podman-tui
+    else
+        podman "$@"
+    fi
+}
+
 # Podman Compose
 # Sometimes I like to use my own Docker Compose setup for projects.
 # This will correctly find the `docker-compose[.override].yaml` and run it in

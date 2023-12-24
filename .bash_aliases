@@ -165,11 +165,19 @@ export GOROOT="/usr/local/go"
 export GOPATH="$HOME/code/golang"
 export PATH="$PATH:$GOROOT/bin:$GOPATH/bin"
 
-# === #
-# AWS #
-# === #
+# =============== #
+# Auto-completion #
+# =============== #
 
-# AWS Autocompletion
-if [[ -f /usr/local/bin/aws_completer ]]; then
-    complete -C '/usr/local/bin/aws_completer' aws
-fi
+## These are not meant to be executed every time a new Bash environment is created, instead they
+## are helpful reminders to set up autocompletion on a new system. Most assume that the associated
+## tool has already been installed.
+
+## Docker Compose
+# sudo curl -L https://raw.githubusercontent.com/docker/compose/$(docker-compose version --short)/contrib/completion/bash/docker-compose -o /etc/bash_completion.d/docker-compose
+
+## Kompose
+# sudo "$SHELL" -c "kompose completion bash > /etc/bash_completion.d/kompose"
+
+## AWS (might take a while to complete)
+# sudo cp -s $(find / -name aws_completer 2>/dev/null | head -n1) /etc/bash_completion.d/aws

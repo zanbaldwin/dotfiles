@@ -25,10 +25,15 @@ sudo dnf install --assumeyes \
     echo "[XDebug]"; \
     echo "xdebug.mode = develop,debug"; \
     echo "xdebug.discover_client_host = true"; \
-    echo "xdebug.force_error_reporting = -1"; \
     echo "xdebug.start_with_request = yes"; \
     echo "xdebug.log_level = 0"; \
 } | sudo tee "/etc/php.d/99-xdebug.ini"
+
+# If you can deal with EVERY. SINGLE. DEPRECATION. NOTICE. EVER. in your PHPUnit output:
+#{ \
+#    echo "xdebug.force_error_reporting = -1"; \
+#    echo "xdebug.force_display_errors = On"; \
+#} | sudo tee -a "/etc/php.d/99-xdebug.ini"
 
 { \
     echo "[PHP]"; \

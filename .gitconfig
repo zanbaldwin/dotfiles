@@ -14,7 +14,7 @@
 
 	# Committing Shortcuts
 	amend           = commit --amend
-	recommit        = commit --amend --no-edit
+	recommit        = commit --amend --no-edit --date=now
 	uncommit        = reset --soft HEAD^
 	# Save and list working tree snapshots.
 	snapshot        = !git stash save "snapshot: $(date)" && git stash apply "stash@{0}"

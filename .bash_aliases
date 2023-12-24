@@ -171,15 +171,8 @@ docker() {
     fi
 }
 
-alias v1="docker-compose -f docker-compose.yml"
-alias v2="docker-compose -f docker-compose-v2.yml"
-alias v2-php="docker-compose -f docker-compose-v2.yml run --rm php"
-alias v3="docker-compose -f docker-compose-v3.yml"
-alias v3-php="docker-compose -f docker-compose-v3.yml run --rm php"
-alias v4="docker-compose -f docker-compose-v4.yml"
-alias v4-php="docker-compose -f docker-compose-v4.yml run --rm php"
-alias v5="docker-compose -f docker-compose-v5.yml"
-alias v5-php="docker-compose -f docker-compose-v5.yml run --rm php"
+alias dterm="echo -it -e COLUMNS=$(tput cols) -e LINES=$(tput lines) -e TERM=xterm"
+alias alpine="docker run --rm $(dterm) -v \"$(pwd):$(pwd)\" -w \"$(pwd)\" alpine:latest sh"
 
 # === #
 # PHP #

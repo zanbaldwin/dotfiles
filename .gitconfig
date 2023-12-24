@@ -90,6 +90,7 @@
     autocorrect     = 1
 [core]
     excludesFile    = ~/.ignore
+	editor = nano -AES --tabsize=4
 
 # Force Git to always download over SSH to prevent GitHub's API throttling and/or
 # asking for username and password (which is near-to-impossible to do on the

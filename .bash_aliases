@@ -31,6 +31,7 @@ alias follow='watch $(history -p !!)'
 
 alias xx="exit"
 alias hosts="cat '${HOME}/.ssh/config' | grep 'Host ' | cut -d' ' -f2 | sort"
+alias ssh-config="nano ${HOME}/.ssh/config"
 
 title() { print -Pn "\e]2;$@\a"; }
 
@@ -122,15 +123,17 @@ alias fucking="sudo"
 alias m="make"
 NANO="$(command -v nano 2>/dev/null)"
 if [ $? -eq 0 ]; then
-    alias nano="${NANO} -AES --tabsize=4"
+    alias nano="${NANO} -AE --tabsize=4"
+    export EDITOR="nano -AE --tabsize=4"
+    export VISUAL="nano -AE --tabsize=4"
 fi
-alias n="nano -AES --tabsize=4"
 alias vim="vim -N"
-alias v="vim -N"
 
 # ========== #
 # Networking #
 # ========== #
+
+alias utc='date -u "+%Y%m%dT%H%M%SZ"'
 
 # See https://github.com/denilsonsa/prettyping
 command -v prettyping >/dev/null 2>&1 && { alias ping="prettyping --nolegend"; }

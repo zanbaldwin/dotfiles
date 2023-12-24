@@ -13,7 +13,8 @@ function add_to_path {
 }
 
 # Import Wasmer, if it's installed.
-[ -s "${HOME}/.wasmer/wasmer.sh" ] && . "${HOME}/.wasmer/wasmer.sh"
+export WASMER_DIR="${HOME}/.wasmer"
+[ -s "${WASMER_DIR}/wasmer.sh" ] && source "${WASMER_DIR}/wasmer.sh"
 
 # On macOS, we definitely want everything we install via Homebrew.
 [ -d "/opt/homebrew/bin" ] && add_to_path "/opt/homebrew/bin"

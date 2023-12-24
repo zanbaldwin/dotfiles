@@ -1,6 +1,6 @@
 #!/bin/bash
 
-function add_to_path() {
+function add_to_path {
     ADD="${1}"
     case ":${PATH}:" in
         *:"${ADD}":*)

@@ -25,7 +25,7 @@ command -v "zoxide" >"/dev/null" 2>&1 && {
 ## Git Repository Information on Directory Change
 if command -v "onefetch" >"/dev/null" 2>&1 && command -v "git" >"/dev/null" 2>&1; then
     LAST_REPO=""
-    function cd() {
+    function cd {
         if [[ "$(type -f __zoxide_z 2>/dev/null)" == "function" ]]; then
             # TODO: Don't think this is working very well. Dive into zoxide src and
             #       Bash initialisation script when you have the time.

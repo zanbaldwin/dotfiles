@@ -23,7 +23,7 @@ alias sudo="sudo --preserve-env --"
 # execute it constantly whilst waiting for a different output.
 alias follow='watch $(history -p !!)'
 
-title() { print -Pn "\e]2;$@\a"; }
+function title { print -Pn "\e]2;${@}\a"; }
 
 alias tmux="tmux attach || tmux new"
 

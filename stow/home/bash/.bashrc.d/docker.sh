@@ -6,7 +6,7 @@ alias docker-composer="docker compose"
 
 if command -v "docker" >"/dev/null" 2>&1 && ! (docker version 2>"/dev/null" | grep "Podman" >"/dev/null" 2>&1); then
     # Actually have the real Docker installed.
-    docker() {
+    function docker {
         if [[ ("$1" = "composer") || ("$1" = "composer") ]]; then
             shift
             command docker compose "$@"
@@ -26,7 +26,7 @@ elif command -v "podman" >"/dev/null" 2>&1; then
     export DOCKER_BUILDKIT=0
 
     # Docker is symlinked to Podman (probably the "podman-docker" package).
-    docker() {
+    function docker {
         if [[ ("$1" = "compose") || ("$1" = "composer") ]]; then
             shift
             # If using Podman instead of Docker then Docker Compose would have
@@ -46,7 +46,7 @@ fi
 # Sometimes I like to use my own Docker Compose setup for projects.
 # This will correctly find the `docker-compose[.override].yaml` and run it in
 # the current directory as project root.
-pcom() {
+function pcom {
     if [ "$#" -lt 1 ]; then
         echo >&2 "You must specify a relative directory to where the docker-compose.yaml configuration exists.";
         return;

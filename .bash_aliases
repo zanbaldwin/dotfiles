@@ -51,7 +51,7 @@ alias ll="ls -lAhHp${LL_OPTIONS}"
 # https://github.com/ogham/exa/releases
 which exa >/dev/null 2>&1
 if [ $? -eq 0 ]; then
-    alias ll="exa -lbUh --git --group-directories-first"
+    alias ll="exa -labUh --git --group-directories-first"
 fi
 
 alias cp="cp -iv"

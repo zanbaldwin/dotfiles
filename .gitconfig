@@ -10,7 +10,7 @@
 	co              = checkout
 	fa              = fetch --all
 	ft              = fetch --tags
-	line            = log --pretty=format:'%Cred%h%Creset %C(yellow)%d%Creset %s %Cgreen(%cr) %C(bold blue)<%an>%Creset' --abbrev-commit
+    line            = log --abbrev-commit --decorate=auto --pretty=format:'%C(red)%h%C(reset)\t%C(green)%<(14)%cr%C(reset)%C(yellow)%d%C(reset) %s %C(blue)<%an>%C(reset)'
 
 	# Committing Shortcuts
 	amend           = commit --amend

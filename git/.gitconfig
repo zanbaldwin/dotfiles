@@ -58,16 +58,17 @@
     prepush     = rebase -i @{u}
 
 [user]
-    name        = Zan Baldwin
-    email       = hello@zanbaldwin.com
+    name = Zan Baldwin
+    email = hello@zanbaldwin.com
 [init]
 	defaultBranch = main
 [push]
     default     = simple
     followTags  = true
 	autoSetupRemote = true
+	recurseSubmodules = check
 [pull]
-    rebase      = true
+    rebase = true
 [pager]
     # "diff-highlight" isn't installed by default, you can find it in the
     # contrib section of the Git repo (requires Perl to be installed):
@@ -122,3 +123,11 @@
     line-numbers-plus-style = darkgreen
     line-numbers-left-format = "{nm:>4}┊"
     line-numbers-right-format = "{np:>4}│"
+[commit]
+	gpgSign = false
+[gui]
+	pruneduringfetch = true
+[smartgit "submodule"]
+	fetchalways = false
+	update = true
+	initializenew = true

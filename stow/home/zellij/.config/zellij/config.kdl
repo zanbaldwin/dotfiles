@@ -20,6 +20,7 @@ keybinds {
         bind "=" "+" { Resize "Increase"; }
         bind "-" { Resize "Decrease"; }
     }
+
     pane {
         bind "Ctrl p" { SwitchToMode "Normal"; }
         bind "h" "Left" { MoveFocus "Left"; }
@@ -220,22 +221,35 @@ themes {
         black 0 0 0
         white 255 255 255
     }
+    nord {
+        fg 216 222 233 // #D8DEE9
+        bg 46 52 64 // #2E3440
+        black 59 66 82 // #3B4252
+        red 191 97 106 // #BF616A
+        green 163 190 140 // #A3BE8C
+        yellow 235 203 139 // #EBCB8B
+        blue 129 161 193 // #81A1C1
+        magenta 180 142 173 // #B48EAD
+        cyan 136 192 208 // #88C0D0
+        white 229 233 240 // #E5E9F0
+        orange 208 135 112 // #D08770
+    }
 }
 
 // Choose the theme that is specified in the themes section.
 // Default: default
 //
-// theme "dracula"
+theme "nord"
 
 // The name of the default layout to load on startup
 // Default: "default"
 //
-// default_layout "compact"
+default_layout "default"
 
 // Choose the mode that zellij uses when starting up.
 // Default: normal
 //
-// default_mode "locked"
+default_mode "locked"
 
 // Toggle enabling the mouse mode.
 // On certain configurations, or terminals this could
@@ -244,7 +258,7 @@ themes {
 //   - true (default)
 //   - false
 //
-// mouse_mode false
+mouse_mode true
 
 // Configure the scroll back buffer size
 // This is the number of lines zellij stores for each pane in the scroll back
@@ -276,7 +290,7 @@ themes {
 // Enable or disable automatic copy (and clear) of selection when releasing mouse
 // Default: true
 //
-// copy_on_select false
+copy_on_select true
 
 // Path to the default editor to use to edit pane scrollbuffer
 // Default: $EDITOR or $VISUAL

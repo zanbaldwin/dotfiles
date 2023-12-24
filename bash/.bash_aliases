@@ -66,7 +66,7 @@ alias ll="ls -lAhHp${LL_OPTIONS}"
 # https://github.com/ogham/exa/releases
 command -v exa >/dev/null 2>&1 && { alias ll="exa -labUh --git --group-directories-first"; }
 
-alias cp="cp -iv"
+alias cp="cp -riv"
 alias mv="mv -iv"
 alias rmdir="rmdir -v"
 alias ln="ln -v"
@@ -90,7 +90,10 @@ function search() {
 }
 
 # https://github.com/sharkdp/bat/releases
-command -v bat >/dev/null 2>&1 && { alias cat="bat --theme=DarkNeon"; }
+command -v bat >/dev/null 2>&1 && {
+    alias cat="bat --theme=DarkNeon";
+    alias less="bat --theme=DarkNeon";
+}
 
 command -v trash >/dev/null 2>&1 && { alias rm="trash -v"; }
 
@@ -133,8 +136,6 @@ command -v nano >/dev/null 2>&1 && {
     export EDITOR="${NANO_ALIAS}"
     export VISUAL="${NANO_ALIAS}"
 }
-
-alias vim="vim -N"
 
 # ========== #
 # Networking #

@@ -436,7 +436,7 @@ colors:
 #   - (Linux/BSD) user login shell
 #   - (Windows) powershell
 shell:
-  program: 'tmux'
+  program: 'zellij'
   args: []
 
 # Startup directory

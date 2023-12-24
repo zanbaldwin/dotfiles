@@ -6,6 +6,7 @@ sudo dnf install --assumeyes \
     "php-devel" \
     "php-fpm" \
     "php-gd" \
+    "php-intl" \
     "php-mbstring" \
     "php-mysqlnd" \
     "php-pdo" \

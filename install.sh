@@ -62,13 +62,14 @@ cargo install exa
 # [NordVPN](https://support.nordvpn.com/Connectivity/Linux/1325531132/Installing-and-using-NordVPN-on-Debian-Ubuntu-Raspberry-Pi-Elementary-OS-and-Linux-Mint.htm)
 
 # Stow Configuration Files
-stow bash
-stow editor
-stow git
-stow gnupg
-stow nvim
-stow ssh
-stow tmux
+SCRIPT_DIRECTORY="$(dirname "$(readlink -f "$0")")"
+stow --dir="${SCRIPT_DIRECTORY}" --target="${HOME}" bash
+stow --dir="${SCRIPT_DIRECTORY}" --target="${HOME}" editor
+stow --dir="${SCRIPT_DIRECTORY}" --target="${HOME}" git
+stow --dir="${SCRIPT_DIRECTORY}" --target="${HOME}" gnupg
+stow --dir="${SCRIPT_DIRECTORY}" --target="${HOME}" nvim
+stow --dir="${SCRIPT_DIRECTORY}" --target="${HOME}" ssh
+stow --dir="${SCRIPT_DIRECTORY}" --target="${HOME}" tmux
 
 # Other
 if [ ! -f "/etc/bash_completion.d/exa" ]; then

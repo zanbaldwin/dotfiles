@@ -110,6 +110,10 @@ function destroy_secure() {
     sudo umount "${FOLDER}"
 }
 
+command -v "direnv" >/dev/null 2>&1 && {
+    eval "$(direnv hook bash)";
+}
+
 # ================ #
 # Anger Management #
 # ================ #
@@ -151,6 +155,10 @@ alias mitm="mitmproxy --transparent --host"
 command -v "firefox" >/dev/null 2>&1 && { alias fx="firefox --new-instance --profile \"\$(mktemp -d)\""; }
 ## VPN
 alias nord="nordvpn"
+
+command -v "mkcert" >/dev/null 2>&1 && command -v "http" >/dev/null 2>&1 && {
+    alias http="http --verify=\"$(mkcert -CAROOT)/rootCA.pem\"";
+}
 
 # ========================================================= #
 # GnuPG SSH Authentication                                  #

@@ -19,6 +19,7 @@ install_as_sudo() {
         ca-certificates \
         curl \
         dconf-cli \
+        direnv \
         fonts-firacode \
         fzy \
         git \

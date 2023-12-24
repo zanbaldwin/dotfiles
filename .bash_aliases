@@ -1,3 +1,4 @@
+#!/bin/bash
 # To use this file, symlink it to ~/.bash_aliases (it should already be included
 # in ~/.bashrc).
 
@@ -27,7 +28,7 @@ alias follow='watch $(history -p !!)'
 
 alias xx="exit"
 
-title() { print -Pn "\e]2;$@\a" }
+title() { print -Pn "\e]2;$@\a"; }
 
 # ============================= #
 # Directory and File Management #

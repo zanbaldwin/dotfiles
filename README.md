@@ -24,7 +24,3 @@ git clone "git@github.com:zanbaldwin/dotfiles.git" "${DOTFILES}"
 > This project makes no promises regarding backwards-compatibility. There are no
 > stable releases. Things will break simply because I thought I would try
 > something different.
-
-If not using Fedora, then read through the toolbox scripts and figure this
-shit out yourself. User configuration has been written to at least try to
-work well on macOS, but there are no guarantees.

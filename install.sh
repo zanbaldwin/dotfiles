@@ -34,7 +34,6 @@ snap install --stable --classic nvim
 snap install --stable --classic phpstorm
 snap install --stable --classic slack
 
-snap install --stable aws-cli
 snap install --stable bitwarden
 snap install --stable chromium
 snap install --stable chromium-ffmpeg

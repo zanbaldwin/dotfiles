@@ -33,7 +33,11 @@ rpm-ostree kargs \
 rpm-ostree install --idempotent --allow-inactive \
     akmod-nvidia xorg-x11-drv-nvidia xorg-x11-drv-nvidia-cuda \
     bridge-utils edk2-ovmf guestfs-tools qemu-kvm virt-install virt-manager virt-top \
-    distrobox ncdu nss-tools podman-docker tmux
+    distrobox ncdu nss-tools podman-docker tlp tlp-rdw tmux
+
+# The following is only if you want the runtime-dependencies of Hyprland WM.
+rpm-ostree install --idempotent --allow-inactive \
+
 ```
 
 Reboot into the new deployment layer.
@@ -91,6 +95,13 @@ Setup PHP Environment
 toolbox create php
 toolbox enter php
 bash "./toolbox/install-php.sh"
+```
+
+Setup Hyprland WM
+```bash
+toolbox create hyprland
+toolbox enter hyprland
+bash "./toolbox/build-hyprland.sh
 ```
 
 ### Common Terminal Tools

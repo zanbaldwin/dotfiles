@@ -26,6 +26,7 @@ function enable_services() {
     systemctl enable --now "libvirtd"
     systemctl enable --now "podman"
     systemctl enable --now "podman.socket"
+    systemctl enable --now "tlp.service" || true
 
     grep -E '^libvirt:' "/usr/lib/group" >> "/etc/group"
     usermod -aG "libvirt" "${USER}"

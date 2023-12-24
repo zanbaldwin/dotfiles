@@ -4,6 +4,11 @@
     # NATIVE SHORTCUTS #
     # ================ #
 
+    ## Tip for Alias Commands
+    ## If the alias uses positional arguments ($1, $2, etc) make sure that you
+    # end the command (;) and comment out anything that could be prepended to
+    # the end of the command (#).
+
     # Keystroke Savers
     s           = status -s
     st          = status
@@ -16,11 +21,14 @@
     history     = line --follow --
     # See: https://github.com/paulirish/git-recent/blob/master/git-recent
     recent      = !git for-each-ref --color=always --count=15 --sort=-committerdate 'refs/heads/' --format='%(HEAD) %(color:yellow)%(refname:short)%(color:reset)|%(color:bold red)%(objectname:short)%(color:reset) %(color:bold green)(%(committerdate:relative))%(color:reset)|%(color:bold blue)%(authorname)%(color:reset) %(color:yellow)%(upstream:track)%(color:reset)%(color:black) %(color:reset)|%(contents:subject)%(color:black) %(color:reset)|' | column -ts '|'  | less --tabs=4 --quit-if-one-screen --RAW-CONTROL-CHARS --no-init
-    # Delete any branches that have been merged into "dev" branch. Fetch latest "dev" commits first.
-    finished    = !git branch --merged "dev" | grep -v "\\*" | xargs git branch -d
+    # Delete any branches that have been merged into "main" branch (the default
+    # branch for Git repositories on GitHub and GitLab).
+    # N.B. You should fetch latest "main" commits first. Plus be careful; command
+    # very similar to "merge".
+    merged        = "!git branch --merged \"${1:-main}\" | grep -v \"\\*\" | xargs --no-run-if-empty git branch -d; #"
 
-    # Hide changed files in the working tree from Git, like ".gitignore" for committed files.
-    # Ideal for edits in configuration that shouldn't be committed.
+    # Hide changed files in the working tree from Git, like ".gitignore" for
+    # committed files. Ideal for edits in configuration that shouldn't be committed.
     hide        = update-index --assume-unchanged
     unhide      = update-index --no-assume-unchanged
     unhide-all  = update-index --really-refresh
@@ -39,8 +47,12 @@
     versions    = "!git tag | grep \"^[vV]\\?[0-9.]\\+$\" | sort -V"
     ignored     = "!git -C \"$GIT_PREFIX\" status -s --ignored \"$@\" | grep \"^!!\" | cut -c 4-"
     # Pull Requests from GitHub (eg, "git review 21604")
-    review      = "!git fetch -fu \"${2:-origin}\" \"refs/pull/${1}/head:pr/${1}\" && git checkout \"pr/${1}\""
-    # Prepush opens up an interactive rebase for all the changes that haven't been pushed to the remote upstream branch yet.
+    # For some reason, the additional arguments after the alias name get echoed
+    # to the end of the command; add a comment at the end to prevent errors.
+    review      = "!git fetch -fu \"${2:-origin}\" \"refs/pull/${1}/head:pr/${1}\" && git checkout \"pr/${1}\"; #"
+    reviewed    = "!git branch | grep \"^  pr/\" | xargs --no-run-if-empty git branch -D"
+    # Prepush opens up an interactive rebase for all the changes that haven't
+    # been pushed to the remote upstream branch yet.
     prepush     = rebase -i @{u}
 
 [user]

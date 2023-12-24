@@ -69,6 +69,7 @@ alias fucking="sudo"
 # Editors #
 # ======= #
 
+alias m="make"
 alias nano="nano -AES --tabsize=4"
 alias n="nano -AES --tabsize=4"
 alias vim="vim -N"

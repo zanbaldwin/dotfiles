@@ -1,3 +1,6 @@
+# Running on Podman? Do not run in rootless.
+# DOCKER_HOST=unix:///run/podman/podman.sock sudo docker-compose up -d
+
 version: '3.8'
 x-logging:
   &default-logging
@@ -41,11 +44,48 @@ services:
               target: '/etc/letsencrypt'
               read_only: false
 
+    mailhog:
+        image: 'mailhog/mailhog:${MAILHOG_VERSION:-latest}'
+        restart: 'always'
+        logging: *default-logging
+        network_mode: 'host'
+        ports:
+            - target: 1025
+              published: 1025
+              protocol: 'tcp'
+              mode: 'host'
+            - target: 8025
+              published: 8025
+              protocol: 'tcp'
+              mode: 'host'
+
+    mitm:
+        image: 'mitmproxy/mitmproxy:${MITM_VERSION:-latest}'
+        restart: 'always'
+        logging: *default-logging
+        network_mode: 'host'
+        command:
+            - 'mitmweb'
+            - '--listen-host=0.0.0.0'
+            - '--listen-port=8080'
+            - '--web-host=0.0.0.0'
+            - '--web-port=8081'
+            - '--showhost'
+            - '--no-web-open-browser'
+            - '--http2'
+        ports:
+            - target: 8080
+              published: 8080
+              protocol: 'tcp'
+              mode: 'host'
+            - target: 8081
+              published: 8081
+              protocol: 'tcp'
+              mode: 'host'
+
+
 volumes:
     config:
         driver: 'local'
     certs:
         driver: 'local'
-
-# Running on Podman? Do not run in rootless.
-# DOCKER_HOST=unix:///run/podman/podman.sock sudo docker-compose up -d

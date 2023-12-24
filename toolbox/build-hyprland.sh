@@ -97,4 +97,10 @@ sudo dnf install --assumeyes \
     xorg-x11-server-Xwayland-devel
 
 git clone --recursive "https://github.com/hyprwm/Hyprland.git" "/tmp/hyprland"
-(cd "/tmp/hyprland"; sudo make install)
+# "/usr/local" is the only mutable location we can install system libraries and shares on Silverblue.
+(cd "/tmp/hyprland"; sudo make install PREFIX="/usr/local")
+
+rm -rf \
+    "/tmp/libxcb-errors" \
+    "/tmp/vulkan-renderer" \
+    "/tmp/hyprland"

@@ -35,7 +35,7 @@ fi
 VERSION="${VERSION_ID:-latest}"
 podman build --pull="newer" --target="gnome" --build-arg="VERSION=${VERSION}" --tag="localhost:5000/zanbaldwin/silverblue" "${THIS_DIR}/oci" \
     && podman run -d --name="registry" --publish="5000:5000" "docker.io/library/registry:2" \
-    && podman push "localhost:5000/zanbaldwin/silverblue:39" \
+    && podman push "localhost:5000/zanbaldwin/silverblue" \
     && rpm-ostree rebase "ostree-unverified-registry:localhost:5000/zanbaldwin/silverblue"
 
 systemctl reboot

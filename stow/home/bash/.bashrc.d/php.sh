@@ -1,6 +1,8 @@
 #!/bin/bash
 
 command -v "php" >"/dev/null" 2>&1 && {
+    export PHP_CS_FIXER_IGNORE_ENV=1
+
     # Make sure that XDebug is either not enabled or not in mode "debug" in the CLI configuration. If you wish to enable
     # debugging via XDebug while using PHP's CLI SAPI, use the command alias "xdebug" instead.
     alias xdebug='php -dzend_extension=xdebug.so -dxdebug.mode=debug,develop'

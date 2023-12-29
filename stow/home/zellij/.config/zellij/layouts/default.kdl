@@ -1,7 +1,7 @@
 // Override the default layout to add an initial tab in the background running `btop`.
 
 layout {
-
+    cwd "$HOME"
     default_tab_template {
         pane size=1 borderless=true {
             plugin location="zellij:tab-bar"
@@ -21,12 +21,17 @@ layout {
         }
     }
 
+    tab name="Dotfiles" {
+        pane {
+            cwd "$HOME/.dotfiles"
+            name "Dotfiles Repository"
+        }
+    }
+
     tab name="New Tab" focus=true {
         pane {
-            cwd "$HOME"
             focus true
             name "Pane #1"
         }
     }
-
 }

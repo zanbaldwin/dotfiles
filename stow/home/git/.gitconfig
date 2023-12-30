@@ -46,13 +46,13 @@
 
     # Misc
     root        = rev-parse --show-toplevel
-    versions    = "!git tag | grep \"^[vV]\\?[0-9.]\\+$\" | sort -V"
+    versions    = "!git tag --list --sort='version:refname' | \\grep -P -e '^[vV]?\\d+(\\.\\d+)+' | sort --version-sort"
     ignored     = "!git -C \"$GIT_PREFIX\" status -s --ignored \"$@\" | grep \"^!!\" | cut -c 4-"
     # Pull Requests from GitHub (eg, "git review 21604")
     # For some reason, the additional arguments after the alias name get echoed
     # to the end of the command; add a comment at the end to prevent errors.
     pr          = "!git fetch -fu \"${2:-origin}\" \"refs/pull/${1}/head:pr/${1}\" && git checkout \"pr/${1}\"; #"
-    reviewed    = "!git branch | grep \"^  pr/\" | xargs --no-run-if-empty git branch -D"
+    reviewed    = "!git branch | grep \"^  (pr|mr)/\" | xargs --no-run-if-empty git branch -D"
     # Prepush opens up an interactive rebase for all the changes that haven't
     # been pushed to the remote upstream branch yet.
     prepush     = rebase -i @{u}
@@ -76,14 +76,11 @@
 [rebase]
     autoStash = true
 [pager]
-    # "diff-highlight" isn't installed by default, you can find it in the
-    # contrib section of the Git repo (requires Perl to be installed):
-    # https://github.com/git/git/tree/master/contrib/diff-highlight
-
-    # Delta diff tool: https://github.com/dandavison/delta
+    # The default Git diffing tool isn't very nice to look at, use something better.
     log         = delta
     show        = delta
     diff        = delta
+    blame       = delta
 [interactive]
     diffFilter  = delta --color-only --features=interactive
 [diff]
@@ -91,12 +88,14 @@
     algorithm           = patience
     mnemonicprefix      = true
     colorMoved          = default
+[difftool]
+    prompt = false
 [rerere]
     # Remember my merges
     # http://gitfu.wordpress.com/2008/04/20/git-rerere-rereremember-what-you-did-last-time/
     enabled     = true
 [help]
-    autocorrect = 1
+    autocorrect = false
 [core]
     excludesFile = "~/.config/git/global-ignore"
     editor       = "nano -AES --tabsize=4"
@@ -110,26 +109,6 @@
 [merge]
 #    ff         = only
 
-[delta]
-    features = unobtrusive-line-numbers decorations
-    side-by-side = false
-    color-only = false
-    light = false
-[delta "interactive"]
-    keep-plus-minus-markers = false
-[delta "decorations"]
-    commit-style = raw
-    file-style = file
-    file-decoration-style = box bold ul
-    hunk-header-style = omit
-    plus-style = darkgrey darkgreen
-[delta "unobtrusive-line-numbers"]
-    line-numbers = true
-    line-numbers-minus-style = "#802928"
-    line-numbers-zero-style = "#888888"
-    line-numbers-plus-style = darkgreen
-    line-numbers-left-format = "{nm:>4}┊"
-    line-numbers-right-format = "{np:>4}│"
 [commit]
 	gpgsign = false
 	template = "~/.config/git/commit-template.txt"
@@ -144,3 +123,68 @@
 	smudge = git-lfs smudge -- %f
 	process = git-lfs filter-process
 	required = true
+
+# Better Diffing with Delta!
+# See: https://github.com/dandavison/delta
+[delta]
+    side-by-side = true
+    color-only = false
+    light = false
+    dark = true
+    features = unobtrusive-line-numbers meta icons files hunks lines theme commits blame
+[delta "interactive"]
+    keep-plus-minus-markers = false
+[delta "meta"]
+    hyperlinks = true
+    width = "-1"
+    keep-plus-minus-markers = true
+    hyperlinks-file-link-format = "phpstorm://{file}:{line}"
+    max-line-length = 120
+    navigate = true
+    tabs = 4
+    true-color = "auto"
+[delta "files"]
+    file-style = yellow bold
+    file-decoration-style = box purple bold ul
+[delta "hunks"]
+    hunk-header-style = "italic bold syntax"
+    hunk-label = "@"
+    hunk-header-decoration-style = ""
+[delta "lines"]
+    zero-style = "dim syntax"
+    minus-style = "syntax colour.red-dark"
+    minus-non-emph-style = "dim syntax colour.red-dark"
+    minus-emph-style = "bold syntax colour.red-medium"
+    minus-empty-line-marker-style = "normal colour.red-dark"
+    plus-style = "syntax colour.green-dark"
+    plus-non-emph-style = "dim syntax colour.green-dark"
+    plus-emph-style = "bold syntax colour.green-medium"
+    plus-empty-line-marker-style = "normal colour.green-dark"
+[delta "commits"]
+    commit-decoration-style = ""
+    commit-style = "lightblue ul italic bold"
+[delta "blame"]
+    blame-format = "{commit:<8}: {author:<15.14} {timestamp:<15}"
+    blame-code-style = "syntax"
+    blame-separator-format = "│{n:^4}┊"
+    #blame-separator-style = ""
+[delta "icons"]
+    file-removed-label = " ✖ "
+    file-added-label = " ⊕ "
+    file-renamed-label = " ⇒ "
+    file-modified-label = " ⁂ "
+[delta "unobtrusive-line-numbers"]
+    line-numbers = true
+    line-numbers-minus-style = "colour.red-light"
+    line-numbers-plus-style = "colour.green-light"
+    line-numbers-left-format = "{nm:>4}┊"
+    line-numbers-right-format = " {np:>4}┊"
+[delta "colour"]
+    red-dark = "#3f0001"
+    red-medium = "#901011"
+    red-light = "#A24B4A"
+    green-dark = "#002800"
+    green-medium = "#006000"
+    green-light = "#008600"
+[delta "theme"]
+    syntax-theme = "Dracula"

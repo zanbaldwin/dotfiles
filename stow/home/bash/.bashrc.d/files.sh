@@ -7,6 +7,7 @@ alias chmod="chmod -Rv"
 alias chown="chown -Rv"
 alias rm="rm -v"
 
+export PAGER="less -RFX -c"
 alias less="less -S -R -N"
 command -v "bat" >"/dev/null" 2>&1 && {
     alias cat="bat --theme=DarkNeon";

@@ -7,6 +7,8 @@ keybinds {
     locked {
         bind "Ctrl g" { SwitchToMode "Normal"; }
         bind "Alt c" { Copy; }
+        // Open a new pane in locked mode (copied from `shared_except "locked"`).
+        bind "Alt n" { NewPane; }
     }
     resize {
         bind "Ctrl n" { SwitchToMode "Normal"; }

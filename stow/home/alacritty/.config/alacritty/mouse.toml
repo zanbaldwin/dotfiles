@@ -1,0 +1,27 @@
+[mouse]
+# If this is `true`, the cursor is temporarily hidden when typing.
+hide_when_typing = true
+
+# Mouse bindings are specified as a list of objects, much like the key
+# bindings further below.
+# To trigger mouse bindings when an application running within Alacritty
+# captures the mouse, the `Shift` modifier is automatically added as a
+# requirement.
+#
+# Each mouse binding will specify a:
+# - `mouse`: Middle, Left, Right, Numeric identifier such as `5`
+# - `action` (see key bindings for actions not exclusive to mouse mode)
+# - Mouse exclusive actions:
+#   - ExpandSelection (Expand the selection to the current mouse cursor location)
+# And optionally:
+# - `mods` (see key bindings)
+
+# Examples Include:
+# [[mouse_bindings]]
+# mouse = "Right"
+# mods = "Control"
+# action = "ExpandSelection"
+# [[mouse_bindings]]
+# mouse = "Middle"
+# mode = "~Vi"
+# action = "PasteSelection"

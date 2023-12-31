@@ -1,0 +1,69 @@
+[window]
+# Window decorations
+# Values for `decorations`:
+#     - full: Borders and title bar
+#     - none: Neither borders nor title bar
+# Values for `decorations` (macOS only):
+#     - transparent: Title bar, transparent background and title bar buttons
+#     - buttonless: Title bar, transparent background and no title bar buttons
+decorations = "full"
+# Decorations theme variant
+# Override the variant of the System theme/GTK theme/Wayland client side
+# decorations. Commonly supported values are `Dark`, `Light`, and `None` for
+# auto pick-up. Set this to `None` to use the default theme variant.
+decorations_theme_variant = "None"
+# Spread additional padding evenly around the terminal content.
+dynamic_padding = true
+# Allow terminal applications to change Alacritty's window title.
+dynamic_title = true
+# Background opacity
+# Window opacity as a floating point number from `0.0` to `1.0`.
+# The value `0.0` is completely transparent and `1.0` is opaque.
+opacity = 0.9
+# Resize increments
+# Prefer resizing window by discrete steps equal to cell dimensions.
+resize_increments = false
+# Startup Mode (changes require restart)
+# Values for `startup_mode`:
+#   - Windowed
+#   - Maximized
+#   - Fullscreen
+# Values for `startup_mode` (macOS only):
+#   - SimpleFullscreen
+startup_mode = "Windowed"
+# Window Title
+title = "Terminal"
+
+# Make `Option` key behave as `Alt` (macOS only):
+#   - OnlyLeft
+#   - OnlyRight
+#   - Both
+#   - None (default)
+#option_as_alt = "None"
+
+# Window class (Linux/BSD only):
+[window.class]
+# General application class
+general = "Alacritty"
+# Application instance name
+instance = "Alacritty"
+
+# Window dimensions (changes require restart)
+# Number of lines/columns (not pixels) in the terminal. Both lines and columns
+# must be non-zero for this to take effect. The number of columns must be at
+# least `2`, while using a value of `0` for columns and lines will fall back
+# to the window manager's recommended size
+[window.dimensions]
+columns = 120
+lines = 32
+
+# Window position (changes require restart)
+# Specified in number of pixels.
+# If the position is not set, the window manager will handle the placement.
+[window.position]
+# x: 0
+# y: 0
+
+[window.padding]
+x = 5
+y = 5

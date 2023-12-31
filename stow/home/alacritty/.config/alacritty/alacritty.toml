@@ -1,0 +1,15 @@
+import = [
+    "~/.config/alacritty/environment.toml",
+    "~/.config/alacritty/window.toml",
+    "~/.config/alacritty/scrolling.toml",
+    "~/.config/alacritty/font.toml",
+    "~/.config/alacritty/colors.toml",
+    "~/.config/alacritty/bell.toml",
+    "~/.config/alacritty/selection.toml",
+    "~/.config/alacritty/cursor.toml",
+    "~/.config/alacritty/hints.toml",
+    "~/.config/alacritty/keybindings.toml",
+    "~/.config/alacritty/debug.toml",
+    "~/.config/alacritty/mouse.toml",
+]
+live_config_reload = true

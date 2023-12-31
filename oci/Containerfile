@@ -24,7 +24,7 @@ FROM rust AS alacritty
 RUN dnf install --assumeyes fontconfig-devel
 # There's absolutely no way I'm settling for Gnome Terminal as my default console.
 RUN source "${HOME}/.cargo/env" \
- && git clone "https://github.com/alacritty/alacritty.git" --branch "v0.12.3" "/tmp/alacritty" \
+ && git clone "https://github.com/alacritty/alacritty.git" --branch "v0.13.0" "/tmp/alacritty" \
  && (cd "/tmp/alacritty"; cargo build --release --features "wayland") \
  && mkdir -p "/opt/alacritty/bin" "/opt/alacritty/etc/bash_completion.d" "/opt/alacritty/share/pixmaps" "/opt/alacritty/share/applications" \
  && cp "/tmp/alacritty/target/release/alacritty" "/opt/alacritty/bin/alacritty" \

@@ -15,6 +15,7 @@ ASTRONVIM="${HOME}/.config/nvim"
 
 rm -rf "${ASTRONVIM}"
 rm -rf "${HOME}/.local/share/nvim"
+rm -rf "${HOME}/.local/share/applications/nvim.desktop"
 rm -rf "${HOME}/.local/state/nvim"
 rm -rf "${HOME}/.cache/nvim"
 

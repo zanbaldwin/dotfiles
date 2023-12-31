@@ -64,6 +64,10 @@ cargo install "cargo-info"    # crates.io in the terminal
 cargo install "tokio-console" # Tokio Tracing Console
 cargo install "cargo-update"  # Update all installed binaries
 
+# For NVim
+cargo install "bottom"
+cargo install "tree-sitter-cli"
+
 # The following are kept for reference, but I don't think I want to use them
 #cargo install "zoxide"    # `cd` alternative
 #cargo install "sccache"   # Build Artifact Cache

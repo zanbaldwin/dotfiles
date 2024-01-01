@@ -72,25 +72,67 @@ RUN source "${HOME}/.cargo/env" \
  && cp "/tmp/swww/completions/swww.bash" "/opt/swww/etc/bash_completion.d/swww" \
  && rm -rf "/tmp/swww"
 
-# === GOLANG === #
-FROM "fedora:${VERSION}" as golang-build
-RUN dnf install --assumeyes \
-        git \
-        golang
-RUN git clone "https://github.com/nwg-piotr/nwg-drawer.git" --branch "v0.4.3" "/tmp/nwg-drawer" \
+
+FROM rust AS linux
+# Dependencies
+RUN source "/etc/os-release" \
+ && git clone --depth=1 --branch="f${VERSION_ID}" "https://src.fedoraproject.org/rpms/kernel.git" "/tmp/fedpkg" \
  && dnf install --assumeyes \
-        cairo-gobject-devel \
-        glib2-devel \
-        gtk-layer-shell-devel \
-        gtk3-devel \
+        'dnf-command(builddep)' \
+        clang-devel \
+        fedpkg \
+        gcc-c++ \
+        git \
+        libXi-devel \
+        lld \
         make \
- && make -C "/tmp/nwg-drawer" get \
- && make -C "/tmp/nwg-drawer" build \
- && mkdir -p "/opt/nwg-drawer/share/nwg-drawer" "/opt/nwg-drawer/bin" \
- && cp -r "/tmp/nwg-drawer/desktop-directories" "/opt/nwg-drawer/share/nwg-drawer/" \
- && cp "/tmp/nwg-drawer/drawer.css" "/opt/nwg-drawer/share/nwg-drawer/" \
- && cp "/tmp/nwg-drawer/bin/nwg-drawer" "/opt/nwg-drawer/bin/" \
- && rm -rf "/tmp/nwg-drawer"
+        ncurses-devel \
+        perl \
+        qt3-devel \
+        rsync \
+ && dnf builddep --assumeyes "/tmp/fedpkg/kernel.spec"
+# Sources
+# There doesn't seem to be a good way of applying Fedora-specific patches, on top of the Linux kernel Git repository.
+# The "approxpriate" command `fedpkg local` doesn't allow you to specify a custom directory to build from and uses
+# `fedpkg sources` to download a fresh copy of the Linux kernel seemingly a version behind the latest (and it takes
+# FUCKING AGES. Like 30 minutes to download ~135MiB ages).
+ARG LINUX_GIT_REPO="git://git.kernel.org/pub/scm/linux/kernel/git/stable/linux-stable.git"
+RUN export LINUX_LATEST_VERSION="$(git -c 'versionsort.suffix=-' ls-remote --tags --sort='v:refname' "${LINUX_GIT_REPO}" \
+        | \grep -v '\^' \
+        | \grep -P -e '\d+\.\d+' \
+        | \grep -P -v 'alpha|ALPHA|beta|BETA|rc|RC|-' \
+        | cut -d'/' -f3 \
+        | sort --version-sort \
+        | tail -n1)" \
+ && echo "Latest stable version of Linux Kernel is ${LINUX_LATEST_VERSION}" \
+ && git clone --depth=1 --branch="${LINUX_LATEST_VERSION}" "${LINUX_GIT_REPO}" "/tmp/linux"
+# Setup
+RUN source "${HOME}/.cargo/env" \
+ && export LINUX_RUST_VERSION="$("/tmp/linux/scripts/min-tool-version.sh" rustc)" \
+ && rustup toolchain add "${LINUX_RUST_VERSION}" \
+ && rustup component add --toolchain="${LINUX_RUST_VERSION}" "rust-src" \
+ && rustup override set --path="/tmp/linux" "${LINUX_RUST_VERSION}" \
+ && cargo install --locked --version "$("/tmp/linux/scripts/min-tool-version.sh" bindgen)" "bindgen-cli" \
+ && ( { echo "[toolchain]"; echo "channel = \"${LINUX_RUST_VERSION}\""; } | tee "/tmp/linux/rust-toolchain")
+ # Custom Kernel Configuration
+COPY "custom_kernel.config" "/tmp/custom_kernel.config"
+# Configure Kernel
+RUN source "${HOME}/.cargo/env" \
+ && sed -i -E "s/^.*CONFIG_RUSTC_VERSION_TEXT.*$/CONFIG_RUSTC_VERSION_TEXT=\"$(rustc --version)\"/g" "/tmp/custom_kernel.config" \
+ && sed -i -E "s/^.*CONFIG_BINDGEN_VERSION_TEXT.*$/CONFIG_BINDGEN_VERSION_TEXT=\"$(bindgen --version)\"/g" "/tmp/custom_kernel.config" \
+ && ( \
+    cd "/tmp/linux"; \
+    KCONFIG_CONFIG="/tmp/kernel-custom-build.config" bash "/tmp/linux/scripts/kconfig/merge_config.sh" \
+        "/tmp/fedpkg/kernel-$(uname -m)-fedora.config" \
+        "/tmp/custom_kernel.config" \
+) \
+ && sed -i 's/^EXTRAVERSION.*/EXTRAVERSION = -zanbaldwin/g' "/tmp/linux/Makefile"
+# Build Kernel
+RUN source "${HOME}/.cargo/env" \
+ && git -C "/tmp/linux" clean -d -f -x \
+ && mv "/tmp/kernel-custom-build.config" "/tmp/linux/.config" \
+ && echo "Building Linux kernel version '$(make -C "/tmp/linux" --no-print-directory kernelversion)'." \
+ && make -C "/tmp/linux" -j "$(nproc --all)" rpm-pkg
 
 # ================ #
 #                  #

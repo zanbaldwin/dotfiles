@@ -14,8 +14,10 @@ fi
 # Perl is required for OpenSSL to build -> openssl-sys -> zellij.
 sudo dnf install --assumeyes \
     "alsa-lib-devel" \
+    "clang" \
     "cmake" \
     "gcc" \
+    "lld" \
     "openssl-devel" \
     "perl" \
     "pkg-config"

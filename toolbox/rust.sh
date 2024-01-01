@@ -38,44 +38,47 @@ command -v "cargo" >"/dev/null" 2>&1 && { \
 # Run separately instead of one command so that Cargo cleans up build files between each one.
 # Kept running into /tmp ramfs running out of space on small VMs.
 
+# Don't bother installing/compiling them again if they're already installed.
+# Use `cargo install-update` to upgrade them.
+
 # Important Rust binaries I want for *every* installation.
-cargo install "bat"       # `cat` but better
-cargo install "exa"       # `ls` but better
-cargo install "starship"  # PS1
-cargo install "git-delta" # Better Diffing
-cargo install "onefetch"  # Git Repository Overview
-cargo install "zellij"    # Terminal Multiplexer (tmux replacement)
-cargo install "atuin"         # Better Bash History
+command -v "bat" >"/dev/null" 2>&1                  || cargo install "bat"       # `cat` but better
+command -v "exa" >"/dev/null" 2>&1                  || cargo install "exa"       # `ls` but better
+command -v "starship" >"/dev/null" 2>&1             || cargo install "starship"  # PS1
+command -v "delta" >"/dev/null" 2>&1                || cargo install "git-delta" # Better Diffing
+command -v "onefetch" >"/dev/null" 2>&1             || cargo install "onefetch"  # Git Repository Overview
+command -v "zellij" >"/dev/null" 2>&1               || cargo install "zellij"    # Terminal Multiplexer (tmux replacement)
+command -v "atuin" >"/dev/null" 2>&1                || cargo install "atuin"         # Better Bash History
 
 # Other tools that I want to try to start using more
-cargo install "gimoji"        # Select an appropriate emoji to Git commits depending on what the commit does
-cargo install "gitui"         # Git TUI
-cargo install "oha"           # HTTP Load Testing
+command -v "gimoji" >"/dev/null" 2>&1               || cargo install "gimoji"        # Select an appropriate emoji to Git commits depending on what the commit does
+command -v "gitui" >"/dev/null" 2>&1                || cargo install "gitui"         # Git TUI
+command -v "oha" >"/dev/null" 2>&1                  || cargo install "oha"           # HTTP Load Testing
 
 # Useful Rust binaries that I want on my machine, but I'll cancel the script
 # about here when running in VMs.
-cargo install "coreutils" # Rusty GNU
-cargo install "mprocs"    # Multi Process Runner
-cargo install "ripgrep"   # It's just fast
+command -v "coreutils" >"/dev/null" 2>&1            || cargo install "coreutils" # Rusty GNU
+command -v "mprocs" >"/dev/null" 2>&1               || cargo install "mprocs"    # Multi Process Runner
+command -v "rg" >"/dev/null" 2>&1                   || cargo install "ripgrep"   # It's just fast
 
 # Control Spotify from command line, instead of through Flatpak. Used for Eww.
 # `secret-tool store --label='spotifyd' application rust-keyring service spotifyd username zanbaldwin`
-cargo install "spotifyd" --features "dbus_keyring"
-cargo install "spotify-tui"
+command -v "spotifyd" >"/dev/null" 2>&1             || cargo install "spotifyd" --features "dbus_keyring"
+command -v "spt" >"/dev/null" 2>&1                  || cargo install "spotify-tui"
 
 # Specifically for Rust development instead of general tools
-cargo install "bacon"         # Background Rust Code Checker (alternative watch TUI)
-cargo install "cargo-expand"  # Macro Source Code Expansion
-cargo install "cargo-info"    # crates.io in the terminal
-cargo install "tokio-console" # Tokio Tracing Console
-cargo install "cargo-update"  # Update all installed binaries
+command -v "bacon" >"/dev/null" 2>&1                || cargo install "bacon"         # Background Rust Code Checker (alternative watch TUI)
+command -v "cargo-expand" >"/dev/null" 2>&1         || cargo install "cargo-expand"  # Macro Source Code Expansion
+command -v "cargo-info" >"/dev/null" 2>&1           || cargo install "cargo-info"    # crates.io in the terminal
+command -v "tokio-console" >"/dev/null" 2>&1        || cargo install "tokio-console" # Tokio Tracing Console
+command -v "cargo-install-update" >"/dev/null" 2>&1 || cargo install "cargo-update"  # Update all installed binaries
 
 # For NVim
-cargo install "bottom"
-cargo install "tree-sitter-cli"
+command -v "btm" >"/dev/null" 2>&1                  || cargo install "bottom"
+command -v "tree-sitter" >"/dev/null" 2>&1          || cargo install "tree-sitter-cli"
 
 # The following are kept for reference, but I don't think I want to use them
 #cargo install "zoxide"    # `cd` alternative
 #cargo install "sccache"   # Build Artifact Cache
 
-curl -sSfL "https://get.wasmer.io" | bash
+command -v "wasmer" >"/dev/null" 2>&1               || curl -sSfL "https://get.wasmer.io" | bash

@@ -116,17 +116,19 @@ RUN source "${HOME}/.cargo/env" \
  && ( { echo "[toolchain]"; echo "channel = \"${LINUX_RUST_VERSION}\""; } | tee "/tmp/linux/rust-toolchain")
  # Custom Kernel Configuration
 COPY "custom_kernel.config" "/tmp/custom_kernel.config"
+COPY "patches" "/tmp/patches"
 # Configure Kernel
 RUN source "${HOME}/.cargo/env" \
+ && cd "/tmp/linux" \
  && sed -i -E "s/^.*CONFIG_RUSTC_VERSION_TEXT.*$/CONFIG_RUSTC_VERSION_TEXT=\"$(rustc --version)\"/g" "/tmp/custom_kernel.config" \
  && sed -i -E "s/^.*CONFIG_BINDGEN_VERSION_TEXT.*$/CONFIG_BINDGEN_VERSION_TEXT=\"$(bindgen --version)\"/g" "/tmp/custom_kernel.config" \
- && ( \
-    cd "/tmp/linux"; \
-    KCONFIG_CONFIG="/tmp/kernel-custom-build.config" bash "/tmp/linux/scripts/kconfig/merge_config.sh" \
+ && KCONFIG_CONFIG="/tmp/kernel-custom-build.config" bash "/tmp/linux/scripts/kconfig/merge_config.sh" \
         "/tmp/fedpkg/kernel-$(uname -m)-fedora.config" \
         "/tmp/custom_kernel.config" \
-) \
- && sed -i 's/^EXTRAVERSION.*/EXTRAVERSION = -zanbaldwin/g' "/tmp/linux/Makefile"
+ && sed -i 's/^EXTRAVERSION.*/EXTRAVERSION = -zanbaldwin/g' "/tmp/linux/Makefile" \
+ && git config user.name "Zan Baldwin (Container Build)" \
+ && git config user.email "hello+build@zanbaldwin.com" \
+ && git -C "/tmp/linux" am /tmp/patches/*.patch
 # Build Kernel
 RUN source "${HOME}/.cargo/env" \
  && git -C "/tmp/linux" clean -d -f -x \

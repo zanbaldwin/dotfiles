@@ -1,5 +1,10 @@
 #!/bin/bash
 
+TOOLBOX_SCRIPT_DIRECTORY="$(dirname "$(readlink -f "$0")")"
+if [ -f "${TOOLBOX_SCRIPT_DIRECTORY}/toolbox.sh" ]; then
+    source "${TOOLBOX_SCRIPT_DIRECTORY}/toolbox.sh"
+fi
+
 sudo dnf install --assumeyes \
     "ansible" \
     "php" \

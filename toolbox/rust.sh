@@ -1,5 +1,10 @@
 #!/bin/bash
 
+TOOLBOX_SCRIPT_DIRECTORY="$(dirname "$(readlink -f "$0")")"
+if [ -f "${TOOLBOX_SCRIPT_DIRECTORY}/toolbox.sh" ]; then
+    source "${TOOLBOX_SCRIPT_DIRECTORY}/toolbox.sh"
+fi
+
 # Requiring all of these seems a little excessive, when only `gcc` is required.
 # sudo dnf group install --assumeyes \
 #     "C Development Tools and Libraries" \
@@ -11,7 +16,6 @@ sudo dnf install --assumeyes \
     "alsa-lib-devel" \
     "cmake" \
     "gcc" \
-    "git" \
     "openssl-devel" \
     "perl" \
     "pkg-config"

@@ -1,9 +1,9 @@
 [cursor]
 # Cursor blinking interval in milliseconds.
-blink_interval = 750
+blink_interval = 450
 # Time after which cursor stops blinking, in seconds.
 # Specifying '0' will disable timeout for blinking.
-blink_timeout = 5
+blink_timeout = 30
 # Thickness of the cursor relative to the cell width as floating point number
 # from `0.0` to `1.0`.
 thickness = 0.15

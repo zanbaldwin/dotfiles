@@ -99,6 +99,7 @@
 [core]
     excludesFile = "~/.config/git/global-ignore"
     editor       = "nano -AES --tabsize=4"
+    pager        = "delta"
 
 # Force Git to always download over SSH to prevent GitHub's API throttling and/or
 # asking for username and password (which is near-to-impossible to do on the
@@ -108,6 +109,7 @@
 #    insteadOf  = https://github.com/
 [merge]
 #    ff         = only
+conflictStyle   = "zdiff3"
 
 [commit]
 	gpgsign = false

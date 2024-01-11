@@ -15,5 +15,3 @@ command -v "php" >"/dev/null" 2>&1 && {
         add_to_path "$(XDEBUG_MODE="off" composer global config bin-dir --absolute 2>/dev/null)"
     }
 }
-
-alias mtest="make install && make clear && make migrate && make fix && make stan && make unit"

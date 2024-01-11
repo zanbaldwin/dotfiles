@@ -25,9 +25,6 @@ command -v "zoxide" >"/dev/null" 2>&1 && {
     eval "$(zoxide init bash --no-cmd)";
 }
 
-if command -v "zoxide" >"/dev/null" 2>&1; then
-    eval "$(zoxide init bash)"
-fi
 CD_LAST_REPO=""
 function cd {
     if [[ "$(type -f __zoxide_z 2>/dev/null)" == "function" ]]; then

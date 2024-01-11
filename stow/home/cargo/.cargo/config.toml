@@ -1,13 +1,16 @@
 [net]
 git-fetch-with-cli = true
 
-[build]
-# ScCache is causing builds to hang inside Toolbox containers on Silverblue?
-# Plus it depends on GLibC which is not installed outside of Toolbox containers by default so Rust Analyzer doesn't work.
-#rustc-wrapper = "sccache"
+[http]
+ssl-version = "tlsv1.3"
+multiplexing = true
 
 [registries.crates-io]
 protocol = "sparse"
 
 [target.x86_64-unknown-linux-gnu]
-rustflags = ["-C", "link-arg=-fuse-ld=lld"]
+# Compile for more modern CPU architecture. Work laptop doesn't support v4, though.
+rustflags = ["-C", "target-cpu=x86-64-v3"]
+# Using the compiler flag `"-C", "link-arg=-fuse-ld=lld"` produces ~4% larger
+# output, whilst build times are (barely) marginally better. Don't use this
+# option and stick with GCC.

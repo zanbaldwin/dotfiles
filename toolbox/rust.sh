@@ -17,7 +17,6 @@ sudo dnf install --assumeyes \
     "clang" \
     "cmake" \
     "gcc" \
-    "lld" \
     "openssl-devel" \
     "perl" \
     "pkg-config"

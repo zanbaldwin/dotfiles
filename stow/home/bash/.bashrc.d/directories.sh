@@ -1,6 +1,8 @@
 #!/usr/bin/env bash
 
-if command -v "exa" >"/dev/null" 2>&1; then
+if command -v "eza" >"/dev/null" 2>&1; then
+    alias ll='eza -labUh --git --group-directories-first --icons';
+elif command -v "exa" >"/dev/null" 2>&1; then
     alias ll="exa -labUh --git --group-directories-first --icons";
 else
     # Some systems have a version of "ls" that does not have the

@@ -42,7 +42,7 @@ command -v "cargo" >"/dev/null" 2>&1 && { \
 
 # Important Rust binaries I want for *every* installation.
 command -v "bat" >"/dev/null" 2>&1                  || cargo install "bat"       # `cat` but better
-command -v "exa" >"/dev/null" 2>&1                  || cargo install "exa"       # `ls` but better
+command -v "eza" >"/dev/null" 2>&1                  || cargo install "eza"       # `ls` but better
 command -v "starship" >"/dev/null" 2>&1             || cargo install "starship"  # PS1
 command -v "delta" >"/dev/null" 2>&1                || cargo install "git-delta" # Better Diffing
 command -v "onefetch" >"/dev/null" 2>&1             || cargo install "onefetch"  # Git Repository Overview

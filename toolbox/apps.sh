@@ -36,3 +36,11 @@ flatpak install --noninteractive --assumeyes --or-update flathub \
 # PHPStorm version 2023.1.3 is borked.
 # Disable `ide.browser.jcef.sandbox.enable` in PHPStorm's registry.
 # See https://youtrack.jetbrains.com/issue/IDEA-317347/After-last-flatpak-update-idea-crashed#focus=Comments-27-7253679.0-0
+
+# To continue using a fallback license version of PHPStorm:
+# - Figure out the commit of the version you want to use (eg, acf67cd4d for v2022.3.3)
+#   `flatpak remote-info --log <remote> <app-id>`
+# - Downgrade the application by setting it to that commit
+#   `flatpak update --commit=<commit> <app-id>`
+# - Then mask the appliation from updates so it remains at that version
+#   `flatpak mask <app-id>`

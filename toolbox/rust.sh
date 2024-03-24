@@ -47,12 +47,13 @@ command -v "starship" >"/dev/null" 2>&1             || cargo install "starship" 
 command -v "delta" >"/dev/null" 2>&1                || cargo install "git-delta" # Better Diffing
 command -v "onefetch" >"/dev/null" 2>&1             || cargo install "onefetch"  # Git Repository Overview
 command -v "zellij" >"/dev/null" 2>&1               || cargo install "zellij"    # Terminal Multiplexer (tmux replacement)
-command -v "atuin" >"/dev/null" 2>&1                || cargo install "atuin"         # Better Bash History
+command -v "atuin" >"/dev/null" 2>&1                || cargo install "atuin"     # Better Bash History
 
 # Other tools that I want to try to start using more
 command -v "gimoji" >"/dev/null" 2>&1               || cargo install "gimoji"        # Select an appropriate emoji to Git commits depending on what the commit does
 command -v "gitui" >"/dev/null" 2>&1                || cargo install "gitui"         # Git TUI
 command -v "oha" >"/dev/null" 2>&1                  || cargo install "oha"           # HTTP Load Testing
+command -v "jj" >"/dev/null" 2>&1                   || cargo install "jj-cli"        # Jujutsu DVCS layered on top of Git
 
 # Useful Rust binaries that I want on my machine, but I'll cancel the script
 # about here when running in VMs.
@@ -71,6 +72,7 @@ command -v "cargo-expand" >"/dev/null" 2>&1         || cargo install "cargo-expa
 command -v "cargo-info" >"/dev/null" 2>&1           || cargo install "cargo-info"    # crates.io in the terminal
 command -v "tokio-console" >"/dev/null" 2>&1        || cargo install "tokio-console" # Tokio Tracing Console
 command -v "cargo-install-update" >"/dev/null" 2>&1 || cargo install "cargo-update"  # Update all installed binaries
+command -v "cargo-wizard" >"/dev/null" 2>&1         || cargo install "cargo-wizard"  # Automatic configuration of Cargo projects
 
 # For NVim
 command -v "btm" >"/dev/null" 2>&1                  || cargo install "bottom"

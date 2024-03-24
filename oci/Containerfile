@@ -59,7 +59,8 @@ COPY --from="alacritty" "/opt/alacritty/" "/usr/"
 # you want to receive.
 RUN if grep "secure_path" "/etc/sudoers" >"/dev/null" 2>&1; then \
         cat "/etc/sudoers" | grep -v "secure_path" | tee "/etc/sudoers" >"/dev/null" 2>&1; \
-    fi
+    fi \
+ && sed -i -E "s/^#HandleLidSwitchExternalPower=.*$/HandleLidSwitchExternalPower=ignore/g" "/etc/systemd/logind.conf"
 
 # === RUST === #
 FROM rust AS rust-build

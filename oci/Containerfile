@@ -113,8 +113,7 @@ RUN source "${HOME}/.cargo/env" \
  && rustup toolchain add "${LINUX_RUST_VERSION}" \
  && rustup component add --toolchain="${LINUX_RUST_VERSION}" "rust-src" \
  && rustup override set --path="/tmp/linux" "${LINUX_RUST_VERSION}" \
- && cargo install --locked --version "$("/tmp/linux/scripts/min-tool-version.sh" bindgen)" "bindgen-cli" \
- && ( { echo "[toolchain]"; echo "channel = \"${LINUX_RUST_VERSION}\""; } | tee "/tmp/linux/rust-toolchain")
+ && cargo install --locked --version "$("/tmp/linux/scripts/min-tool-version.sh" bindgen)" "bindgen-cli"
  # Custom Kernel Configuration
 COPY "custom_kernel.config" "/tmp/custom_kernel.config"
 COPY "patches" "/tmp/patches"
@@ -148,6 +147,8 @@ MAINTAINER "Zan Baldwin"
 # two behind. Just install that instead of trying to compile from source - there's
 # too many dev/runtime dependencies, and sometimes xdg-desktop-portal-hyprland
 # just fails to build. It's not worth the hassle.
+COPY --from="linux" "/opt/kernel" "/opt/kernel"
+RUN rpm-ostree override replace /opt/kernel/*.rpm
 RUN rpm-ostree install --idempotent --allow-inactive \
         hyprland \
         waybar \

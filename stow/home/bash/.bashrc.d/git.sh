@@ -34,9 +34,17 @@ command -v "gitui" >"/dev/null" 2>&1 && {
 command -v "jj" >"/dev/null" 2>&1 && {
     function jj {
         if [ $# -eq 0 ]; then
-            if jj "status"; then
-            echo ""
-                jj log --limit=5 --stat
+            # Don't bother checking `jj root` to see if we're in a directory,
+            # since the error message from `jj st` is better to display than any
+            # other alternative.
+            if command "jj" "status"; then
+                echo ""
+                echo -e "\e[4mRevision Changes:\e[0m"
+                command "jj" --ignore-working-copy obslog --stat
+
+                echo ""
+                echo -e "\e[4mHistory Log:\e[0m"
+                command "jj" --ignore-working-copy log --limit=5 --template="builtin_log_comfortable"
             fi
         else
             command "jj" "$@"

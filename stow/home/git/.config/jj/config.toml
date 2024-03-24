@@ -1,3 +1,28 @@
 [user]
 name = "Zan Baldwin"
 email = "hello@zanbaldwin.com"
+
+[template-aliases]
+# Relative timestamp rendered as "x days/hours/seconds ago"
+'format_timestamp(timestamp)' = 'timestamp.ago()'
+# Show both author name and email address
+'format_short_signature(signature)' = 'signature'
+'format_short_id(id)' = 'id.shortest(12)'
+
+[git]
+auto-local-branch = true
+push-branch-prefix = "zanbaldwin/push-"
+
+[ui]
+diff-instructions = true
+pager = ":builtin"
+paginate = "never"
+default-command = "statwithlog"
+
+[format]
+tree-level-conflicts = true
+
+[aliases]
+statwithlog = ["log", "--limit=5"]
+co = ["checkout"]
+sh = ["bash"]

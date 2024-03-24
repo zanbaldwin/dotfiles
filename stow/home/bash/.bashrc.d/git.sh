@@ -23,10 +23,23 @@ command -v "gitui" >"/dev/null" 2>&1 && {
             if [ -d "${GIT_DIR}" ]; then
                 gitui --watcher --directory="${GIT_DIR}"
             else
-                command git --help
+                command "git" --help
             fi
         else
-            command git "$@"
+            command "git" "$@"
+        fi
+    }
+}
+
+command -v "jj" >"/dev/null" 2>&1 && {
+    function jj {
+        if [ $# -eq 0 ]; then
+            if jj "status"; then
+            echo ""
+                jj log --limit=5 --stat
+            fi
+        else
+            command "jj" "$@"
         fi
     }
 }

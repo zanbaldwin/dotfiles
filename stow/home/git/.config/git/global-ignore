@@ -6,6 +6,7 @@
 /.vagrant/
 /Thumbs.db
 /*.test
+/.jj/
 /npm-debug.log*
 /yarn-debug.log*
 /yarn-error.log*

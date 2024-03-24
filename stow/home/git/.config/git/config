@@ -101,7 +101,7 @@
     # http://gitfu.wordpress.com/2008/04/20/git-rerere-rereremember-what-you-did-last-time/
     enabled     = true
 [help]
-    autocorrect = false
+    autocorrect = 0
 [core]
     excludesFile = "~/.config/git/global-ignore"
     editor       = "nano -AES --tabsize=4"

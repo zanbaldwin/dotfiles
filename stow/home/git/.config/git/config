@@ -17,6 +17,8 @@
     ft          = fetch --tags
     force       = push --force-with-lease --force-if-includes
 
+    stash       = stash --include-untracked
+
     # Useful Tools
     line        = log --abbrev-commit --find-renames --decorate=auto --pretty=format:'%C(red)%h%C(reset)\t%C(green)%<(14)%cr%C(reset)%C(yellow)%d%C(reset) %s %C(blue)<%an>%C(reset)'
     history     = line --follow --
@@ -90,6 +92,10 @@
     colorMoved          = default
 [difftool]
     prompt = false
+[stash]
+    showIncludeUntracked = true
+[status]
+    showStash = true
 [rerere]
     # Remember my merges
     # http://gitfu.wordpress.com/2008/04/20/git-rerere-rereremember-what-you-did-last-time/

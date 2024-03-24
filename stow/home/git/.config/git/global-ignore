@@ -1,5 +1,4 @@
 # Global Git Ignore File
-# Symlink this file to ~/.ignore, the .gitconfig file bundled automatically includes it.
 
 /*.swp
 /.tmuxp.yaml

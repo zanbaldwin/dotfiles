@@ -23,6 +23,7 @@ RUN dnf install --assumeyes \
 FROM rust AS alacritty
 RUN dnf install --assumeyes fontconfig-devel
 # There's absolutely no way I'm settling for Gnome Terminal as my default console.
+# TODO: Migrate to Kitty for better rendering, such as ligatures.
 RUN source "${HOME}/.cargo/env" \
  && git clone "https://github.com/alacritty/alacritty.git" --branch "v0.13.0" "/tmp/alacritty" \
  && (cd "/tmp/alacritty"; cargo build --release --features "wayland") \

@@ -24,9 +24,9 @@ fi
 
 TOOLBOX_SCRIPT_DIRECTORY="$(dirname "$(readlink -f "$0")")"
 
-HOME_STOW_PACKAGES="$(find "${TOOLBOX_SCRIPT_DIRECTORY}/../stow/home" -maxdepth 1 -mindepth 1 -type d | sed "s#${TOOLBOX_SCRIPT_DIRECTORY}/../stow/home/##g")"
+HOME_STOW_PACKAGES="$(find "${TOOLBOX_SCRIPT_DIRECTORY}/../stow" -maxdepth 1 -mindepth 1 -type d | sed "s#${TOOLBOX_SCRIPT_DIRECTORY}/../stow/##g")"
 # shellcheck disable=SC2086
-stow --dir="${TOOLBOX_SCRIPT_DIRECTORY}/../stow/home" --target="${HOME}" --stow ${HOME_STOW_PACKAGES}
+stow --dir="${TOOLBOX_SCRIPT_DIRECTORY}/../stow" --target="${HOME}" --stow ${HOME_STOW_PACKAGES}
 echo "Stowed into ${HOME}: ${HOME_STOW_PACKAGES}"
 
 # ETC_STOW_PACKAGES="$(find "${TOOLBOX_SCRIPT_DIRECTORY}/../stow/etc" -maxdepth 1 -mindepth 1 -type d | sed "s#${TOOLBOX_SCRIPT_DIRECTORY}/../stow/etc/##g")"

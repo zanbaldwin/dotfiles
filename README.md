@@ -17,7 +17,7 @@ git clone "git@github.com:zanbaldwin/dotfiles.git" "${DOTFILES}"
   [`qmk/`](./qmk) and the script to set that up can be found at
   [`toolbox/qmk.sh`](./toolbox/qmk.sh).
 - Environment setup scripts are stored in [`toolbox/`](./toolbox)
-- User configuration files are stored in [`stow/home/`](./stow/home) and can be
+- User configuration files are stored in [`stow/`](./stow) and can be
   installed via the [`stow.sh`](toolbox/stow.sh) script.
 - Various notes, reminders and archived stuff are in [`notes/`](./notes)
 

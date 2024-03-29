@@ -54,6 +54,7 @@ command -v "gimoji" >"/dev/null" 2>&1               || cargo install "gimoji"   
 command -v "gitui" >"/dev/null" 2>&1                || cargo install "gitui"         # Git TUI
 command -v "oha" >"/dev/null" 2>&1                  || cargo install "oha"           # HTTP Load Testing
 command -v "jj" >"/dev/null" 2>&1                   || cargo install "jj-cli"        # Jujutsu DVCS layered on top of Git
+command -v "sd" >"/dev/null" 2>&1                   || cargo install "sd"            # Replacement for `sed`
 
 # Useful Rust binaries that I want on my machine, but I'll cancel the script
 # about here when running in VMs.

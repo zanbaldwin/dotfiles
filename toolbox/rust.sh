@@ -55,6 +55,7 @@ command -v "gitui" >"/dev/null" 2>&1                || cargo install "gitui"    
 command -v "oha" >"/dev/null" 2>&1                  || cargo install "oha"           # HTTP Load Testing
 command -v "jj" >"/dev/null" 2>&1                   || cargo install "jj-cli"        # Jujutsu DVCS layered on top of Git
 command -v "sd" >"/dev/null" 2>&1                   || cargo install "sd"            # Replacement for `sed`
+command -v "hyperfine" >"/dev/null" 2>&1            || cargo install "hyperfine"     # Benchmarking utility, more advanced than `time`
 command -v "hexyl" >"/dev/null" 2>&1                || cargo install "hexyl"         # Binary file viewer
 
 # Useful Rust binaries that I want on my machine, but I'll cancel the script

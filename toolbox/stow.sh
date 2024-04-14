@@ -6,6 +6,7 @@ mkdir -p \
     "${HOME}/.cargo" \
     "${HOME}/code" \
     "${HOME}/.config/autostart" \
+    "${HOME}/.config/flakes" \
     "${HOME}/.local/share/applications" \
     "${HOME}/.ssh"
 

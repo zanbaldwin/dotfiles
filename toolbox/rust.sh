@@ -17,6 +17,7 @@ sudo dnf install --assumeyes \
     "clang" \
     "cmake" \
     "gcc" \
+    "musl-gcc" \
     "openssl-devel" \
     "perl" \
     "pkg-config"
@@ -84,5 +85,12 @@ command -v "tree-sitter" >"/dev/null" 2>&1          || cargo install "tree-sitte
 # The following are kept for reference, but I don't think I want to use them
 #cargo install "zoxide"    # `cd` alternative
 #cargo install "sccache"   # Build Artifact Cache
+
+if [ ! -f "/etc/NIXOS" ] && ! command -v "nix-installer" >"/dev/null" 2>&1; then
+    # Requires unstable Tokio until they update their MSRV.
+    # Target musl so that the same binary can be used in Alpine containers and VMs.
+    RUSTFLAGS="--cfg tokio_unstable" cargo install "nix-installer" --target "x86_64-unknown-linux-musl"
+fi
+
 
 command -v "wasmer" >"/dev/null" 2>&1               || curl -sSfL "https://get.wasmer.io" | bash

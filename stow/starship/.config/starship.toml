@@ -11,6 +11,7 @@ $os\
 $kubernetes\
 $directory\
 $fill\
+$nix_shell\
 $git_branch\
 $git_commit\
 $git_state\
@@ -95,6 +96,9 @@ disabled = false
 
 [shell]
 disabled = true
+[nix_shell]
+disabled = false
+heuristic = true
 [jobs]
 disabled = true
 [container]

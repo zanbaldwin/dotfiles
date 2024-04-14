@@ -2,8 +2,13 @@
 // installed (Flatpak, RPM, etc). You'll have to manually copy the file contents
 // over, remembering to copy them back when you make changes.
 {
+    "[nix]": {
+        "editor.defaultFormatter": "jnoortheen.nix-ide",
+        "editor.formatOnSave": true
+    },
     "diffEditor.codeLens": true,
     "diffEditor.ignoreTrimWhitespace": false,
+    "direnv.path.executable": "/home/zan/.local/state/nix/profile/bin/direnv",
     "editor.codeActionsOnSave": {},
     "editor.codeLens": false,
     "editor.cursorBlinking": "phase",
@@ -40,6 +45,22 @@
         "document"
     ],
     "gitlens.currentLine.scrollable": false,
+    "nix.enableLanguageServer": true,
+    "nix.formatterPath": [
+        "host-spawn",
+        "nixpkgs-fmt"
+    ],
+    "nix.serverPath": "/home/zan/.local/state/nix/profile/bin/nil",
+    "nix.serverSettings": {
+        "nil": {
+            "formatting": {
+                "command": [
+                    "host-spawn",
+                    "nixpkgs-fmt"
+                ]
+            }
+        }
+    },
     "redhat.telemetry.enabled": false,
     "rust-analyzer.inlayHints.bindingModeHints.enable": true,
     "rust-analyzer.inlayHints.lifetimeElisionHints.enable": "skip_trivial",

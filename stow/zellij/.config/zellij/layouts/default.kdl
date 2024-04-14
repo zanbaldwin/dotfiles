@@ -28,6 +28,14 @@ layout {
         }
     }
 
+    tab name="Nvim" {
+        pane {
+            cwd "$HOME/code"
+            borderless true
+            command "nvim"
+        }
+    }
+
     tab name="New Tab" focus=true {
         pane {
             focus true

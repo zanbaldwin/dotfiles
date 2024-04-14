@@ -1,55 +1,67 @@
+// VSCode uses too many different paths to load setting depending on how it is
+// installed (Flatpak, RPM, etc). You'll have to manually copy the file contents
+// over, remembering to copy them back when you make changes.
 {
-    "editor.guides.bracketPairs": "active",
-    "workbench.iconTheme": "material-icon-theme",
-    "files.autoSave": "onFocusChange",
-    "editor.fontFamily": "'JetBrainsMono Nerd Font', 'FiraCode Nerd Font', 'Fira Code', 'UbuntuMono Nerd Font', 'Ubuntu Mono', Menlo, Monaco, 'Courier New', monospace",
-    "editor.renderWhitespace": "trailing",
-    "editor.cursorStyle": "line-thin",
-    "editor.cursorBlinking": "phase",
-    "editor.find.autoFindInSelection": "multiline",
-    "editor.fontLigatures": true,
-    "editor.formatOnSave": true,
     "diffEditor.codeLens": true,
     "diffEditor.ignoreTrimWhitespace": false,
+    "editor.codeActionsOnSave": {},
+    "editor.codeLens": false,
+    "editor.cursorBlinking": "phase",
+    "editor.cursorStyle": "line-thin",
+    "editor.find.autoFindInSelection": "multiline",
+    "editor.fontFamily": "'JetBrainsMono Nerd Font', 'FiraCode Nerd Font', 'Fira Code', 'UbuntuMono Nerd Font', 'Ubuntu Mono', Menlo, Monaco, 'Courier New', monospace",
+    "editor.fontLigatures": true,
+    "editor.formatOnSave": true,
+    "editor.guides.bracketPairs": "active",
+    "editor.inlineSuggest.enabled": true,
     "editor.minimap.renderCharacters": false,
+    "editor.renderWhitespace": "trailing",
+    "editor.rulers": [
+        80,
+        120,
+    ],
+    "explorer.confirmDelete": false,
+    "extensions.ignoreRecommendations": true,
+    "files.autoSave": "onFocusChange",
     "files.eol": "\n",
     "files.trimFinalNewlines": true,
     "files.trimTrailingWhitespace": true,
-    "workbench.colorTheme": "Atom One Dark",
-    "workbench.fontAliasing": "auto",
-    "workbench.editor.autoLockGroups": {
-        "mainThreadWebview-markdown.preview": true
-    },
-    "rust-analyzer.inlayHints.parameterHints": true,
-    "rust-analyzer.inlayHints.bindingModeHints.enable": true,
-    "rust-analyzer.inlayHints.lifetimeElisionHints.enable": "skip_trivial",
-    "rust-analyzer.inlayHints.lifetimeElisionHints.useParameterNames": true,
-    "rust-analyzer.lens.enable": false,
-    "explorer.confirmDelete": false,
-    "editor.codeActionsOnSave": {
-        
+    "git.autofetch": "all",
+    "git.autoStash": true,
+    "git.openRepositoryInParentFolders": "never",
+    "github.copilot.advanced": {},
+    "github.copilot.enable": {
+        "*": true,
+        "markdown": true,
+        "plaintext": false,
+        "scminput": false
     },
     "gitlens.codeLens.scopes": [
         "document"
     ],
     "gitlens.currentLine.scrollable": false,
-    "git.autofetch": "all",
-    "git.autoStash": true,
-    "extensions.ignoreRecommendations": true,
-    "git.openRepositoryInParentFolders": "never",
     "redhat.telemetry.enabled": false,
+    "rust-analyzer.inlayHints.bindingModeHints.enable": true,
+    "rust-analyzer.inlayHints.lifetimeElisionHints.enable": "skip_trivial",
+    "rust-analyzer.inlayHints.lifetimeElisionHints.useParameterNames": true,
+    "rust-analyzer.inlayHints.parameterHints": true,
+    "rust-analyzer.lens.enable": false,
     "telemetry.telemetryLevel": "off",
-    "github.copilot.advanced": {},
-    "github.copilot.enable": {
-        "*": true,
-        "plaintext": false,
-        "markdown": true,
-        "scminput": false
+    "terminal.integrated.defaultProfile.linux": "flatpak-bash",
+    "terminal.integrated.profiles.linux": {
+        "flatpak-bash": {
+            "args": [
+                "bash"
+            ],
+            "path": "host-spawn"
+        }
     },
-    "editor.inlineSuggest.enabled": true,
-    "editor.rulers": [
-        80,
-        120,
-    ],
-    "window.zoomLevel": 1.5
+    // Okay, maybe I need a _little_ bit of help viewing things on a 4K monitor.
+    "window.zoomLevel": 1.15,
+    "workbench.colorTheme": "Atom One Dark",
+    "workbench.editor.autoLockGroups": {
+        "mainThreadWebview-markdown.preview": true
+    },
+    "workbench.fontAliasing": "auto",
+    "workbench.iconTheme": "material-icon-theme"
 }

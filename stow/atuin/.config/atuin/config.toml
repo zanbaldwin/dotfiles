@@ -126,17 +126,20 @@ filter_mode_shell_up_key_binding = "directory"
 # This applies for new installs. Old installs will keep the old behaviour unless configured otherwise.
 enter_accept = true
 
-#[stats]
+[stats]
 # Set commands where we should consider the subcommand for statistics. Eg, kubectl get vs just kubectl
-#common_subcommands = [
-#  "cargo",
-#  "go",
-#  "git",
-#  "npm",
-#  "yarn",
-#  "pnpm",
-#  "kubectl",
-#]
-#
+common_subcommands = [
+    "cargo",
+    "go",
+    "git",
+    "npm",
+    "yarn",
+    "pnpm",
+    "kubectl",
+    "docker",
+    "podman",
+    "composer",
+    "nix",
+]
 # Set commands that should be totally stripped and ignored from stats
-#common_prefix = ["sudo"]
+common_prefix = ["sudo"]

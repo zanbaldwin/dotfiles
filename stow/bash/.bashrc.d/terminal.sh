@@ -29,3 +29,6 @@ alias follow='watch $(history -p !!)'
 # Anger Management
 alias fuck='sudo "$SHELL" -c "$(history -p !!)"'
 alias fucking="sudo"
+
+# Uncomment the following line if you don't like systemctl's auto-paging feature:
+# export SYSTEMD_PAGER=

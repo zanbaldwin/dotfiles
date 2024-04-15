@@ -35,6 +35,7 @@ in {
 
   imports = [
     "${./users}/${username}.nix"
+    ./modules/virtualization.nix
   ];
 
   networking.hostId = builtins.substring 0 8 (builtins.hashString "md5" config.networking.hostName);

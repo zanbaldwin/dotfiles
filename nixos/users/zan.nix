@@ -13,10 +13,12 @@ in {
       "wheel"
       "docker"
       "libvirt"
+      "podman"
     ];
     shell = pkgs.bashInteractive;
     packages = with pkgs; [
       alacritty
+      arion
       atuin
       bat
       bitwarden

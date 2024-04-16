@@ -40,6 +40,7 @@ in {
       spotifyd
       spotify-tui
       starship
+      stow
       toolbox
       zellij
     ];

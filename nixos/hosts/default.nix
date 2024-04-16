@@ -30,14 +30,6 @@
             ./tuffed/hardware.nix
             ./tuffed/bootloader.nix
             ../configuration.nix
-            # home-manager.nixosModules.home-manager {
-            #     home-manager.useGlobalPkgs = true;
-            #     home-manager.useUserPackages = true;
-            #     home-manager.extraSpecialArgs = { inherit username; };
-            #     home-manager.users.${username} = {
-            #         imports = [ (import ../home.nix) ++ (import ./tuffed/home.nix) ]
-            #     };
-            # }
         ];
     };
 }

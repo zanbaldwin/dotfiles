@@ -1,5 +1,3 @@
-#!/bin/bash
-
 if [ -f "${HOME}/.cargo/env" ]; then
     # Just in case this script is being immediately after `rust.sh` without a reload.
     # shellcheck source="/dev/null"
@@ -18,12 +16,19 @@ zellij_stable_version() {
         | tail -n1
 }
 
-rustup target add "wasm32-wasi"
+
+TARGET="wasm32-wasi"
+# WASI 0.2 target won't be realised until May 2nd 2024.
+if rustup target add "wasm32-wasip2"; then
+    TARGET="wasm32-wasip2"
+else
+    rustup target add "wasm32-wasi"
+fi
 
 mkdir -p "${HOME}/.local/share/zellij/plugins"
 rm -rf /tmp/zellij*
 git clone "https://github.com/imsnif/monocle.git" "/tmp/zellij-monocle" \
     && git -C "/tmp/zellij-monocle" checkout "$(zellij_stable_version "/tmp/zellij-monocle")" \
-    && (cd "/tmp/zellij-monocle"; cargo build --target "wasm32-wasi" --release) \
-    && cp "/tmp/zellij-monocle/target/wasm32-wasi/release/monocle.wasm" "${HOME}/.local/share/zellij/plugins/monocle.wasm" \
+    && (cd "/tmp/zellij-monocle"; cargo build --target "${TARGET}" --release) \
+    && cp "/tmp/zellij-monocle/target/${TARGET}/release/monocle.wasm" "${HOME}/.local/share/zellij/plugins/monocle.wasm" \
     && rm -rf "/tmp/zellij-monocle"

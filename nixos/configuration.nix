@@ -2,7 +2,7 @@
 # Help is available in the configuration.nix(5) man page and in the NixOS manual
 # (accessible by running ‘nixos-help’).
 
-{ config, pkgs, username, system, ... }: let
+{ config, pkgs, username, hostname, ... }: let
   version = "23.11";
 in {
   # This value determines the NixOS release from which the default
@@ -40,6 +40,7 @@ in {
     ./modules/dconf.nix
   ];
 
+  networking.hostName = hostname;
   networking.hostId = builtins.substring 0 8 (builtins.hashString "md5" config.networking.hostName);
 
   # networking.wireless.enable = true;  # Enables wireless support via wpa_supplicant.

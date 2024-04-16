@@ -10,9 +10,13 @@ export DOTFILES="${HOME}/.dotfiles"
 git clone "git@github.com:zanbaldwin/dotfiles.git" "${DOTFILES}"
 ```
 
-- Based on [Fedora Silverblue](https://silverblue.fedoraproject.org/), the
-  custom operating system base is built using an OCI image definition. See the
-  [README in the `oci/` directory](./oci) for build and rebasing instructions.
+- Operating System
+  - [Fedora Silverblue](https://silverblue.fedoraproject.org/):
+    customised build using an OCI image definition. See the [README in the
+    `oci/` directory](./oci) for build and rebasing instructions.
+  - [NixOS](https://nixos.org/): deterministic build using
+    [Flakes](https://nixos.wiki/wiki/Flakes). See the [README in the `nixos/`
+    directory](./nixos) for installation instructions.
 - Customised keymap firmware for a Corne keyboard can be found in
   [`qmk/`](./qmk) and the script to set that up can be found at
   [`toolbox/qmk.sh`](./toolbox/qmk.sh).

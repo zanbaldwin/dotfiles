@@ -1,4 +1,4 @@
-{ config, pkgs, ... }: let
+{ pkgs, ... }: let
   username = "zan";
 in {
   # Don't forget to set a password with ‘passwd’.

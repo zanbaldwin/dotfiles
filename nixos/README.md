@@ -1,8 +1,20 @@
 # NixOS Flake Configuration
 
+Hosts defined in the [`hosts` NixOS module](./hosts/default.nix).
+
 ```shell
-SYSTEM_HOSTNAME="qemu"
-DEFAULT_DOTFILES_DIR="/dotfiles"
-git clone "https://github.com/zanbaldwin/dotfiles.git" "${DEFAULT_DOTFILES_DIR}"
-sudo nixos-rebuild switch --flake "${DEFAULT_DOTFILES_DIR}/nixos#${SYSTEM_HOSTNAME}"
+export HOST="<choose-host>"
+```
+
+## Installation
+
+```shell
+sudo nixos-install --flake "https://github.com/zanbaldwin/dotfiles#${HOST}"
+```
+
+## Upgrading
+
+```shell
+git clone "https://github.com/zanbaldwin/dotfiles" "/dotfiles"
+sudo nixos-rebuild switch --flake "/dotfiles#${HOST}"
 ```

@@ -29,7 +29,3 @@ HOME_STOW_PACKAGES="$(find "${TOOLBOX_SCRIPT_DIRECTORY}/../stow" -maxdepth 1 -mi
 # shellcheck disable=SC2086
 stow --dir="${TOOLBOX_SCRIPT_DIRECTORY}/../stow" --target="${HOME}" --stow ${HOME_STOW_PACKAGES}
 echo "Stowed into ${HOME}: ${HOME_STOW_PACKAGES}"
-
-# ETC_STOW_PACKAGES="$(find "${TOOLBOX_SCRIPT_DIRECTORY}/../stow/etc" -maxdepth 1 -mindepth 1 -type d | sed "s#${TOOLBOX_SCRIPT_DIRECTORY}/../stow/etc/##g")"
-# # shellcheck disable=SC2086
-# sudo stow --dir="${TOOLBOX_SCRIPT_DIRECTORY}/../stow/etc" --target="/etc" --stow ${ETC_STOW_PACKAGES}

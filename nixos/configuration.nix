@@ -87,8 +87,10 @@ in {
     options = "caps:swapescape,compose:ralt,terminate:ctrl_alt_bksp,mod_led:compose";
   };
 
-  # Enable CUPS to print documents.
-  services.printing.enable = true;
+  # CUPS: Common Unix Printing Service.
+  # Honestly, it's easier to email PDFs to myself and wirelessly print
+  # from my iPhone than it is to try and get printing working on Linux.
+  services.printing.enable = false;
 
   # Enable sound with pipewire.
   sound.enable = true;

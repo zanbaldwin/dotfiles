@@ -13,7 +13,7 @@ THIS_DIR="$(dirname "$(readlink -f "$0")")"
 # Installation scripts that work on the host, rather than a toolbox container.
 bash "${THIS_DIR}/toolbox/fonts.sh"
 bash "${THIS_DIR}/toolbox/gnome.sh"
-bash "${THIS_DIR}/toolbox/apps.sh"
+bash "${THIS_DIR}/toolbox/flakpak.sh"
 
 toolbox create rust \
     && toolbox run --container="rust" bash "${THIS_DIR}/toolbox/rust.sh" \

@@ -7,7 +7,7 @@ ARG IMAGE="${IMAGE:-quay.io/fedora/fedora-${VARIANT}}"
 
 # ======================= RUST ======================= #
 # Rust is needed to build binaries for both Gnome and  #
-# Hyprland environments.                               #
+# Custom Linux kernel environments.                    #
 # ==================================================== #
 FROM "fedora:${VERSION}" AS rust
 RUN dnf install --assumeyes \
@@ -34,46 +34,6 @@ RUN source "${HOME}/.cargo/env" \
  && cp "/tmp/alacritty/extra/completions/alacritty.bash" "/opt/alacritty/etc/bash_completion.d/alacritty" \
  && rm -rf "/tmp/alacritty"
 
-# ================ #
-#                  #
-#       GNOME      #
-#                  #
-# ================ #
-FROM "${IMAGE}:${VERSION}" AS gnome
-MAINTAINER "Zan Baldwin"
-COPY "./usr/" "/usr/"
-RUN rpm-ostree install --idempotent --allow-inactive --releasever="${VERSION}" \
-        bridge-utils edk2-ovmf guestfs-tools libvirt qemu-kvm virt-install virt-manager \
-        podman-docker podman-plugins podman-tui containernetworking-plugins aardvark-dns \
-        distrobox ffmpeg-free fzf make ncdu nss-tools tlp tlp-rdw \
- && systemctl enable "libvirtd" \
- && systemctl enable "podman.service" \
- && systemctl enable "podman.socket" \
- && systemctl enable "podman-restart.service" \
- && systemctl enable "flatpak-update.service" \
- && (systemctl enable "tlp.service" || true) \
- && rm -rf /tmp/* /var/* \
- && ostree container commit
-COPY --from="alacritty" "/opt/alacritty/" "/usr/"
-# I truncated the sudoers file to zero by accident when I included this snippet
-# in the RUN layer above. "<user> is not in the sudoers file" is not a message
-# you want to receive.
-RUN if grep "secure_path" "/etc/sudoers" >"/dev/null" 2>&1; then \
-        cat "/etc/sudoers" | grep -v "secure_path" | tee "/etc/sudoers" >"/dev/null" 2>&1; \
-    fi \
- && sed -i -E "s/^#HandleLidSwitchExternalPower=.*$/HandleLidSwitchExternalPower=ignore/g" "/etc/systemd/logind.conf"
-
-# === RUST === #
-FROM rust AS rust-build
-RUN source "${HOME}/.cargo/env" \
- && git clone "https://github.com/Horus645/swww.git" --branch "v0.8.1" "/tmp/swww" \
- && (cd "/tmp/swww"; cargo build --release) \
- && mkdir -p "/opt/swww/bin" "/opt/swww/etc/bash_completion.d" \
- && cp "/tmp/swww/target/release/swww" "/opt/swww/bin/swww" \
- && cp "/tmp/swww/target/release/swww-daemon" "/opt/swww/bin/swww-daemon" \
- && cp "/tmp/swww/completions/swww.bash" "/opt/swww/etc/bash_completion.d/swww" \
- && rm -rf "/tmp/swww"
-
 FROM "fedora:${VERSION}" AS secure-boot
 RUN dnf install --assumeyes openssl \
  && mkdir -p "/opt/secureboot" \
@@ -83,7 +43,7 @@ RUN dnf install --assumeyes openssl \
         -subj "/CN=${NAMESPACE}/" \
  && openssl pkcs12 -export -out "/opt/secureboot/key.p12" -inkey "/opt/secureboot/key.pem" -in "/opt/secureboot/cert.der"
 
-FROM rust AS linux
+FROM rust AS kernel
 # Dependencies
 RUN source "/etc/os-release" \
  && git clone --depth=1 --branch="f${VERSION_ID}" "https://src.fedoraproject.org/rpms/kernel.git" "/tmp/fedpkg" \
@@ -145,24 +105,43 @@ RUN source "${HOME}/.cargo/env" \
  && echo "Building Linux kernel version '$(make -C "/tmp/linux" --no-print-directory kernelversion)'." \
  && make -C "/tmp/linux" -j "$(nproc --all)" rpm-pkg
 
-# ================ #
-#                  #
-#     Hyprland     #
-#                  #
-# ================ #
-FROM gnome AS hyprland
+# ===================== #
+#                       #
+#     Custom Kernel     #
+#    (extends GMOME)    #
+#                       #
+# ===================== #
+FROM gnome AS linux
 MAINTAINER "Zan Baldwin"
-# The Hyprland package in the Fedora repositories only seems to be a version or
-# two behind. Just install that instead of trying to compile from source - there's
-# too many dev/runtime dependencies, and sometimes xdg-desktop-portal-hyprland
-# just fails to build. It's not worth the hassle.
-COPY --from="linux" "/opt/kernel" "/opt/kernel"
+COPY --from="kernel" "/opt/kernel" "/opt/kernel"
 RUN rpm-ostree override replace /opt/kernel/*.rpm
-RUN rpm-ostree install --idempotent --allow-inactive \
-        hyprland \
-        waybar \
+
+# ================ #
+#                  #
+#       GNOME      #
+#     (default)    #
+#                  #
+# ================ #
+FROM "${IMAGE}:${VERSION}" AS gnome
+MAINTAINER "Zan Baldwin"
+COPY "./usr/" "/usr/"
+RUN rpm-ostree install --idempotent --allow-inactive --releasever="${VERSION}" \
+        bridge-utils edk2-ovmf guestfs-tools libvirt qemu-kvm virt-install virt-manager \
+        podman-docker podman-plugins podman-tui containernetworking-plugins aardvark-dns \
+        distrobox ffmpeg-free fzf make ncdu nss-tools tlp tlp-rdw \
+ && systemctl enable "libvirtd" \
+ && systemctl enable "podman.service" \
+ && systemctl enable "podman.socket" \
+ && systemctl enable "podman-restart.service" \
+ && systemctl enable "flatpak-update.service" \
+ && (systemctl enable "tlp.service" || true) \
  && rm -rf /tmp/* /var/* \
  && ostree container commit
-# Tools built in previous steps.
-COPY --from="rust-build" "/opt/swww/" "/usr/"
-COPY --from="golang-build" "/opt/nwg-drawer/" "/usr/"
+COPY --from="alacritty" "/opt/alacritty/" "/usr/"
+# I truncated the sudoers file to zero by accident when I included this snippet
+# in the RUN layer above. "<user> is not in the sudoers file" is not a message
+# you want to receive.
+RUN if grep "secure_path" "/etc/sudoers" >"/dev/null" 2>&1; then \
+        cat "/etc/sudoers" | grep -v "secure_path" | tee "/etc/sudoers" >"/dev/null" 2>&1; \
+    fi \
+ && sed -i -E "s/^#HandleLidSwitchExternalPower=.*$/HandleLidSwitchExternalPower=ignore/g" "/etc/systemd/logind.conf"

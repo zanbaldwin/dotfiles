@@ -1,33 +1,11 @@
 # Fedora OCI Operating System Images
 
-### Define your settings
-```bash
-# Could also be "kinoite" (KDE sping), or "sericea" (Sway spin).
-export VARIANT="silverblue"
-# Currently, this can either be `gnome` or `hyprland`.
-export WM="gnome"
-# Fedora 39 is the first version to officially publish as OCI images.
-export VERSION="39"
-# This could be an official container registry (like "docker.io", "ghcr.io", etc).
-export REGISTRY="localhost:5000"
-export NAMESPACE="zanbaldwin"
-# If pushed to an official container registry, should probably be repository name.
-export IMAGE="silverblue"
-```
-
-### Building your custom Operating System image
-```bash
-podman build \
-    --file "Containerfile" \
-    --build-arg="VARIANT=${VARIANT}" \
-    --build-arg="VERSION=${VERSION}" \
-    --target="${WM}"
-    --tag "${REGISTRY}/${NAMESPACE}/${IMAGE}:${VERSION}" \
-    "$(pwd)"
-```
-
 ### Host your own container registry locally
-```bash
+Skip this step if you are planning on pushing to an official container registry
+like [docker.io](https://hub.docker.com) or [ghcr.io](https://ghcr.io). Set your
+`REGISTRY` environment variable appropriately.
+
+```shell
 { \
     echo "[[registry]]"; \
     echo "location = 'localhost:5000'"; \
@@ -35,25 +13,31 @@ podman build \
 } | sudo tee --append "/etc/containers/registries.conf"
 
 podman run -d --name="registry" --publish="5000:5000" "docker.io/library/registry:2"
+export REGISTRY="localhost:5000"
 ```
+
+### Building your custom Operating System image
+```shell
+podman build \
+    --file "Containerfile" \
+    --tag "${REGISTRY}/zanbaldwin/silverblue:latest" \
+    "${DOTFILES_DIR}/oci"
+```
+
+The default build target is `gnome`, use `--target="linux"` to use a custom build of the
+Linux kernel (which has absolute no guarantees it will even build).
+
+Specify the following build arguments (using `--build-arg="NAME=value"`) for
+further customization:
+- `VARIANT` (default value `silverblue`)
+- `VERSION` (default value `39`)
 
 ### Push and Deploy
-```bash
-podman push "${REGISTRY}/${NAMESPACE}/${IMAGE}:${VERSION}"
-# Annoying that we can't re-use the one that Podman just built; will have to look into that further.
-rpm-ostree rebase "ostree-unverified-registry:${REGISTRY}/${NAMESPACE}/${IMAGE}:${VERSION}"
-```
-
-### Clean up
-```bash
-podman rm -f "registry"
-podman rmi \
-    "docker.io/library/registry:2" \
-    "quay.io/fedora/fedora-${VARIANT}:${VERSION}" \
-    "${REGISTRY}/${NAMESPACE}/${IMAGE}:${VERSION}"
-```
-
-### Reboot into your custom Operating System image!
-```bash
+```shell
+# Annoying that we can't re-use the one that Podman just built; will
+# have to look into that further.
+podman push "${REGISTRY}/zanbaldwin/silverblue:latest"
+rpm-ostree rebase "ostree-unverified-registry:${REGISTRY}/zanbaldwin/silverblue:latest"
+# Reboot into your custom Operating System image!
 systemctl reboot
 ```

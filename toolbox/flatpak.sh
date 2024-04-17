@@ -13,6 +13,7 @@ flatpak update
 
 flatpak install --noninteractive --assumeyes --or-update flathub \
     "com.bitwarden.desktop" \
+    "org.chromium.Chromium" \
     "com.mongodb.Compass" \
     "com.github.tchx84.Flatseal" \
     "com.mattjakeman.ExtensionManager" \

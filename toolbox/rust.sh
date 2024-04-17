@@ -49,21 +49,20 @@ command -v "delta" >"/dev/null" 2>&1                || cargo install "git-delta"
 command -v "onefetch" >"/dev/null" 2>&1             || cargo install "onefetch"  # Git Repository Overview
 command -v "zellij" >"/dev/null" 2>&1               || cargo install "zellij"    # Terminal Multiplexer (tmux replacement)
 command -v "atuin" >"/dev/null" 2>&1                || cargo install "atuin"     # Better Bash History
+command -v "rg" >"/dev/null" 2>&1                   || cargo install "ripgrep"   # It's just fast
 
 # Other tools that I want to try to start using more
-command -v "gimoji" >"/dev/null" 2>&1               || cargo install "gimoji"        # Select an appropriate emoji to Git commits depending on what the commit does
-command -v "gitui" >"/dev/null" 2>&1                || cargo install "gitui"         # Git TUI
-command -v "oha" >"/dev/null" 2>&1                  || cargo install "oha"           # HTTP Load Testing
-command -v "jj" >"/dev/null" 2>&1                   || cargo install "jj-cli"        # Jujutsu DVCS layered on top of Git
-command -v "sd" >"/dev/null" 2>&1                   || cargo install "sd"            # Replacement for `sed`
-command -v "hyperfine" >"/dev/null" 2>&1            || cargo install "hyperfine"     # Benchmarking utility, more advanced than `time`
-command -v "hexyl" >"/dev/null" 2>&1                || cargo install "hexyl"         # Binary file viewer
-
-# Useful Rust binaries that I want on my machine, but I'll cancel the script
-# about here when running in VMs.
+# Useful Rust binaries that I want on my machine, or tools I want to try to
+# start using more, but I'll cancel the script about here when running in VMs.
 command -v "coreutils" >"/dev/null" 2>&1            || cargo install "coreutils" # Rusty GNU
 command -v "mprocs" >"/dev/null" 2>&1               || cargo install "mprocs"    # Multi Process Runner
-command -v "rg" >"/dev/null" 2>&1                   || cargo install "ripgrep"   # It's just fast
+command -v "hyperfine" >"/dev/null" 2>&1            || cargo install "hyperfine" # Benchmarking utility, more advanced than `time`
+command -v "gimoji" >"/dev/null" 2>&1               || cargo install "gimoji"    # Select an appropriate emoji to Git commits depending on what the commit does
+command -v "gitui" >"/dev/null" 2>&1                || cargo install "gitui"     # Git TUI
+command -v "oha" >"/dev/null" 2>&1                  || cargo install "oha"       # HTTP Load Testing
+command -v "jj" >"/dev/null" 2>&1                   || cargo install "jj-cli"    # Jujutsu DVCS layered on top of Git
+command -v "sd" >"/dev/null" 2>&1                   || cargo install "sd"        # Replacement for `sed`
+command -v "hexyl" >"/dev/null" 2>&1                || cargo install "hexyl"     # Binary file viewer
 
 # Control Spotify from command line, instead of through Flatpak. Used for Eww.
 # `secret-tool store --label='spotifyd' application rust-keyring service spotifyd username zanbaldwin`
@@ -87,10 +86,12 @@ command -v "tree-sitter" >"/dev/null" 2>&1          || cargo install "tree-sitte
 #cargo install "sccache"   # Build Artifact Cache
 
 if [ ! -f "/etc/NIXOS" ] && ! command -v "nix-installer" >"/dev/null" 2>&1; then
+    # Target musl so that it can be copied onto a VM and not worry about whether
+    # the required linked-libraries are installed.
+    rustup target add "x86_64-unknown-linux-musl"
     # Requires unstable Tokio until they update their MSRV.
-    # Target musl so that the same binary can be used in Alpine containers and VMs.
     RUSTFLAGS="--cfg tokio_unstable" cargo install "nix-installer" --target "x86_64-unknown-linux-musl"
 fi
 
-
-command -v "wasmer" >"/dev/null" 2>&1               || curl -sSfL "https://get.wasmer.io" | bash
+rustup target add "wasm32-wasip2" || rustup target add "wasm32-wasi"
+command -v "wasmer" >"/dev/null" 2>&1 || curl -sSfL "https://get.wasmer.io" | bash

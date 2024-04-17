@@ -20,9 +20,9 @@ elif command -v "podman" >"/dev/null" 2>&1; then
     #   systemctl --user enable --now "podman.socket"
     DOCKER_HOST="unix:///run/user/$(id -u)/podman/podman.sock"
     export DOCKER_HOST
-    # The Podman (v4.8.0) API is not yet compatible with Docker Compose
-    # defaulting to BuildKit yet when Compose configuration files have more than
-    # one service that contains a build configuration.
+    # The Podman (v4.8.0) API is not yet compatible with Docker Compose when it
+    # uses BuildKit (for Compose configuration files that contain services with
+    # `build` configuration).
     export DOCKER_BUILDKIT=0
 
     # Docker is symlinked to Podman (probably the "podman-docker" package).

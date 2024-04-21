@@ -17,7 +17,7 @@
         luarocks
         neovim
         nil
-        nixfmt
+        nixfmt-rfc-style
         php83
         statix
       ];

@@ -33,6 +33,7 @@ layout {
             cwd "$HOME/code"
             borderless true
             command "nvim"
+            start_suspended true
         }
     }
 

@@ -59,33 +59,50 @@ services:
               protocol: 'tcp'
               mode: 'host'
 
-    mitm:
-        image: 'mitmproxy/mitmproxy:${MITM_VERSION:-latest}'
+    ollama:
+        image: 'ollama/ollama'
+        restart: 'always'
+        logging: *default-logging
+        environment:
+            OLLAMA_HOST: '0.0.0.0:11434'
+            OLLAMA_ORIGINS: 'http://localhost,https://ollama.test'
+        ports:
+            - target: 11434
+              published: 11434
+              protocol: 'tcp'
+              mode: 'host'
+        volumes:
+            # - type: 'bind'
+            #   source: '/home/zan/.local/share/ollama'
+            #   target: '/root/.ollama'
+            #   read_only: false
+            # Docker Compose does not allow setting the `:z` flag in long-form syntax.
+            - '/home/zan/.local/share/ollama:/root/.ollama:z,rw'
+
+    openwebui:
+        image: 'ghcr.io/open-webui/open-webui:main'
         restart: 'always'
         logging: *default-logging
         network_mode: 'host'
-        command:
-            - 'mitmweb'
-            - '--listen-host=0.0.0.0'
-            - '--listen-port=8080'
-            - '--web-host=0.0.0.0'
-            - '--web-port=8081'
-            - '--showhost'
-            - '--no-web-open-browser'
-            - '--http2'
+        environment:
+            PORT: 6554
         ports:
-            - target: 8080
-              published: 8080
+            - target: 6554
+              published: 6554
               protocol: 'tcp'
               mode: 'host'
-            - target: 8081
-              published: 8081
-              protocol: 'tcp'
-              mode: 'host'
-
+        volumes:
+            - type: 'volume'
+              source: 'ollama'
+              target: '/app/backend/data'
+              read_only: false
+        extra_hosts:
+            - 'host.docker.internal:host-gateway'
 
 volumes:
     config:
         driver: 'local'
     certs:
+        driver: 'local'
+    ollama:
         driver: 'local'

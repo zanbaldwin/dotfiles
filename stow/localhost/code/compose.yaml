@@ -59,26 +59,6 @@ services:
               protocol: 'tcp'
               mode: 'host'
 
-    ollama:
-        image: 'ollama/ollama'
-        restart: 'always'
-        logging: *default-logging
-        environment:
-            OLLAMA_HOST: '0.0.0.0:11434'
-            OLLAMA_ORIGINS: 'http://localhost,https://ollama.test'
-        ports:
-            - target: 11434
-              published: 11434
-              protocol: 'tcp'
-              mode: 'host'
-        volumes:
-            # - type: 'bind'
-            #   source: '/home/zan/.local/share/ollama'
-            #   target: '/root/.ollama'
-            #   read_only: false
-            # Docker Compose does not allow setting the `:z` flag in long-form syntax.
-            - '/home/zan/.local/share/ollama:/root/.ollama:z,rw'
-
     openwebui:
         image: 'ghcr.io/open-webui/open-webui:main'
         restart: 'always'

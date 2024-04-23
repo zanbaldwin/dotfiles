@@ -1,4 +1,4 @@
-ARG VERSION="${VERSION:-39}"
+ARG VERSION="${VERSION:-40}"
 ARG VARIANT="${VARIANT:-silverblue}"
 # Fedora 39 is the first to officially ship as an OCI image; before then the
 # unofficial images could be found at "quay.io/fedora-ostree-desktops/${VARIANT}".

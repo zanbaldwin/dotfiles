@@ -10,7 +10,7 @@
     # the end of the command (#).
 
     # Keystroke Savers
-    s           = status -s
+    s           = switch
     st          = status
     co          = checkout
     fa          = fetch --all
@@ -45,6 +45,8 @@
     continue    = rebase --continue
     skip        = rebase --skip
     abort       = rebase --abort
+    fixup       = !git commit --fixup="${1}"
+    autosquash  = rebase --autosquash
 
     # Misc
     root        = rev-parse --show-toplevel
@@ -77,6 +79,7 @@
     rebase = true
 [rebase]
     autoStash = true
+    updateRefs = true
 [pager]
     # The default Git diffing tool isn't very nice to look at, use something better.
     log         = delta

@@ -15,6 +15,8 @@ command -v "atuin" >"/dev/null" 2>&1 && {
 # Up & down map to history search once a command has been started.
 bind '"\e[A":history-search-backward' 2>"/dev/null"
 bind '"\e[B":history-search-forward' 2>"/dev/null"
+# Case-insensitive tab completion
+bind 'set completion-ignore-case On' 2>"/dev/null"
 
 alias c="clear"
 alias xx="exit"

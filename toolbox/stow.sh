@@ -4,7 +4,7 @@
 mkdir -p \
     "${HOME}/bin" \
     "${HOME}/.cargo" \
-    "${HOME}/code" \
+    "${HOME}/code/jupyter" \
     "${HOME}/.config/autostart" \
     "${HOME}/.config/flakes" \
     "${HOME}/.local/share/applications" \

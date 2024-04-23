@@ -100,26 +100,18 @@ services:
             - 'host.docker.internal:host-gateway'
 
     jupyter:
-        # You may need to build image manually first before Compose Up due to
-        # symlink targets being outside of the context (on Podman, this must be
-        # run as the same user you plan on using with Compose Up):
-        # [sudo] docker build --tag "zanbaldwin.com/localhost/jupyter" --format="docker" jupyter/Containerfile
-        image: 'zanbaldwin.com/localhost/jupyter'
-        build:
-            context: './jupyter'
-            dockerfile: 'Containerfile'
+        image: 'quay.io/jupyter/pytorch-notebook:cuda12-latest'
         restart: 'always'
         logging: *default-logging
+        environment:
+            NOTEBOOK_ARGS: '--no-browser --ip="0.0.0.0" --LabApp.password="" --LabApp.token="" --NotebookApp.password="" --NotebookApp.token=""'
         ports:
             - target: 8888
               published: 58798
               protocol: 'tcp'
               mode: 'host'
         volumes:
-            - type: 'bind'
-              source: './'
-              target: '/srv'
-              read_only: false
+            - './:/srv:z,rw'
         working_dir: '/srv'
 
 volumes:

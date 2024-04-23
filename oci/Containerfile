@@ -68,12 +68,12 @@ RUN source "/etc/os-release" \
 # FUCKING AGES. Like 30 minutes to download ~135MiB ages).
 ARG LINUX_GIT_REPO="git://git.kernel.org/pub/scm/linux/kernel/git/stable/linux-stable.git"
 RUN export LINUX_LATEST_VERSION="$(git -c 'versionsort.suffix=-' ls-remote --tags --sort='v:refname' "${LINUX_GIT_REPO}" \
-        | \grep -v '\^' \
-        | \grep -P -e '\d+\.\d+' \
-        | \grep -P -v 'alpha|ALPHA|beta|BETA|rc|RC|-' \
-        | cut -d'/' -f3 \
-        | sort --version-sort \
-        | tail -n1)" \
+       | \grep -v '\^' \
+       | \grep -P -e '\d+\.\d+' \
+       | \grep -P -v 'alpha|ALPHA|beta|BETA|rc|RC|-' \
+       | cut -d'/' -f3 \
+       | sort --version-sort \
+       | tail -n1)" \
  && echo "Latest stable version of Linux Kernel is ${LINUX_LATEST_VERSION}" \
  && git clone --depth=1 --branch="${LINUX_LATEST_VERSION}" "${LINUX_GIT_REPO}" "/tmp/linux"
 # Setup
@@ -112,7 +112,6 @@ RUN source "${HOME}/.cargo/env" \
 #                       #
 # ===================== #
 FROM gnome AS linux
-MAINTAINER "Zan Baldwin"
 COPY --from="kernel" "/opt/kernel" "/opt/kernel"
 RUN rpm-ostree override replace /opt/kernel/*.rpm
 
@@ -123,25 +122,21 @@ RUN rpm-ostree override replace /opt/kernel/*.rpm
 #                  #
 # ================ #
 FROM "${IMAGE}:${VERSION}" AS gnome
-MAINTAINER "Zan Baldwin"
 COPY "./usr/" "/usr/"
 RUN rpm-ostree install --idempotent --allow-inactive --releasever="${VERSION}" \
-        bridge-utils edk2-ovmf guestfs-tools libvirt qemu-kvm virt-install virt-manager \
-        podman-docker podman-plugins podman-tui containernetworking-plugins aardvark-dns \
-        distrobox ffmpeg-free fzf make ncdu nss-tools tlp tlp-rdw \
+       bridge-utils edk2-ovmf guestfs-tools libvirt qemu-kvm virt-install virt-manager \
+       podman-docker podman-tui containernetworking-plugins aardvark-dns \
+       distrobox ffmpeg-free fzf make ncdu nss-tools tlp tlp-rdw \
  && systemctl enable "libvirtd" \
  && systemctl enable "podman.service" \
  && systemctl enable "podman.socket" \
  && systemctl enable "podman-restart.service" \
  && systemctl enable "flatpak-update.service" \
  && (systemctl enable "tlp.service" || true) \
+ && if grep "secure_path" "/etc/sudoers" >"/dev/null" 2>&1; then \
+       cat "/etc/sudoers" | grep -v "secure_path" | tee "/etc/sudoers" >"/dev/null" 2>&1; \
+    fi \
+ && sed -i -E "s/^#HandleLidSwitchExternalPower=.*$/HandleLidSwitchExternalPower=ignore/g" "/usr/lib/systemd/logind.conf" \
  && rm -rf /tmp/* /var/* \
  && ostree container commit
 COPY --from="alacritty" "/opt/alacritty/" "/usr/"
-# I truncated the sudoers file to zero by accident when I included this snippet
-# in the RUN layer above. "<user> is not in the sudoers file" is not a message
-# you want to receive.
-RUN if grep "secure_path" "/etc/sudoers" >"/dev/null" 2>&1; then \
-        cat "/etc/sudoers" | grep -v "secure_path" | tee "/etc/sudoers" >"/dev/null" 2>&1; \
-    fi \
- && sed -i -E "s/^#HandleLidSwitchExternalPower=.*$/HandleLidSwitchExternalPower=ignore/g" "/etc/systemd/logind.conf"

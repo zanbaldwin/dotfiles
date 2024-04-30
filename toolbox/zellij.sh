@@ -4,6 +4,9 @@ if [ -f "${HOME}/.cargo/env" ]; then
     source "${HOME}/.cargo/env"
 fi
 
+TOOLBOX_DIRECTORY="$(dirname "$(readlink -f "$0")")"
+. "${TOOLBOX_DIRECTORY}/stable-version.sh"
+
 # Zellij Plugins
 zellij_stable_version() {
     GIT_DIR="${1:-$(pwd)}"
@@ -27,8 +30,7 @@ fi
 
 mkdir -p "${HOME}/.local/share/zellij/plugins"
 rm -rf /tmp/zellij*
-git clone "https://github.com/imsnif/monocle.git" "/tmp/zellij-monocle" \
-    && git -C "/tmp/zellij-monocle" checkout "$(zellij_stable_version "/tmp/zellij-monocle")" \
+git clone "https://github.com/imsnif/monocle.git" --branch "$(remote_stable_version "https://github.com/imsnif/monocle.git")" --depth=1 "/tmp/zellij-monocle" \
     && (cd "/tmp/zellij-monocle"; cargo build --target "${TARGET}" --release) \
     && cp "/tmp/zellij-monocle/target/${TARGET}/release/monocle.wasm" "${HOME}/.local/share/zellij/plugins/monocle.wasm" \
     && rm -rf "/tmp/zellij-monocle"

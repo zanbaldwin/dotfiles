@@ -140,3 +140,20 @@ RUN rpm-ostree install --idempotent --allow-inactive --releasever="${VERSION}" \
  && rm -rf /tmp/* /var/* \
  && ostree container commit
 COPY --from="alacritty" "/opt/alacritty/" "/usr/"
+
+# ================ #
+#                  #
+#       GNOME      #
+# (nVidia Drivers) #
+#                  #
+# ================ #
+FROM gnome AS nvidia
+RUN rpm-ostree install "https://download1.rpmfusion.org/nonfree/fedora/rpmfusion-nonfree-release-$(rpm -E %fedora).noarch.rpm" \
+ && rpm-ostree install --idempotent --allow-inactive --releasever="${VERSION}" \
+      akmod-nvidia \
+      xorg-x11-drv-nvidia \
+      xorg-x11-drv-nvidia-cuda \
+ && rpm-ostree kargs \
+      --append=rd.driver.blacklist=nouveau \
+      --append=modprobe.blacklist=nouveau \
+      --append=nvidia-drm.modeset=1

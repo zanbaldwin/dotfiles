@@ -2,16 +2,10 @@
 
 export GIT_DISCOVERY_ACROSS_FILESYSTEM=0
 
-# This function relies on Git repositories having sensible tag names. Do not rely on it.
-function latest_stable_version {
-    GIT_DIR="${1:-$(pwd)}"
-    # Fetch all tags that contain at least a MAJOR.MINOR, filtering out hyphens (alpha, beta, rc, etc), and print the latest.
-    git -C "${GIT_DIR}" tag --list --sort="version:refname" \
-        | rg -e '\d+\.\d+' \
-        | rg -v 'alpha|ALPHA|beta|BETA|rc|RC|-' \
-        | sort --version-sort \
-        | tail -n1
-}
+BASHRC_INCLUDE_DIRECTORY="$(dirname "$(readlink -f "$0")")"
+if [ -f "${BASHRC_INCLUDE_DIRECTORY}/../../../toolbox/stable-version.sh" ]; then
+    . "${BASHRC_INCLUDE_DIRECTORY}/../../../toolbox/stable-version.sh"
+fi
 
 # `git <arg>` runs `git <arg>`
 # `git` (in a Git repository) runs `gitui`

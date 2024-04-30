@@ -27,8 +27,7 @@ sudo dnf install --assumeyes \
     "php-pgsql" \
     "php-process" \
     "php-soap" \
-    "php-xml" \
-    "wkhtmltopdf"
+    "php-xml"
 
 { \
     echo "[XDebug]"; \
@@ -56,7 +55,7 @@ if ! command -v "composer" >"/dev/null" 2>&1; then
 
     sudo dnf install --assumeyes "coreutils"
 
-    COMPOSER_INSTALLER_HASH="e21205b207c3ff031906575712edab6f13eb0b361f2085f1f1237b7126d785e826a450292b6cfd1d64d92e6563bbde02"
+    COMPOSER_INSTALLER_HASH="dac665fdc30fdd8ec78b38b9800061b4150413ff2e3b6f88543c636f7cd84f6db9189d43a81e5503cda447da73c7e5b6"
     echo "${COMPOSER_INSTALLER_HASH} /tmp/composer-setup.php" >"/tmp/composer-setup.sha384"
     if ! sha384sum --check "/tmp/composer-setup.sha384" --strict --status; then
         echo "Composer installer script has been either been upgraded or tampered with."

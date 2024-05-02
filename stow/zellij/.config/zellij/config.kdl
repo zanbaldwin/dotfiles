@@ -5,7 +5,7 @@ keybinds {
         bind "Alt c" { Copy; }
     }
     locked {
-        bind "Ctrl g" { SwitchToMode "Normal"; }
+        bind "Ctrl Space" { SwitchToMode "Normal"; }
         bind "Alt c" { Copy; }
         // Open a new pane in locked mode (copied from `shared_except "locked"`).
         bind "Alt n" { NewPane; }
@@ -115,12 +115,12 @@ keybinds {
     }
     tmux {
         bind "[" { SwitchToMode "Scroll"; }
-        bind "Ctrl b" { Write 2; SwitchToMode "Normal"; }
-        bind "\"" { NewPane "Down"; SwitchToMode "Normal"; }
-        bind "%" { NewPane "Right"; SwitchToMode "Normal"; }
+        bind "`" { Write 96; SwitchToMode "Normal"; }
+        bind "_" { NewPane "Down"; SwitchToMode "Normal"; }
+        bind "|" { NewPane "Right"; SwitchToMode "Normal"; }
         bind "z" { ToggleFocusFullscreen; SwitchToMode "Normal"; }
         bind "c" { NewTab; SwitchToMode "Normal"; }
-        bind "," { SwitchToMode "RenameTab"; }
+        bind "r" { SwitchToMode "RenameTab"; }
         bind "p" { GoToPreviousTab; SwitchToMode "Normal"; }
         bind "n" { GoToNextTab; SwitchToMode "Normal"; }
         bind "Left" { MoveFocus "Left"; SwitchToMode "Normal"; }
@@ -135,7 +135,7 @@ keybinds {
         bind "d" { Detach; }
     }
     shared_except "locked" {
-        bind "Ctrl g" { SwitchToMode "Locked"; }
+        bind "Ctrl Space" { SwitchToMode "Locked"; }
         bind "Ctrl q" { Quit; }
         bind "Alt n" { NewPane; }
         bind "Alt h" "Alt Left" { MoveFocusOrTab "Left"; }
@@ -167,7 +167,7 @@ keybinds {
         bind "Ctrl h" { SwitchToMode "Move"; }
     }
     shared_except "tmux" "locked" {
-        bind "Ctrl b" { SwitchToMode "Tmux"; }
+        bind "`" { SwitchToMode "Tmux"; }
     }
 
     shared_except "locked" {
@@ -267,7 +267,7 @@ default_layout "default"
 // Choose the mode that zellij uses when starting up.
 // Default: normal
 //
-default_mode "locked"
+default_mode "normal"
 
 // Toggle enabling the mouse mode.
 // On certain configurations, or terminals this could

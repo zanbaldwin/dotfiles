@@ -63,6 +63,7 @@ command -v "oha" >"/dev/null" 2>&1                  || cargo install "oha"      
 command -v "jj" >"/dev/null" 2>&1                   || cargo install "jj-cli"    # Jujutsu DVCS layered on top of Git
 command -v "sd" >"/dev/null" 2>&1                   || cargo install "sd"        # Replacement for `sed`
 command -v "hexyl" >"/dev/null" 2>&1                || cargo install "hexyl"     # Binary file viewer
+command -v "systemctl-tui" >"/dev/null" 2>&1        || cargo install "systemctl-tui"     # SystemD TUI
 
 # Control Spotify from command line, instead of through Flatpak. Used for Eww.
 # `secret-tool store --label='spotifyd' application rust-keyring service spotifyd username zanbaldwin`

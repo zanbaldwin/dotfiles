@@ -1,6 +1,6 @@
 # Useful Binaries
 
-Not managed by either a packge manager or Cargo.
+Not managed by either Flatpak or Cargo.
 
 - [`act`](https://github.com/nektos/act/releases/latest)
 - [`btop`](https://github.com/aristocratos/btop/releases/latest)
@@ -13,11 +13,17 @@ Not managed by either a packge manager or Cargo.
 - [`jq`](https://github.com/jqlang/jq/releases/latest)
 - [`mkcert`](https://github.com/FiloSottile/mkcert/releases/latest)
 - [`neofetch`](https://github.com/dylanaraps/neofetch/releases/latest)
+- [`ollama`](https://ollama.com)
 - [`symfony`](https://symfony.com/download)
 - [`vhs`](https://github.com/charmbracelet/vhs/releases/latest)
 
 # Useful Extensions
 
-- GNOME Shell extension: [`gSnap`](https://extensions.gnome.org/extension/4442/gsnap/)
-- Firefox Extension: [Bitwarden](https://addons.mozilla.org/en-US/firefox/addon/bitwarden-password-manager/)
-- Firefox Extension: [uBlock Origin](https://addons.mozilla.org/en-US/firefox/addon/ublock-origin/)
+- GNOME Shell Extensions:
+  - [Alphabetical App Grid](https://extensions.gnome.org/extension/4269/alphabetical-app-grid/)
+  - [Blur my Shell](https://extensions.gnome.org/extension/3193/blur-my-shell/)
+  - [gSnap](https://extensions.gnome.org/extension/4442/gsnap/)
+  - [Notification Timeout](https://extensions.gnome.org/extension/3795/notification-timeout/)
+- Browser Extensions:
+  - Extension: [Bitwarden](https://addons.mozilla.org/en-US/firefox/addon/bitwarden-password-manager/)
+  - Extension: [uBlock Origin](https://addons.mozilla.org/en-US/firefox/addon/ublock-origin/)

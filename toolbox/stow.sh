@@ -8,7 +8,8 @@ mkdir -p \
     "${HOME}/.config/autostart" \
     "${HOME}/.config/flakes" \
     "${HOME}/.local/share/applications" \
-    "${HOME}/.ssh"
+    "${HOME}/.ssh/conf.d" \
+    "${HOME}/.ssh/keys"
 
 if ! command -v "stow" >"/dev/null" 2>&1; then
     if command -v "dnf" >"/dev/null" 2>&1; then

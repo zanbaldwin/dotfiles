@@ -4,6 +4,8 @@
 alias docker-compose="docker compose"
 alias docker-composer="docker compose"
 
+alias aws='mkdir -p "${HOME}/.aws"; docker run --rm -it -v "${HOME}/.aws:/root/.aws:z" -v "$(pwd):$(pwd):z" -w "$(pwd)" "amazon/aws-cli:latest"'
+
 if command -v "docker" >"/dev/null" 2>&1 && ! (docker version 2>"/dev/null" | grep "Podman" >"/dev/null" 2>&1); then
     # Actually have the real Docker installed.
     function docker {

@@ -1,6 +1,6 @@
 [mouse]
 # If this is `true`, the cursor is temporarily hidden when typing.
-hide_when_typing = true
+hide_when_typing = false
 
 # Mouse bindings are specified as a list of objects, much like the key
 # bindings further below.

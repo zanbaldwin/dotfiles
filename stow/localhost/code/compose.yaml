@@ -1,7 +1,6 @@
 # Running on Podman? Do not run in rootless.
 # DOCKER_HOST=unix:///run/podman/podman.sock sudo docker-compose up -d
 
-version: '3.8'
 x-logging:
   &default-logging
     driver: 'json-file'
@@ -21,6 +20,7 @@ services:
             interval: 10s
             timeout: 3s
         network_mode: 'host'
+        # Don't bother with extra_hosts, Nginx does not use it. Use host network instead.
         ports:
             - target: 80
               published: 80
@@ -63,7 +63,6 @@ services:
         image: 'ghcr.io/open-webui/open-webui:main'
         restart: 'always'
         logging: *default-logging
-        network_mode: 'host'
         environment:
             PORT: 6554
         ports:

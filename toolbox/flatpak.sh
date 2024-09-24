@@ -13,7 +13,6 @@ flatpak update
 
 flatpak install --noninteractive --assumeyes --or-update flathub \
     "com.bitwarden.desktop" \
-    "org.chromium.Chromium" \
     "com.mongodb.Compass" \
     "com.github.tchx84.Flatseal" \
     "com.mattjakeman.ExtensionManager" \
@@ -28,8 +27,7 @@ flatpak install --noninteractive --assumeyes --or-update flathub \
     "com.skype.Client" \
     "com.slack.Slack" \
     "com.syntevo.SmartGit" \
-    "com.spotify.Client" \
-    "us.zoom.Zoom"
+    "com.spotify.Client"
 
 # Notes:
 # ======

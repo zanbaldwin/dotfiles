@@ -117,8 +117,8 @@
 #[url "git@github.com:"]
 #    insteadOf  = https://github.com/
 [merge]
-#    ff         = only
-conflictStyle   = "zdiff3"
+    # ff         = only
+    conflictStyle   = "zdiff3"
 
 [commit]
 	gpgsign = false
@@ -134,6 +134,9 @@ conflictStyle   = "zdiff3"
 	smudge = git-lfs smudge -- %f
 	process = git-lfs filter-process
 	required = true
+
+[pack]
+    usePathWalk = true
 
 # Better Diffing with Delta!
 # See: https://github.com/dandavison/delta

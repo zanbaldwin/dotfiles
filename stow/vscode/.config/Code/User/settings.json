@@ -2,38 +2,59 @@
 // installed (Flatpak, RPM, etc). You'll have to manually copy the file contents
 // over, remembering to copy them back when you make changes.
 {
-    "[nix]": {
-        "editor.defaultFormatter": "jnoortheen.nix-ide",
-        "editor.formatOnSave": true
-    },
-    "diffEditor.codeLens": true,
-    "diffEditor.ignoreTrimWhitespace": false,
-    "direnv.path.executable": "/home/zan/.local/state/nix/profile/bin/direnv",
-    "editor.codeActionsOnSave": {},
+    // Get rid of the annoying things
+    "diffEditor.codeLens": false,
     "editor.codeLens": false,
-    "editor.cursorBlinking": "phase",
-    "editor.cursorStyle": "line-thin",
+    "diffEditor.ignoreTrimWhitespace": false,
+    "editor.codeActionsOnSave": {},
+    "explorer.confirmDelete": false,
+    "extensions.ignoreRecommendations": true,
     "editor.find.autoFindInSelection": "multiline",
-    "editor.fontFamily": "'JetBrainsMono Nerd Font', 'FiraCode Nerd Font', 'Fira Code', 'UbuntuMono Nerd Font', 'Ubuntu Mono', Menlo, Monaco, 'Courier New', monospace",
-    "editor.fontLigatures": true,
-    "editor.formatOnSave": true,
-    "editor.guides.bracketPairs": "active",
     "editor.inlineSuggest.enabled": true,
+    "editor.copyWithSyntaxHighlighting": false,
+    // VIEWING
+    "workbench.editor.showTabs": "multiple",
+    "window.menuBarVisibility": "toggle",
+    "window.zoomLevel": 1.00,
     "editor.minimap.renderCharacters": false,
+    "editor.minimap.enabled": true,
+    "editor.minimap.maxColumn": 120,
+    "editor.lineNumbers": "interval",
     "editor.renderWhitespace": "trailing",
     "editor.rulers": [
         80,
-        120,
+        120
     ],
-    "explorer.confirmDelete": false,
-    "extensions.ignoreRecommendations": true,
+    "editor.guides.indentation": true,
+    "editor.guides.bracketPairs": "active",
+    "editor.cursorBlinking": "phase",
+    "editor.cursorStyle": "line-thin",
+    // Font
+    "editor.fontFamily": "'JetBrainsMono Nerd Font', 'FiraCode Nerd Font', 'Fira Code', 'UbuntuMono Nerd Font', 'Ubuntu Mono', Menlo, Monaco, 'Courier New', monospace",
+    "editor.fontLigatures": true,
+    "editor.tokenColorCustomizations": {
+        "textMateRules": [
+            {
+                "scope": "comment",
+                "settings": {
+                    "fontStyle": "italic",
+                    "fontFamily": "'Monaspace Radon', 'JetBrainsMono Nerd Font', 'FiraCode Nerd Font', 'Fira Code', 'UbuntuMono Nerd Font', 'Ubuntu Mono', Menlo, Monaco, 'Courier New', monospace",
+                }
+            }
+        ]
+    },
+    // Files / Trimming
+    "editor.formatOnSave": true,
     "files.autoSave": "onFocusChange",
     "files.eol": "\n",
     "files.trimFinalNewlines": true,
     "files.trimTrailingWhitespace": true,
+    "files.insertFinalNewline": true,
+    // Git
     "git.autofetch": "all",
     "git.autoStash": true,
     "git.openRepositoryInParentFolders": "never",
+    // Copilot
     "github.copilot.advanced": {},
     "github.copilot.enable": {
         "*": true,
@@ -45,29 +66,15 @@
         "document"
     ],
     "gitlens.currentLine.scrollable": false,
-    "nix.enableLanguageServer": true,
-    "nix.formatterPath": [
-        "host-spawn",
-        "nixpkgs-fmt"
-    ],
-    "nix.serverPath": "/home/zan/.local/state/nix/profile/bin/nil",
-    "nix.serverSettings": {
-        "nil": {
-            "formatting": {
-                "command": [
-                    "host-spawn",
-                    "nixpkgs-fmt"
-                ]
-            }
-        }
-    },
     "redhat.telemetry.enabled": false,
+    // Rust
     "rust-analyzer.inlayHints.bindingModeHints.enable": true,
     "rust-analyzer.inlayHints.lifetimeElisionHints.enable": "skip_trivial",
     "rust-analyzer.inlayHints.lifetimeElisionHints.useParameterNames": true,
     "rust-analyzer.inlayHints.parameterHints": true,
     "rust-analyzer.lens.enable": false,
     "telemetry.telemetryLevel": "off",
+    // Terminal
     "terminal.integrated.defaultProfile.linux": "flatpak-bash",
     "terminal.integrated.profiles.linux": {
         "flatpak-bash": {
@@ -77,12 +84,47 @@
             "path": "host-spawn"
         }
     },
-    // Okay, maybe I need a _little_ bit of help viewing things on a 4K monitor.
-    "window.zoomLevel": 1.15,
-    "workbench.colorTheme": "Atom One Dark",
+    // Theme
+    //"workbench.colorTheme": "React Theme",
     "workbench.editor.autoLockGroups": {
         "mainThreadWebview-markdown.preview": true
     },
     "workbench.fontAliasing": "auto",
-    "workbench.iconTheme": "material-icon-theme"
+    "workbench.iconTheme": "material-icon-theme",
+    "material-icon-theme.saturation": 0.75,
+    // Recommended Settings
+    "editor.emptySelectionClipboard": false,
+    "workbench.editor.enablePreview": false,
+    "window.newWindowDimensions": "inherit",
+    "editor.multiCursorModifier": "alt",
+    "diffEditor.renderSideBySide": false,
+    "editor.snippetSuggestions": "inline",
+    "editor.detectIndentation": false,
+    "window.nativeFullScreen": true,
+    // Minimalistic Editor (Silence the Noise)
+    "breadcrumbs.enabled": false,
+    "scm.diffDecorations": "none",
+    "editor.hover.enabled": true,
+    "editor.matchBrackets": "near",
+    "workbench.tips.enabled": false,
+    "editor.colorDecorators": false,
+    "git.decorations.enabled": false,
+    "workbench.startupEditor": "none",
+    "editor.lightbulb.enabled": "off",
+    "editor.selectionHighlight": true,
+    "editor.overviewRulerBorder": false,
+    "editor.renderLineHighlight": "gutter",
+    "editor.occurrencesHighlight": "singleFile",
+    "problems.decorations.enabled": false,
+    "editor.renderControlCharacters": false,
+    "editor.hideCursorInOverviewRuler": true,
+    "editor.gotoLocation.multipleReferences": "goto",
+    "editor.gotoLocation.multipleDefinitions": "goto",
+    "editor.gotoLocation.multipleDeclarations": "goto",
+    "workbench.editor.enablePreviewFromQuickOpen": false,
+    "editor.gotoLocation.multipleImplementations": "goto",
+    "editor.gotoLocation.multipleTypeDefinitions": "goto",
+    "workbench.statusBar.visible": false,
+    "workbench.activityBar.location": "hidden",
+    "window.customTitleBarVisibility": "never",
 }

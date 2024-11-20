@@ -15,4 +15,3 @@
 *.cpp merge=mergiraf
 *.hpp merge=mergiraf
 *.cs merge=mergiraf
-*.php merge=mergiraf

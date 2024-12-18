@@ -7,6 +7,7 @@ mkdir -p \
     "${HOME}/code" \
     "${HOME}/.config/autostart" \
     "${HOME}/.config/flakes" \
+    "${HOME}/.config/systemd/user" \
     "${HOME}/.local/share/applications" \
     "${HOME}/.ssh/conf.d" \
     "${HOME}/.ssh/keys"

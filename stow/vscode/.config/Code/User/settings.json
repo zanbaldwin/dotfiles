@@ -14,7 +14,6 @@
     "editor.copyWithSyntaxHighlighting": false,
     // VIEWING
     "workbench.editor.showTabs": "multiple",
-    "window.menuBarVisibility": "toggle",
     "window.zoomLevel": 1.00,
     "editor.minimap.renderCharacters": false,
     "editor.minimap.enabled": true,
@@ -94,7 +93,6 @@
     "material-icon-theme.saturation": 0.75,
     // Recommended Settings
     "editor.emptySelectionClipboard": false,
-    "workbench.editor.enablePreview": false,
     "window.newWindowDimensions": "inherit",
     "editor.multiCursorModifier": "alt",
     "diffEditor.renderSideBySide": false,
@@ -127,4 +125,6 @@
     "workbench.statusBar.visible": false,
     "workbench.activityBar.location": "hidden",
     "window.customTitleBarVisibility": "never",
+    "debug.allowBreakpointsEverywhere": true,
+    "window.menuBarVisibility": "toggle",
 }

@@ -1,0 +1,12 @@
+[Unit]
+Description=Unlock PHPStorm on Login
+After=graphical-session.target
+
+[Service]
+Type=oneshot
+ExecStart=%h/bin/unlock-phpstorm.sh
+Environment=DISPLAY=:0
+RemainAfterExit=true
+
+[Install]
+WantedBy=default.target

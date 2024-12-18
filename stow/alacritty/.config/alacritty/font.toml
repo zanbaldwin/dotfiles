@@ -3,7 +3,7 @@
 
 [font]
 # Use 11.0 for laptop screen, and 13.0 for 4K monitors.
-size = 11.0
+size = 11.5
 # Use built-in font for box drawing characters.
 # If `true`, Alacritty will use a custom built-in font for box drawing
 # characters (Unicode points 2500 - 259f).
@@ -42,12 +42,12 @@ style = "Bold Italic"
 # of as modifying the line spacing, and `offset.x` as modifying the letter
 # spacing.
 [font.offset]
-# x: 0
-# y: 0
+x = -1
+y = 3
 
 # Glyph offset determines the locations of the glyphs within their cells with
 # the default being at the bottom. Increasing `x` moves the glyph to the
 # right, increasing `y` moves the glyph upward.
 [font.glyph_offset]
-# x: 0
-# y: 0
+x = 0
+y = 0

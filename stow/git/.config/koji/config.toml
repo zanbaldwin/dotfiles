@@ -1,0 +1,64 @@
+autocomplete = true
+breaking_changes = true
+issues = true
+emoji = true
+
+[[commit_types]]
+name = "bugfix"
+emoji = "🐛"
+description = "semantic PATCH version bump"
+
+[[commit_types]]
+name = "feature"
+emoji = "✨"
+description = "semantic MINOR version bump"
+
+[[commit_types]]
+name = "style"
+emoji = "💄"
+description = "styling or template changes"
+
+[[commit_types]]
+name = "test"
+emoji = "🚨"
+description = "adding, improving or correcting tests"
+
+[[commit_types]]
+name = "chore"
+emoji = "🧹"
+description = "other and/or automated changes"
+
+[[commit_types]]
+name = "lang"
+emoji = "🗣️"
+description = "changes to text content or languages translations"
+
+[[commit_types]]
+name = "refactor"
+emoji = "🔨"
+description = "code improvements that don't change functionality"
+
+[[commit_types]]
+name = "build"
+emoji = "📦"
+description = "changes that affect the build system or external dependencies"
+
+[[commit_types]]
+name = "docs"
+emoji = "📚"
+description = "goal-oriented guides, learning-orientated tutorials, information-orientated references, etc"
+
+[[commit_types]]
+name = "ci"
+emoji = "🤖"
+description = "changes to the CI/CD pipeline or deployment process"
+
+[[commit_types]]
+name = "perf"
+emoji = "⚡"
+description = "performance improvements or debugging investigations"
+
+[[commit_types]]
+name = "revert"
+emoji = "⏪"
+description = "undoing previously committed changes"

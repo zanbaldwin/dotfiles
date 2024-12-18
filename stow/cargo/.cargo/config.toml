@@ -11,6 +11,3 @@ protocol = "sparse"
 [target.x86_64-unknown-linux-gnu]
 # Compile for more modern CPU architecture. Work laptop doesn't support v4, though.
 rustflags = ["-C", "target-cpu=x86-64-v3"]
-# Using the compiler flag `"-C", "link-arg=-fuse-ld=lld"` produces ~4% larger
-# output, whilst build times are (barely) marginally better. Don't use this
-# option and stick with GCC.

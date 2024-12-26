@@ -13,7 +13,10 @@ function add_to_path {
 }
 
 # Import Custom User Executables
+# Standalone binaries should be put in your home directory (especially for macOS and immutable OSs like Silverblue).
+# These are usually binaries we downloaded manually (maybe an older version in package repositories).
 [ -d "${HOME}/bin" ] && add_to_path "${HOME}/bin"
+[ -d "${HOME}/.local/bin" ] && add_to_path "${HOME}/.local/bin"
 
 # Import Wasmer, if it's installed.
 export WASMER_DIR="${HOME}/.wasmer"
@@ -35,7 +38,3 @@ elif [ -d "${HOME}/.nix-profile" ]; then
     EXPORT MY_NIX_PROFILE="${HOME}/.nix-profile";
     add_to_path "${MY_NIX_PROFILE}/bin";
 fi
-
-# Standalone binaries should be put in your home directory (especially for macOS and immutable OSs like Silverblue).
-# These are usually binaries we downloaded manually (maybe an older version in package repositories).
-add_to_path "${HOME}/bin"

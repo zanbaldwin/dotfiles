@@ -1,0 +1,42 @@
+# Window
+mouse-hide-while-typing = false
+background-opacity = 0.9
+background-blur-radius = 30
+gtk-single-instance = true
+window-save-state = "always"
+window-height = 48
+window-width = 200
+
+# Clipboard
+clipboard-trim-trailing-spaces = true
+
+# Shell
+command = "zellij attach --create"
+# Pass Ctrl+Shift+C through to Zellij to copy
+# pane selection, not terminal selection.
+keybind = "ctrl+shift+c=unbind"
+working-directory = "home"
+# Do not use shell integration! Zellij handles the shell for us.
+shell-integration = "none"
+gtk-single-instance = true
+term = "xterm-256color"
+
+# Theming
+theme = "arcoiris"
+cursor-color = "ffffff"
+cursor-style = "bar"
+font-family = "JetBrainsMono Nerd Font"
+font-feature = "calt"
+font-feature = "liga"
+font-feature = "zero"
+font-size = 11
+adjust-cell-width = -1
+adjust-cell-height = 10%
+gtk-titlebar = false
+
+# Update
+auto-update = "check"
+auto-update-channel = "stable"
+
+# Keybinds
+keybind = "ctrl+,=unbind"

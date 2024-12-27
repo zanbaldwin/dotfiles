@@ -42,7 +42,7 @@ continuation_prompt = "[↳ ](bold white)"
 [character]
 format = "$symbol "
 success_symbol = "[❯](blue)"
-error_symbol = "[✖](bold red)"
+error_symbol = "[×](bold red)"
 
 [status]
 format = '[$status]($style) '

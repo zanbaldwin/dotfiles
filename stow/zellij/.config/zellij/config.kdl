@@ -3,10 +3,12 @@ keybinds {
     normal {
         // uncomment this and adjust key if using copy_on_select=false
         bind "Alt c" { Copy; }
+        bind "Ctrl Shift c" { Copy; }
     }
     locked {
         bind "Ctrl Space" { SwitchToMode "Normal"; }
         bind "Alt c" { Copy; }
+        bind "Ctrl Shift c" { Copy; }
         // Open a new pane in locked mode (copied from `shared_except "locked"`).
         bind "Alt n" { NewPane; }
     }
@@ -147,6 +149,7 @@ keybinds {
     }
     shared_except "normal" "locked" {
         bind "Enter" "Esc" { SwitchToMode "Normal"; }
+        bind "Ctrl Shift c" { Copy; }
     }
     shared_except "pane" "locked" {
         bind "Ctrl p" { SwitchToMode "Pane"; }

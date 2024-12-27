@@ -50,7 +50,7 @@ dconf write "/org/gtk/gtk4/settings/file-chooser/view-type" "'list'"
 
 # Keybindings
 dconf write "/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/custom0/binding" "'<Control><Alt>t'"
-dconf write "/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/custom0/command" "'alacritty'"
+dconf write "/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/custom0/command" "'ghostty'"
 dconf write "/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/custom0/name" "'Terminal'"
 dconf write "/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/custom1/binding" "'<Control><Alt>f'"
 dconf write "/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/custom1/command" "'/usr/bin/env nautilus'"

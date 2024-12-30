@@ -1,15 +1,21 @@
 #!/usr/bin/env bash
 
-if [ -d "${HOME}/.bash_competion.d" ]; then
-    for COMPLETION_FILE in "${HOME}/.bash_completion.d/"*.sh; do
-        if [ -f "${COMPLETION_FILE}" ]; then
-            # shellcheck source="/dev/null"
-            source "${COMPLETION_FILE}"
-        fi
-    done
+if [ -z "${LOCAL_BASH_COMPLETION_LOADED}" ]; then
+    # Loading this file twice in a Bash session (easy to do since we reattach to
+    # Zellij sessions) will cause Bash to Crash™ (somewhere inside the yyparse library).
+    [ -f "/etc/bash_completion" ] && source "/etc/bash_completion"
+
+    if [ -d "${HOME}/.bash_competion.d" ]; then
+        for COMPLETION_FILE in ~/.bash_completion.d/*.sh; do
+            if [ -f "${COMPLETION_FILE}" ]; then
+                # shellcheck source="/dev/null"
+                source "${COMPLETION_FILE}"
+            fi
+        done
+    fi
+    unset COMPLETION_FILE
 fi
-unset COMPLETION_FILE
 
 # Some distros will automatically call this file, but most will
 # not so we will call it from within our bashrc files.
-export LOCAL_BASH_COMPLETION_LOADED="1"
+export LOCAL_BASH_COMPLETION_LOADED="yes"

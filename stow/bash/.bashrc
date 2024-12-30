@@ -1,14 +1,6 @@
 # Source global definitions
-if [ -f "/etc/bashrc" ]; then
-    . "/etc/bashrc"
-fi
+[ -f "/etc/bashrc" ] && source "/etc/bashrc"
+[ -f "/etc/bash.bashrc" ] && source "/etc/bash.bashrc"
 
-# User specific aliases and functions
-if [ -d "${HOME}/.bashrc.d" ]; then
-    for RC in "${HOME}/.bashrc.d/"*; do
-        if [ -f "${RC}" ]; then
-            . "${RC}"
-        fi
-    done
-fi
-unset RC
+[ -f "${HOME}/.bash_aliases" ] && source "${HOME}/.bash_aliases"
+[ -f "${HOME}/.bash_completion" ] && source "${HOME}/.bash_completion"

@@ -59,6 +59,7 @@ command -v "mprocs" >"/dev/null" 2>&1               || cargo install "mprocs"   
 command -v "hyperfine" >"/dev/null" 2>&1            || cargo install "hyperfine" # Benchmarking utility, more advanced than `time`
 command -v "gimoji" >"/dev/null" 2>&1               || cargo install "gimoji"    # Select an appropriate emoji to Git commits depending on what the commit does
 command -v "gitui" >"/dev/null" 2>&1                || cargo install "gitui"     # Git TUI
+command -v "koji" >"/dev/null" 2>&1                 || cargo install "koji"      # Conventional Commits
 command -v "oha" >"/dev/null" 2>&1                  || cargo install "oha"       # HTTP Load Testing
 command -v "jj" >"/dev/null" 2>&1                   || cargo install "jj-cli"    # Jujutsu DVCS layered on top of Git
 command -v "sd" >"/dev/null" 2>&1                   || cargo install "sd"        # Replacement for `sed`

@@ -1,0 +1,196 @@
+"$schema" = 'https://starship.rs/config-schema.json'
+add_newline = true
+continuation_prompt = "[↳ ](bold white)"
+
+format = """
+$status\
+[](orange)\
+$os\
+$username\
+$hostname\
+[ ](bg:orange)\
+[ ](bg:yellow fg:orange)\
+$directory\
+[ ](bg:yellow)\
+[](fg:yellow bg:cyan)\
+$git_branch\
+$git_state\
+$git_commit\
+[](fg:cyan bg:blue)\
+$localip\
+[](fg:blue bg:midground)\
+$sudo\
+[](fg:midground bg:background)\
+$cmd_duration\
+[](fg:background)\
+$fill\
+[](fg:background)\
+$php\
+$rust\
+$nodejs\
+[](fg:midground bg:background)\
+$time\
+[](fg:midground) \
+$line_break$character """
+
+palette = 'gruvbox'
+
+[localip]
+disabled = false
+ssh_only = false
+format = "[ $localipv4 ]($style)"
+style = 'bg:blue fg:dark_foreground'
+
+[palettes.dracula]
+bright_foreground = "#f8f8f2"
+dark_foreground = "#08080d"
+background = "#282a36"
+midground = "#55586b"
+blue = "#6272a4"
+cyan = "#8be9fd"
+green = "#50fa7b"
+orange = "#ffb86c"
+pink = "#ff79c6"
+purple = "#bd93f9"
+red = "#ff5555"
+yellow = "#f1fa8c"
+[palettes.gruvbox]
+bright_foreground = '#fbf1c7'
+dark_foreground = '#040e39'
+background = '#3c3836'
+midground = '#554b43'
+blue = '#458588'
+cyan = '#689d6a'
+green = '#98971a'
+orange = '#d65d0e'
+pink = '#???'
+purple = '#b16286'
+red = '#cc241d'
+dark_red = '#8a0904'
+yellow = '#d79921'
+
+[character]
+format = "$symbol"
+success_symbol = "[❯](blue)"
+error_symbol = "[×](bold red)"
+
+[status]
+format = '[ $status ]($style) '
+style = 'bg:red fg:bright_foreground bold'
+disabled = false
+
+[os]
+disabled = false
+format = "[$symbol]($style)"
+style = "bg:orange fg:dark_foreground"
+[os.symbols]
+Debian = '󰣚'
+Fedora = '󰌽'
+Linux = '󰌽'
+Macos = '󰘳'
+Raspbian = ''
+Ubuntu = '󰕈'
+Windows = "󰍲"
+SUSE = ""
+Mint = "󰣭"
+Manjaro = ""
+Gentoo = "󰣨"
+Alpine = ""
+Amazon = ""
+Android = ""
+Arch = "󰣇"
+Artix = "󰣇"
+EndeavourOS = ""
+CentOS = ""
+Redhat = "󱄛"
+RedHatEnterprise = "󱄛"
+Pop = ""
+
+[username]
+show_always = true
+format = '[ $user]($style)'
+disabled = false
+style_user = "bg:orange fg:dark_foreground"
+style_root = "red"
+
+[hostname]
+disabled = false
+ssh_only = true
+format = "[$ssh_symbol]($style blue)[$hostname]($style)"
+style = "bg:orange fg:dark_foreground"
+ssh_symbol = "🌐 "
+
+[directory]
+home_symbol = "🏠"
+format = '[$read_only]($read_only_style)[$path]($style)'
+repo_root_format = '[$read_only]($read_only_style)[$before_root_path]($before_repo_root_style)[$repo_root]($repo_root_style)[$path]($style)'
+truncation_length = 5
+truncation_symbol = "…/"
+truncate_to_repo = false
+before_repo_root_style = "bg:yellow fg:midground"
+repo_root_style = "bg:yellow fg:dark_foreground bold"
+style = 'bg:yellow fg:dark_foreground'
+read_only = ' '
+read_only_style = "bg:yellow fg:red bold"
+
+[git_branch]
+always_show_remote = false
+style = 'bg:cyan fg:dark_foreground'
+format = '[ $symbol $branch ]($style)'
+symbol = ''
+truncation_length = 50
+truncation_symbol = '…'
+only_attached = true
+disabled = false
+[git_commit]
+format = '[ \(commit $hash\) ]($style)'
+style = 'bg:cyan fg:dark_foreground'
+only_detached = true
+tag_disabled = true
+tag_symbol = " "
+disabled = false
+[git_metrics]
+disabled = true
+[git_state]
+format = '[ $state ($progress_current/$progress_total)]($style)'
+rebase = 'REBASING'
+merge = 'MERGING'
+revert = 'REVERTING'
+cherry_pick = 'CHERRY-PICKING'
+bisect = 'BISECTING'
+style = 'bg:cyan fg:dark_red bold'
+disabled = false
+
+[rust]
+format = "[ $symbol $version ]($style)"
+style = 'bg:background fg:bright_foreground'
+symbol = "🦀"
+version_format = "v${major}.${minor}"
+[php]
+format = "[ $symbol $version ]($style)"
+version_format = "v${major}.${minor}"
+symbol = "🐘"
+detect_files = ['composer.json', 'symfony.lock']
+style = 'bg:background fg:bright_foreground'
+[nodejs]
+format = "[ $symbol $version ]($style)"
+version_format = "v${major}.${minor}"
+symbol = ""
+style = 'bg:background fg:bright_foreground'
+
+[sudo]
+disabled = false
+symbol = "🎩✨"
+format = '[$symbol ]($style)'
+style = 'bg:midground fg:orange'
+[cmd_duration]
+min_time = 2_000
+show_milliseconds = true
+format = '[ took 󰄉 ](bg:background fg:bright_foreground)[$duration ]($style)'
+style = 'bg:background yellow'
+
+[time]
+disabled = false
+format = "[ $time ]($style)"
+style = 'bg:midground fg:yellow'
+time_format = '%a, %e %b   %H:%M'

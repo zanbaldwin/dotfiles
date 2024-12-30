@@ -33,3 +33,10 @@ git clone "https://github.com/dj95/zjstatus.git" --branch "$(remote_stable_versi
     && (cd "/tmp/zellij-zjstatus"; cargo build --target "${TARGET}" --release) \
     && cp "/tmp/zellij-zjstatus/target/${TARGET}/release/zjstatus.wasm" "${HOME}/.local/share/zellij/plugins/zjstatus.wasm" \
     && rm -rf "/tmp/zellij-zjstatus"
+
+# This one will likely error, as it *currently* requires downloading the `wasm32-wasi` target for the `1.72.0` toolchain.
+# rustup target add --toolchain 1.72.0 wasm32-wasi
+git clone "https://github.com/dj95/zj-docker.git" --branch "$(remote_stable_version "https://github.com/dj95/zj-docker.git")" --depth=1 "/tmp/zellij-docker" \
+    && (cd "/tmp/zellij-docker"; cargo build --target "${TARGET}" --release) \
+    && cp "/tmp/zellij-zjstatus/target/${TARGET}/release/zj-docker.wasm" "${HOME}/.local/share/zellij/plugins/docker.wasm" \
+    && rm -rf "/tmp/zellij-docker"

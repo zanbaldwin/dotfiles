@@ -20,13 +20,8 @@ zellij_stable_version() {
 }
 
 
-TARGET="wasm32-wasi"
-# WASI 0.2 target won't be realised until May 2nd 2024.
-if rustup target add "wasm32-wasip2"; then
-    TARGET="wasm32-wasip2"
-else
-    rustup target add "wasm32-wasi"
-fi
+TARGET="wasm32-wasip1"
+rustup target add "${TARGET}"
 
 mkdir -p "${HOME}/.local/share/zellij/plugins"
 rm -rf /tmp/zellij*
@@ -34,3 +29,7 @@ git clone "https://github.com/imsnif/monocle.git" --branch "$(remote_stable_vers
     && (cd "/tmp/zellij-monocle"; cargo build --target "${TARGET}" --release) \
     && cp "/tmp/zellij-monocle/target/${TARGET}/release/monocle.wasm" "${HOME}/.local/share/zellij/plugins/monocle.wasm" \
     && rm -rf "/tmp/zellij-monocle"
+git clone "https://github.com/dj95/zjstatus.git" --branch "$(remote_stable_version "https://github.com/dj95/zjstatus.git")" --depth=1 "/tmp/zellij-zjstatus" \
+    && (cd "/tmp/zellij-zjstatus"; cargo build --target "${TARGET}" --release) \
+    && cp "/tmp/zellij-zjstatus/target/${TARGET}/release/zjstatus.wasm" "${HOME}/.local/share/zellij/plugins/zjstatus.wasm" \
+    && rm -rf "/tmp/zellij-zjstatus"

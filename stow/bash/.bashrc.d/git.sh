@@ -7,6 +7,9 @@ if [ -f "${BASHRC_INCLUDE_DIRECTORY}/../../../toolbox/stable-version.sh" ]; then
     . "${BASHRC_INCLUDE_DIRECTORY}/../../../toolbox/stable-version.sh"
 fi
 
+# Alias-inception
+alias st='git st'
+
 # `git <arg>` runs `git <arg>`
 # `git` (in a Git repository) runs `gitui`
 # `git` (not in a Git repository) runs `git --help`

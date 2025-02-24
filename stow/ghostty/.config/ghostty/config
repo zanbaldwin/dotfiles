@@ -32,7 +32,8 @@ font-feature = "zero"
 font-size = 11
 adjust-cell-width = -1
 adjust-cell-height = 10%
-gtk-titlebar = false
+gtk-titlebar = true
+window-decoration = "server"
 
 # Update
 auto-update = "check"

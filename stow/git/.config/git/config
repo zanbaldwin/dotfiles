@@ -15,6 +15,7 @@
     co          = checkout
     fa          = fetch --all
     ft          = fetch --tags
+    ad          = add
     force       = push --force-with-lease --force-if-includes
 
     stash       = stash --include-untracked
@@ -120,9 +121,6 @@
 [merge]
     # ff         = only
     conflictStyle   = "zdiff3"
-[merge "mergiraf"]
-    name = mergiraf
-    driver = mergiraf merge --git %O %A %B -s %S -x %X -y %Y -p %P
 
 [commit]
 	gpgsign = false

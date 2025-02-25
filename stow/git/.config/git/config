@@ -66,34 +66,44 @@
     yolo = '!git commit -m "$(curl -sfL "https://whatthecommit.com/index.txt")"'
 
 [user]
-    name = Zan Baldwin
-    email = hello@zanbaldwin.com
-	signingkey = 8487AAE3D763501F
+    name = "Zan Baldwin"
+    email = "hello@zanbaldwin.com"
 [init]
-	defaultBranch = main
+	defaultBranch = "main"
+[column]
+    ui = "auto"
+[branch]
+    sort = '-committerdate'
+[tag]
+    sort = "version:refname"
 [push]
-    default     = simple
-    followTags  = true
+    default = "simple"
+    followTags = true
 	autoSetupRemote = true
-	recurseSubmodules = check
+	recurseSubmodules = "check"
 [pull]
     rebase = true
+[fetch]
+    prune = true
+    pruneTags = true
+    all = true
 [rebase]
     autoStash = true
     updateRefs = true
 [pager]
     # The default Git diffing tool isn't very nice to look at, use something better.
-    log         = delta
-    show        = delta
-    diff        = delta
-    blame       = delta
+    log = "delta"
+    show = "delta"
+    diff = "delta"
+    blame = "delta"
 [interactive]
-    diffFilter  = delta --color-only --features=interactive
+    diffFilter = "delta --color-only --features='interactive'"
 [diff]
     compactionHeuristic = true
-    algorithm           = patience
-    mnemonicprefix      = true
-    colorMoved          = default
+    algorithm = "histogram"
+    mnemonicprefix = true
+    colorMoved = "default"
+    renames = true
 [difftool]
     prompt = false
 [stash]
@@ -103,14 +113,15 @@
 [rerere]
     # Remember my merges
     # http://gitfu.wordpress.com/2008/04/20/git-rerere-rereremember-what-you-did-last-time/
-    enabled     = true
+    enabled = true
+    autoupdate = true
 [help]
-    autocorrect = 0
+    autocorrect = "prompt"
 [core]
     excludesFile = "~/.config/git/global-ignore"
-    editor       = "nano -AES --tabsize=4"
-    pager        = "delta"
-    attributesfile = ~/.config/git/attributes
+    editor = "nano -AES --tabsize=4"
+    pager = "delta"
+    attributesfile = "~/.config/git/attributes"
 
 # Force Git to always download over SSH to prevent GitHub's API throttling and/or
 # asking for username and password (which is near-to-impossible to do on the
@@ -119,10 +130,11 @@
 #[url "git@github.com:"]
 #    insteadOf  = https://github.com/
 [merge]
-    # ff         = only
-    conflictStyle   = "zdiff3"
+    # ff = only
+    conflictStyle = "zdiff3"
 
 [commit]
+    verbose = true
 	gpgsign = false
 	template = "~/.config/git/commit-template.txt"
 [gui]
@@ -132,9 +144,9 @@
 	update = true
 	initializenew = true
 [filter "lfs"]
-	clean = git-lfs clean -- %f
-	smudge = git-lfs smudge -- %f
-	process = git-lfs filter-process
+	clean = "git-lfs clean -- %f"
+	smudge = "git-lfs smudge -- %f"
+	process = "git-lfs filter-process"
 	required = true
 
 [pack]
@@ -160,8 +172,8 @@
     tabs = 4
     true-color = "auto"
 [delta "files"]
-    file-style = yellow bold
-    file-decoration-style = box purple bold ul
+    file-style = "yellow bold"
+    file-decoration-style = "box purple bold ul"
 [delta "hunks"]
     hunk-header-style = "italic bold syntax"
     hunk-label = "@"

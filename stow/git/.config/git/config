@@ -73,9 +73,9 @@
 [column]
     ui = "auto"
 [branch]
-    sort = '-committerdate'
+    sort = -committerdate
 [tag]
-    sort = "version:refname"
+    sort = version:refname
 [push]
     default = "simple"
     followTags = true

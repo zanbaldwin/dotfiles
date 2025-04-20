@@ -127,4 +127,13 @@
     "window.customTitleBarVisibility": "never",
     "debug.allowBreakpointsEverywhere": true,
     "window.menuBarVisibility": "toggle",
+    "[typst]": {
+        "editor.wordSeparators": "`~!@#$%^&*()=+[{]}\\|;:'\",.<>/?",
+        "editor.formatOnSave": true
+    },
+    "[typst-code]": {
+        "editor.wordSeparators": "`~!@#$%^&*()=+[{]}\\|;:'\",.<>/?"
+    },
+    "tinymist.formatterMode": "typstyle",
+    "tinymist.formatterIndentSize": 4,
 }

@@ -8,6 +8,7 @@ alias aws='mkdir -p "${HOME}/.aws"; docker run --rm -it -v "${HOME}/.aws:/root/.
 
 if command -v "docker" >"/dev/null" 2>&1 && ! (docker version 2>"/dev/null" | grep "Podman" >"/dev/null" 2>&1); then
     # Actually have the real Docker installed.
+    export COMPOSE_BAKE=true
     function docker {
         if [ "${1}" == "composer" ]; then
             shift

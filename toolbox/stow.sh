@@ -27,7 +27,29 @@ fi
 
 TOOLBOX_SCRIPT_DIRECTORY="$(dirname "$(readlink -f "$0")")"
 
-HOME_STOW_PACKAGES="$(find "${TOOLBOX_SCRIPT_DIRECTORY}/../stow" -maxdepth 1 -mindepth 1 -type d | sed "s#${TOOLBOX_SCRIPT_DIRECTORY}/../stow/##g")"
-# shellcheck disable=SC2086
-stow --dir="${TOOLBOX_SCRIPT_DIRECTORY}/../stow" --target="${HOME}" --stow ${HOME_STOW_PACKAGES}
-echo "Stowed into ${HOME}: ${HOME_STOW_PACKAGES}"
+STOW_DIR="${TOOLBOX_SCRIPT_DIRECTORY}/../stow"
+TARGET_DIR="${HOME}"
+
+echo "Looking for packages in \"${STOW_DIR}\" to stow into \"${TARGET_DIR}...\""
+if [ ! -d "${STOW_DIR}" ]; then
+    echo >&2 "Error: Stow directory \"${STOW_DIR}\" not found."
+    exit 1
+fi
+
+# Find all directories directly in the stow directory.
+# Remove the stow directory prefix, so we're just left with the found directory name.
+# `IFS=` prevents leading/trailing whitespace from getting trimmed.
+# `|| [[ -n "$PACKAGE" ]]` handles the case where the last line doesn't end with a newline.
+# `-r` flag in the `while` prevents backslash interpretation.
+find "${STOW_DIR}" -maxdepth 1 -mindepth 1 -type 'd' | sed "s#${STOW_DIR}/##g" | while IFS= read -r PACKAGE || [ -n "${PACKAGE}" ]; do
+    # Skip empty lines if `sed` somehow produces one.
+    if [ -z "${PACKAGE}" ]; then
+        continue
+    fi
+    # shellcheck disable=SC2086
+    if stow --dir="${TOOLBOX_SCRIPT_DIRECTORY}/../stow" --target="${HOME}" --stow ${PACKAGE}; then
+        echo "Stowed \"${PACKAGE}\" into ${HOME}..."
+    else
+        echo "Failed to stow \"${PACKAGE}\"!"
+    fi
+done

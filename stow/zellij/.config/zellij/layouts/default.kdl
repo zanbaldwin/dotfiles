@@ -66,15 +66,6 @@ layout {
         }
     }
 
-    tab name="Nvim" {
-        pane {
-            cwd "$HOME/code"
-            borderless true
-            command "nvim"
-            start_suspended true
-        }
-    }
-
     tab name="New Tab" focus=true {
         pane {
             focus true

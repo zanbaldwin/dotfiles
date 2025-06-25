@@ -66,8 +66,8 @@
     yolo = '!git commit -m "$(curl -sfL "https://whatthecommit.com/index.txt")"'
 
 [user]
-    name = "Zan Baldwin"
-    email = "hello@zanbaldwin.com"
+    name = Zan Baldwin
+    email = hello@zanbaldwin.com
 [init]
 	defaultBranch = "main"
 [column]

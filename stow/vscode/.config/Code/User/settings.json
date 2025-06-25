@@ -136,4 +136,5 @@
     },
     "tinymist.formatterMode": "typstyle",
     "tinymist.formatterIndentSize": 4,
+    "chat.commandCenter.enabled": false,
 }

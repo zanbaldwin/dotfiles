@@ -37,33 +37,14 @@ command -v "jj" >"/dev/null" 2>&1 && {
             if command "jj" "status"; then
                 echo ""
                 echo -e "\e[4mRevision Changes:\e[0m"
-                command "jj" --ignore-working-copy obslog --stat
+                command "jj" --ignore-working-copy obslog --stat  --template="builtin_log_comfortable"
 
                 echo ""
                 echo -e "\e[4mHistory Log:\e[0m"
                 command "jj" --ignore-working-copy log --limit=7 --template="builtin_log_comfortable"
             fi
-        elif [ "${1}" == "up" ]; then
-            shift
-            jj_up_branch "$@"
         else
             command "jj" "$@"
         fi
     }
-}
-
-function jj_up_branch {
-    BRANCH_NAME="${1}"
-    if [ -z "${BRANCH_NAME}" ]; then
-        echo >&2 "Specify a branch name."
-        return 1
-    fi
-
-    if [ "$(jj branch list "${BRANCH_NAME}")" == "" ]; then
-        jj branch create "${BRANCH_NAME}" --revision "@-"
-        echo "Created new branch \"${BRANCH_NAME}\"."
-    else
-        jj branch set "${BRANCH_NAME}" --revision "@-"
-        echo "Updated branch \"${BRANCH_NAME}\"."
-    fi
 }

@@ -101,7 +101,7 @@
     "window.nativeFullScreen": true,
     // Minimalistic Editor (Silence the Noise)
     "breadcrumbs.enabled": false,
-    "scm.diffDecorations": "none",
+    "scm.diffDecorations": "all",
     "editor.hover.enabled": true,
     "editor.matchBrackets": "near",
     "workbench.tips.enabled": false,
@@ -122,9 +122,8 @@
     "workbench.editor.enablePreviewFromQuickOpen": false,
     "editor.gotoLocation.multipleImplementations": "goto",
     "editor.gotoLocation.multipleTypeDefinitions": "goto",
-    "workbench.statusBar.visible": false,
-    "workbench.activityBar.location": "hidden",
-    "window.customTitleBarVisibility": "never",
+    "workbench.statusBar.visible": true,
+    "workbench.activityBar.location": "top",
     "debug.allowBreakpointsEverywhere": true,
     "window.menuBarVisibility": "toggle",
     "[typst]": {

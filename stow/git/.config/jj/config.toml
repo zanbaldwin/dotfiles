@@ -1,10 +1,13 @@
+# Git-friendly Jujitsu configuration
+"$schema" = "https://jj-vcs.github.io/jj/latest/config-schema.json"
+
 [user]
 name = "Zan Baldwin"
 email = "hello@zanbaldwin.com"
 
 [git]
-auto-local-branch = true
-push-branch-prefix = "zanbaldwin/push-"
+auto-local-bookmark = true
+push-branch-prefix = "z/push-"
 
 [template-aliases]
 # Relative timestamp rendered as "x days/hours/seconds ago"
@@ -14,15 +17,56 @@ push-branch-prefix = "zanbaldwin/push-"
 'format_short_id(id)' = 'id.shortest(12)'
 log_comfortable = 'builtin_log_oneline ++ "\n"'
 
+[templates]
+# One-line log that surfaces key info succinctly.
+# Use via: `jj log -T log_oneline`
+log_oneline = '''
+  if(root,
+    format_root_commit(self),
+    label(if(current_working_copy, "working_copy"),
+      concat(
+        separate(" ",
+          format_short_change_id_with_hidden_and_divergent_info(self),
+          if(empty, label("empty", "(empty)")),
+          description.first_line(),
+          bookmarks, tags,
+          if(git_head, label("git_head", "HEAD"))
+        ) ++ "\n",
+      ),
+    )
+  )
+'''
+
 [ui]
+editor = "nano -AE --tabsize=4"
 diff-instructions = true
-pager = ":builtin"
+pager = "delta"
 paginate = "never"
 default-command = "status"
 log-synthetic-elided-nodes = false
+graph.style = "curved"
+diff-formatter = ":git"
 
 [format]
 tree-level-conflicts = true
 
 [aliases]
 co = ["checkout"]
+ls = ["log", "-r", "@ | trunk()", "-T", "log_oneline"]
+# Polishing stacks
+fixup = ["squash", "-i"]
+push = ["git", "push"]
+tug = ["bookmark", "move", "--from", "heads(::@- & bookmarks())", "--to", "@-"]
+ff = ["git", "fetch", "--all-remotes"]
+up = ["rebase", "--source", "@::", "--destination", "trunk()"]
+latest = ["util", "exec", "--", "bash", "-lc", "jj ff && jj up", ""]
+
+[revset-aliases]
+'HEAD' = '@-'
+'user()' = 'user("hello@zanbaldwin.com")'
+'user(x)' = 'author(x) | committer(x)'
+
+# Show your active work vs trunk: ahead/behind plus fork point and descendants.
+"ahead_behind()" = "trunk()..@ | @..trunk() | trunk() | @:: | fork_point(trunk() | @)"
+# Quick Git-like parent selector: p(n) ~ HEAD~n
+"p(n)" = "@- | ancestors(@, n)"

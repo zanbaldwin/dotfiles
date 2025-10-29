@@ -136,4 +136,8 @@
     "tinymist.formatterMode": "typstyle",
     "tinymist.formatterIndentSize": 4,
     "chat.commandCenter.enabled": false,
+    "files.associations": {
+        "*.json5": "jsonc"
+    },
+    "explorer.confirmDragAndDrop": false,
 }

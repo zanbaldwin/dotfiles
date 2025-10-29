@@ -1,3 +1,7 @@
 #!/usr/bin/env bash
 
-[ -s "${NVM_DIR}/bash_completion" ] && source "${NVM_DIR}/bash_completion"
+[ -z "${NVM__DIR}" ] && [ -s "${NVM_DIR}/bash_completion" ] && source "${NVM_DIR}/bash_completion"
+
+if command -v  'fnm' >'/dev/null' 2>&1; then
+    eval "$(fnm env --use-on-cd --shell 'bash')"
+fi

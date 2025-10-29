@@ -12,22 +12,9 @@ flatpak update
 # don't work. Use the non-Flatpak version of Firefox that comes with the system.
 
 flatpak install --noninteractive --assumeyes --or-update flathub \
-    "com.bitwarden.desktop" \
-    "com.mongodb.Compass" \
-    "com.github.tchx84.Flatseal" \
-    "com.mattjakeman.ExtensionManager" \
-    "org.freedesktop.Platform.ffmpeg-full" \
-    "org.videolan.VLC" \
-    "com.visualstudio.code"
-
-# The following Flatpaks are not available on ARM64/aarch64 architecture, as of 2023-06-02.
-flatpak install --noninteractive --assumeyes --or-update flathub \
-    "com.discordapp.Discord" \
-    "com.jetbrains.PhpStorm" \
-    "com.skype.Client" \
-    "com.slack.Slack" \
-    "com.syntevo.SmartGit" \
-    "com.spotify.Client"
+    "com.calibre_ebook.calibre" \
+    "com.google.Chrome" \
+    "org.videolan.VLC"
 
 # Notes:
 # ======

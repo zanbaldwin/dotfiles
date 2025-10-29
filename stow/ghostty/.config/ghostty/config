@@ -22,7 +22,7 @@ gtk-single-instance = true
 term = "xterm-256color"
 
 # Theming
-theme = "arcoiris"
+theme = "Arcoiris"
 cursor-color = "ffffff"
 cursor-style = "bar"
 font-family = "JetBrainsMono Nerd Font"

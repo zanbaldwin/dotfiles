@@ -44,29 +44,8 @@ services:
               target: '/etc/letsencrypt'
               read_only: false
 
-    openwebui:
-        image: 'ghcr.io/open-webui/open-webui:main'
-        restart: 'unless-stopped'
-        logging: *default-logging
-        environment:
-            PORT: 6554
-        ports:
-            - target: 6554
-              published: 6554
-              protocol: 'tcp'
-              mode: 'host'
-        volumes:
-            - type: 'volume'
-              source: 'ollama'
-              target: '/app/backend/data'
-              read_only: false
-        extra_hosts:
-            - 'host.docker.internal:host-gateway'
-
 volumes:
     config:
         driver: 'local'
     certs:
-        driver: 'local'
-    ollama:
         driver: 'local'

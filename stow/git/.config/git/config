@@ -81,6 +81,7 @@
     followTags = true
 	autoSetupRemote = true
 	recurseSubmodules = "check"
+	useForceIfIncludes = true
 [pull]
     rebase = true
 [fetch]

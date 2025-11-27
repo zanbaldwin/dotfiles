@@ -1,51 +1,79 @@
 # Running on Podman? Do not run in rootless.
 # DOCKER_HOST=unix:///run/podman/podman.sock sudo docker-compose up -d
 
-x-logging:
-  &default-logging
-    driver: 'json-file'
-    options:
-        max-size: '5m'
-        max-file: '1'
+x-logging: &default-logging
+  driver: 'json-file'
+  options:
+    max-size: '5m'
+    max-file: '1'
 
 services:
-    proxy-manager:
-        image: 'jc21/nginx-proxy-manager:${PROXY_MANAGER_VERSION:-latest}'
-        # When using Podman, containers only get restarted after a reboot if
-        # the restart policy is set to "always". Do not use "unless-stopped".
-        restart: 'unless-stopped'
-        logging: *default-logging
-        healthcheck:
-            test: [ "CMD", "/bin/check-health" ]
-            interval: 10s
-            timeout: 3s
-        network_mode: 'host'
-        # Don't bother with extra_hosts, Nginx does not use it. Use host network instead.
-        ports:
-            - target: 80
-              published: 80
-              protocol: 'tcp'
-              mode: 'host'
-            - target: 443
-              published: 443
-              protocol: 'tcp'
-              mode: 'host'
-            - target: 81
-              published: 81
-              protocol: 'tcp'
-              mode: 'host'
-        volumes:
-            - type: 'volume'
-              source: 'config'
-              target: '/data'
-              read_only: false
-            - type: 'volume'
-              source: 'certs'
-              target: '/etc/letsencrypt'
-              read_only: false
+  proxy-manager:
+    image: 'jc21/nginx-proxy-manager:${PROXY_MANAGER_VERSION:-latest}'
+    # When using Podman, containers only get restarted after a reboot if
+    # the restart policy is set to "always". Do not use "unless-stopped".
+    restart: 'unless-stopped'
+    logging: *default-logging
+    healthcheck:
+      test: [ 'CMD', '/bin/check-health' ]
+      interval: '10s'
+      timeout: '3s'
+    network_mode: 'host'
+    # Don't bother with extra_hosts, Nginx does not use it. Use host network instead.
+    ports:
+      - target: 80
+        published: 80
+        protocol: 'tcp'
+        mode: 'host'
+      - target: 443
+        published: 443
+        protocol: 'tcp'
+        mode: 'host'
+      - target: 81
+        published: 81
+        protocol: 'tcp'
+        mode: 'host'
+    volumes:
+      - type: 'volume'
+        source: 'config'
+        target: '/data'
+        read_only: false
+      - type: 'volume'
+        source: 'certs'
+        target: '/etc/letsencrypt'
+        read_only: false
+
+  tailscale:
+    image: 'tailscale/tailscale:latest'
+    restart: 'unless-stopped'
+    network_mode: 'host'
+    environment:
+      TS_STATE_DIR: '/var/lib/tailscale'
+      TS_AUTH_ONCE: 'true'
+      TS_ENABLE_HEALTH_CHECK: 'true'
+      TS_LOCAL_ADDR_PORT: '127.0.0.1:8575'
+    healthcheck:
+      test: [ 'CMD-SHELL', 'wget --spider -q "http://127.0.0.1:8575/healthz"' ]
+      interval: '30s'
+      timeout: '5s'
+      retries: 5
+      start_period: '30s'
+    volumes:
+      - type: 'volume'
+        source: 'tailscale'
+        target: '/var/lib/tailscale'
+        read_only: false
+    devices:
+      - '/dev/net/tun:/dev/net/tun'
+    cap_add:
+      - 'net_admin'
+      - 'sys_module'
+    logging: *default-logging
 
 volumes:
-    config:
-        driver: 'local'
-    certs:
-        driver: 'local'
+  config:
+    driver: 'local'
+  certs:
+    driver: 'local'
+  tailscale:
+    driver: 'local'

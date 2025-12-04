@@ -9,6 +9,7 @@ x-logging: &default-logging
 
 services:
   proxy-manager:
+    container_name: 'proxy-manager'
     image: 'jc21/nginx-proxy-manager:${PROXY_MANAGER_VERSION:-latest}'
     # When using Podman, containers only get restarted after a reboot if
     # the restart policy is set to "always". Do not use "unless-stopped".
@@ -44,6 +45,7 @@ services:
         read_only: false
 
   tailscale:
+    container_name: 'tailscale'
     image: 'tailscale/tailscale:latest'
     restart: 'unless-stopped'
     network_mode: 'host'
@@ -70,6 +72,27 @@ services:
       - 'sys_module'
     logging: *default-logging
 
+  container-updates:
+    container_name: 'container-updates'
+    image: 'ghcr.io/sergi0g/cup:latest'
+    restart: 'unless-stopped'
+    configs:
+      - source: 'cup'
+        target: '/cup.json'
+        mode: '0600'
+    ports:
+      - target: 8000
+        published: 8321
+        protocol: 'tcp'
+        mode: 'host'
+    volumes:
+      - type: 'bind'
+        source: '/var/run/docker.sock'
+        target: '/var/run/docker.sock'
+        read_only: true
+    command: [ '-c', '/cup.json', 'serve' ]
+    logging: *default-logging
+
 volumes:
   config:
     driver: 'local'
@@ -77,3 +100,7 @@ volumes:
     driver: 'local'
   tailscale:
     driver: 'local'
+
+configs:
+  cup:
+    content: '{"refresh_interval":"0 */30 * * * *"}'

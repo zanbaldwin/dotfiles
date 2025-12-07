@@ -2,7 +2,7 @@ name: 'network'
 services:
 
   tailscale:
-    image: 'tailscale/tailscale:latest'
+    image: 'tailscale/tailscale:v1.90.9'
     restart: 'unless-stopped'
     network_mode: 'host'
     environment:

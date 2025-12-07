@@ -41,13 +41,13 @@ services:
         read_only: true
     depends_on:
       cache:
-        condition: service_healthy
+        condition: 'service_healthy'
       database:
-        condition: service_healthy
+        condition: 'service_healthy'
     healthcheck:
       disable: false
     devices:
-      # Hardware-accelerated Transcoding
+      # Hardware-accelerated Transcoding (N100M)
       - '/dev/dri:/dev/dri'
 
   database:

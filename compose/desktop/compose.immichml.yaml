@@ -14,6 +14,11 @@ services:
                 - 'gpu'
     environment:
       TZ: 'Europe/Amsterdam'
+    ports:
+      - target: 3003
+        published: 3003
+        protocol: 'tcp'
+        mode: 'host'
     volumes:
       - type: 'volume'
         source: 'models'

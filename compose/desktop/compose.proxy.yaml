@@ -36,7 +36,7 @@ services:
         read_only: false
 
   containers:
-    image: 'ghcr.io/sergi0g/cup:latest'
+    image: 'ghcr.io/sergi0g/cup:v3.5.1'
     restart: 'unless-stopped'
     configs:
       - source: 'cup'

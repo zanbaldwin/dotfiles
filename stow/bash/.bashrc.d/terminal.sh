@@ -22,7 +22,7 @@ alias c="clear"
 alias xx="exit"
 alias reload=". ~/.bashrc"
 # Most installations of `sudo` have `secure_path` enabled, head to `/etc/sudoers` and remove that line.
-alias sudo="sudo --preserve-env --"
+alias sudo="sudo --"
 
 # Watch the output of the last command instead of having to
 # execute it constantly whilst waiting for a different output.

@@ -43,7 +43,6 @@ auto-update-channel = "stable"
 keybind = "ctrl+,=unbind"
 
 # Shaders
-custom-shader-animation = true
-
-custom-shader = "./shaders/in-game-crt.glsl"
-custom-shader = "./shaders/glow-rgbsplit-twitchy.glsl"
+custom-shader-animation = false
+#custom-shader = "./shaders/in-game-crt.glsl"
+#custom-shader = "./shaders/glow-rgbsplit-twitchy.glsl"

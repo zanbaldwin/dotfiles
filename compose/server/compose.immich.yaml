@@ -12,13 +12,14 @@ services:
       TZ: 'Europe/Amsterdam'
       IMMICH_ENV: 'production'
       IMMICH_MEDIA_LOCATION: '/data'
+      THUMB_LOCATION: '/data/thumbs'
       IMMICH_CONFIG_FILE: '/etc/immich/config.json'
       DB_HOSTNAME: 'database'
       DB_USERNAME: 'immich'
       DB_PASSWORD_FILE: '/run/secrets/dbpass'
       DB_DATABASE_NAME: 'immich'
       DB_VECTOR_EXTENSION: 'vectorchord'
-      DB_STORAGE_TYPE: 'SDD'
+      DB_STORAGE_TYPE: 'HDD'
       REDIS_HOSTNAME: 'cache'
     configs:
       - source: 'immich'
@@ -32,7 +33,7 @@ services:
         mode: 'host'
     volumes:
       - type: 'bind'
-        source: '/mnt/tank4/class2/photos'
+        source: '/mnt/tank4/class2/media/photos'
         target: '/data'
         read_only: false
       - type: 'bind'
@@ -89,7 +90,7 @@ services:
         limits:
           memory: '256M'
     healthcheck:
-      test: [ 'CMD', 'valkey-cli', 'ping' ]
+      test: [ 'CMD', 'valkey-cli', 'ping', '--loglevel', 'warning' ]
     configs:
       - source: 'valkey'
         target: '/etc/valkey/valkey.conf'
@@ -99,53 +100,12 @@ configs:
   immich:
     content: |
       {
-        "backup": {"database": {
-          "cronExpression": "0 02 * * *",
-          "enabled": true,
-          "keepLastAmount": 14
-        }},
         "ffmpeg": {
           "accel": "vaapi",
           "accelDecode": true,
-          "acceptedAudioCodecs": ["aac", "mp3", "libopus"],
-          "acceptedContainers": ["mov", "ogg", "webm"],
-          "acceptedVideoCodecs": ["h264"],
-          "bframes": -1,
-          "cqMode": "auto",
-          "crf": 23,
-          "gopSize": 0,
-          "maxBitrate": "0",
-          "preferredHwDevice": "auto",
-          "preset": "ultrafast",
-          "refs": 0,
-          "targetAudioCodec": "aac",
-          "targetResolution": "720",
-          "targetVideoCodec": "h264",
-          "temporalAQ": false,
-          "threads": 2,
-          "tonemap": "hable",
-          "transcode": "required",
-          "twoPass": false
+          "threads": 2
         },
-        "image": {
-          "colorspace": "srgb",
-          "extractEmbedded": false,
-          "fullsize": {
-            "enabled": false,
-            "format": "jpeg",
-            "quality": 80
-          },
-          "preview": {
-            "format": "jpeg",
-            "quality": 80,
-            "size": 1080
-          },
-          "thumbnail": {
-            "format": "webp",
-            "quality": 80,
-            "size": 250
-          }
-        },
+        "image": {"colorspace": "srgb"},
         "job": {
           "backgroundTask": {"concurrency": 3},
           "faceDetection": {"concurrency": 1},
@@ -160,119 +120,22 @@ configs:
           "thumbnailGeneration": {"concurrency": 2},
           "videoConversion": {"concurrency": 1}
         },
-        "library": {
-          "scan": {
-            "cronExpression": "0 0 * * *",
-            "enabled": true
-          },
-          "watch": {"enabled": false}
-        },
-        "logging": {
-          "enabled": true,
-          "level": "log"
-        },
+        "library": {"watch": {"enabled": false}},
         "machineLearning": {
+          "clip": {"modelName": "ViT-SO400M-16-SigLIP2-384__webli"},
+          "facialRecognition": {"modelName": "buffalo_l"},
+          "urls": ["http://desktop.lan.zanbaldwin.com:3003"],
           "availabilityChecks": {
             "enabled": true,
-            "interval": 30000,
+            "interval": 300000,
             "timeout": 2000
-          },
-          "clip": {
-            "enabled": true,
-            "modelName": "ViT-SO400M-16-SigLIP2-384__webli"
-          },
-          "duplicateDetection": {
-            "enabled": true,
-            "maxDistance": 0.01
-          },
-          "enabled": true,
-          "facialRecognition": {
-            "enabled": true,
-            "maxDistance": 0.5,
-            "minFaces": 3,
-            "minScore": 0.7,
-            "modelName": "buffalo_l"
-          },
-          "ocr": {
-            "enabled": true,
-            "maxResolution": 736,
-            "minDetectionScore": 0.5,
-            "minRecognitionScore": 0.8,
-            "modelName": "PP-OCRv5_mobile"
-          },
-          "urls": ["http://desktop.lan.zanbaldwin.com:3003"]
-        },
-        "map": {
-          "darkStyle": "https://tiles.immich.cloud/v1/style/dark.json",
-          "enabled": true,
-          "lightStyle": "https://tiles.immich.cloud/v1/style/light.json"
-        },
-        "metadata": {"faces": {"import": false}},
-        "newVersionCheck": {"enabled": true},
-        "nightlyTasks": {
-          "clusterNewFaces": true,
-          "databaseCleanup": true,
-          "generateMemories": true,
-          "missingThumbnails": true,
-          "startTime": "00:00",
-          "syncQuotaUsage": true
-        },
-        "notifications": {"smtp": {
-          "enabled": false,
-          "from": "",
-          "replyTo": "",
-          "transport": {
-            "host": "",
-            "ignoreCert": false,
-            "password": "",
-            "port": 587,
-            "secure": false,
-            "username": ""
           }
-        }},
-        "oauth": {
-          "autoLaunch": false,
-          "autoRegister": true,
-          "buttonText": "Login with OAuth",
-          "clientId": "",
-          "clientSecret": "",
-          "defaultStorageQuota": null,
-          "enabled": false,
-          "issuerUrl": "",
-          "mobileOverrideEnabled": false,
-          "mobileRedirectUri": "",
-          "profileSigningAlgorithm": "none",
-          "roleClaim": "immich_role",
-          "scope": "openid email profile",
-          "signingAlgorithm": "RS256",
-          "storageLabelClaim": "preferred_username",
-          "storageQuotaClaim": "immich_quota",
-          "timeout": 30000,
-          "tokenEndpointAuthMethod": "client_secret_post"
         },
-        "passwordLogin": {"enabled": true},
-        "reverseGeocoding": {"enabled": true},
-        "server": {
-          "externalDomain": "",
-          "loginPageMessage": "",
-          "publicUsers": true
-        },
+        "newVersionCheck": {"enabled": true},
+        "server": {"externalDomain": "https://photos.lan.zanbaldwin.com"},
         "storageTemplate": {
-          "enabled": false,
-          "hashVerificationEnabled": true,
-          "template": "{{y}}/{{y}}-{{MM}}-{{dd}}/{{filename}}"
-        },
-        "templates": {"email": {
-          "albumInviteTemplate": "",
-          "albumUpdateTemplate": "",
-          "welcomeTemplate": ""
-        }},
-        "theme": {"customCss": ""},
-        "trash": {
-          "days": 30,
-          "enabled": true
-        },
-        "user": {"deleteDelay": 7}
+          "template": "{{filetypefull}}/{{y}}/{{MM}}-{{MMMM}}/W{{WW}}/{{y}}{{MM}}{{dd}}T{{HH}}{{mm}}{{ss}}-{{filename}}"
+        }
       }
   initdb:
     content: |
@@ -282,6 +145,11 @@ configs:
   dbconfig:
     content: |
       listen_addresses = '*'
+      ## Immich's HDD Postgres Settings
+      shared_preload_libraries = 'vchord.so'
+      search_path = '"$$user", public'
+      wal_compression = on
+      autovacuum_vacuum_cost_limit = 1000
       ## Zan's "Not On My Machine" Settings
       max_connections = 20
       shared_buffers = 256MB
@@ -310,16 +178,6 @@ configs:
       log_checkpoints = off
       log_autovacuum_min_duration = 1s
       log_statement = 'none'
-      ## Immich's HDD Postgres Settings
-      shared_preload_libraries = 'vchord.so'
-      search_path = '"$$user", public'
-      # max_wal_size = 5GB
-      # shared_buffers = 512MB
-      wal_compression = on
-      #work_mem = 16MB
-      # autovacuum_vacuum_scale_factor = 0.1
-      # autovacuum_analyze_scale_factor = 0.05
-      autovacuum_vacuum_cost_limit = 1000
   dbhealth:
     content: |
       #!/usr/bin/env bash

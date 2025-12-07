@@ -14,6 +14,9 @@ services:
                 - 'gpu'
     environment:
       TZ: 'Europe/Amsterdam'
+    healthcheck:
+      test: [ 'CMD', 'curl', '-fsSL', 'http://127.0.0.1:3003/ping' ]
+      interval: '30s'
     ports:
       - target: 3003
         published: 3003
@@ -27,6 +30,26 @@ services:
     healthcheck:
       disable: false
 
+  notifier:
+    image: 'curlimages/curl:8.17.0'
+    depends_on:
+      machine-learning:
+        condition: 'service_healthy'
+    restart: 'no'
+    config:
+      - source: 'apikey'
+        target: '/run/secrets/apikey'
+    command: |
+      curl -X'PUT'
+      'https://photos.lan.zanbaldwin.com/api/jobs/smartSearch'
+      -H "x-api-key: $(cat '/run/secrets/apikey')"
+      -H 'Content-Type: application/json'
+      -d '{"command": "resume-all"}'
+
 volumes:
   models:
     driver: 'local'
+
+configs:
+  apikey:
+    content: 'MY-KEY'

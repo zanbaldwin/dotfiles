@@ -1,0 +1,40 @@
+name: 'music'
+services:
+
+  navidrome:
+    image: 'deluan/navidrome:0.59.0'
+    restart: 'unless-stopped'
+    ports:
+      - target: 4533
+        published: 4533
+        protocol: 'tcp'
+        mode: 'host'
+    environment:
+      # Optional: put your config options customization here. Examples:
+      # ND_LOGLEVEL: debug
+    configs:
+      - source: 'navidrome'
+        target: '/etc/navidrome.toml'
+    volumes:
+      - type: 'bind'
+        source: '/mnt/fast/apps/navidrome'
+        target: '/data'
+        read_only: false
+      - type: 'bind'
+        source: '/mnt/tank4/class2/media/music'
+        target: '/music'
+        read_only: true
+    command: [ 'navidrome', '--configfile', '/etc/navidrome.toml' ]
+
+configs:
+  navidrome:
+    content: |
+      LogLevel = 'WARNING'
+      Scanner.Schedule = '@every 24h'
+      MusicFolder = '/music'
+      DataFolder = '/data'
+      CacheFolder = '/tmp'
+      Address = '0.0.0.0'
+      BaseUrl = 'https://music.lan.zanbaldwin.com'
+      Port = 4533
+      EnableInsightsCollector = false

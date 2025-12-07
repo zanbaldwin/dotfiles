@@ -41,6 +41,7 @@ auto-update-channel = "stable"
 
 # Keybinds
 keybind = "ctrl+,=unbind"
+keybind = shift+enter=text:\x1b\r
 
 # Shaders
 custom-shader-animation = false

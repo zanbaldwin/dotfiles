@@ -4,7 +4,7 @@ Name=Ghostty
 Type=Application
 Comment=A terminal emulator
 TryExec=/home/zan/bin/ghostty
-Exec=/home/zan/bin/ghostty --gtk-single-instance=true
+Exec=/home/zan/bin/ghostty
 Icon=com.mitchellh.ghostty
 Categories=System;TerminalEmulator;
 Keywords=terminal;tty;pty;
@@ -18,9 +18,9 @@ X-TerminalArgTitle=--title=
 X-TerminalArgAppId=--class=
 X-TerminalArgDir=--working-directory=
 X-TerminalArgHold=--wait-after-command
-DBusActivatable=true
+DBusActivatable=false
 X-KDE-Shortcuts=Ctrl+Alt+T
 
 [Desktop Action new-window]
 Name=New Window
-Exec=/home/zan/bin/ghostty --gtk-single-instance=true
+Exec=/home/zan/bin/ghostty

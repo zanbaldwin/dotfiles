@@ -1,0 +1,65 @@
+name: 'proxy'
+services:
+
+  manager:
+    image: 'jc21/nginx-proxy-manager:2.13.5'
+    restart: 'unless-stopped'
+    # Don't bother with extra_hosts, Nginx does not use it. Use host network instead.
+    network_mode: 'host'
+    healthcheck:
+      test: [ 'CMD', '/bin/check-health' ]
+      interval: '10s'
+      timeout: '3s'
+    # Technically these are ignored in "host" network mode,
+    # but always good to reference them in config.
+    ports:
+      - target: 80
+        published: 80
+        protocol: 'tcp'
+        mode: 'host'
+      - target: 443
+        published: 443
+        protocol: 'tcp'
+        mode: 'host'
+      - target: 81
+        published: 81
+        protocol: 'tcp'
+        mode: 'host'
+    volumes:
+      - type: 'volume'
+        source: 'hosts'
+        target: '/data'
+        read_only: false
+      - type: 'volume'
+        source: 'certs'
+        target: '/etc/letsencrypt'
+        read_only: false
+
+  containers:
+    image: 'ghcr.io/sergi0g/cup:latest'
+    restart: 'unless-stopped'
+    configs:
+      - source: 'cup'
+        target: '/cup.json'
+        mode: '0600'
+    ports:
+      - target: 8000
+        published: 8321
+        protocol: 'tcp'
+        mode: 'host'
+    volumes:
+      - type: 'bind'
+        source: '/var/run/docker.sock'
+        target: '/var/run/docker.sock'
+        read_only: true
+    command: [ '-c', '/cup.json', 'serve' ]
+
+configs:
+  cup:
+    content: '{"refresh_interval":"0 */30 * * * *"}'
+
+volumes:
+  hosts:
+    driver: 'local'
+  certs:
+    driver: 'local'

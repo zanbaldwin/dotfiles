@@ -1,0 +1,353 @@
+name: 'immich'
+services:
+
+  server:
+    image: 'ghcr.io/immich-app/immich-server:v2.3.1'
+    restart: 'unless-stopped'
+    deploy:
+      resources:
+        limits:
+          memory: '2G'
+    environment:
+      TZ: 'Europe/Amsterdam'
+      IMMICH_ENV: 'production'
+      IMMICH_MEDIA_LOCATION: '/data'
+      IMMICH_CONFIG_FILE: '/etc/immich/config.json'
+      DB_HOSTNAME: 'database'
+      DB_USERNAME: 'immich'
+      DB_PASSWORD_FILE: '/run/secrets/dbpass'
+      DB_DATABASE_NAME: 'immich'
+      DB_VECTOR_EXTENSION: 'vectorchord'
+      DB_STORAGE_TYPE: 'SDD'
+      REDIS_HOSTNAME: 'cache'
+    configs:
+      - source: 'immich'
+        target: '/etc/immich/config.json'
+      - source: 'dbpass'
+        target: '/run/secrets/dbpass'
+    ports:
+      - target: 2283
+        published: 2283
+        protocol: 'tcp'
+        mode: 'host'
+    volumes:
+      - type: 'bind'
+        source: '/mnt/tank4/class2/photos'
+        target: '/data'
+        read_only: false
+      - type: 'bind'
+        source: '/etc/localtime'
+        target: '/etc/localtime'
+        read_only: true
+    depends_on:
+      cache:
+        condition: service_healthy
+      database:
+        condition: service_healthy
+    healthcheck:
+      disable: false
+    devices:
+      # Hardware-accelerated Transcoding
+      - '/dev/dri:/dev/dri'
+
+  database:
+    image: 'tensorchord/vchord-postgres:pg18-v0.5.3'
+    restart: 'unless-stopped'
+    healthcheck:
+      test: [ 'CMD', 'bash', '/usr/local/bin/healthcheck.sh' ]
+    shm_size: '256mb'
+    deploy:
+      resources:
+        limits:
+          memory: '1G'
+    environment:
+      POSTGRES_PASSWORD_FILE: '/run/secrets/dbpass'
+      POSTGRES_USER: 'immich'
+      POSTGRES_DB: 'immich'
+      POSTGRES_INITDB_ARGS: '--data-checksums'
+    configs:
+      - source: 'initdb'
+        target: '/docker-entrypoint-initdb.d/enable-vectorchord.sql'
+      - source: 'dbconfig'
+        target: '/etc/postgresql/postgresql.conf'
+      - source: 'dbhealth'
+        target: '/usr/local/bin/healthcheck.sh'
+      - source: 'dbpass'
+        target: '/run/secrets/dbpass'
+    volumes:
+      - type: 'bind'
+        source: '/mnt/fast/apps/immich/database'
+        target: '/var/lib/postgresql'
+        read_only: false
+    command: [ 'postgres', '-c', 'config_file=/etc/postgresql/postgresql.conf' ]
+
+  cache:
+    image: 'valkey/valkey:9.0-alpine'
+    restart: 'unless-stopped'
+    deploy:
+      resources:
+        limits:
+          memory: '256M'
+    healthcheck:
+      test: [ 'CMD', 'valkey-cli', 'ping' ]
+    configs:
+      - source: 'valkey'
+        target: '/etc/valkey/valkey.conf'
+    command: [ 'valkey-server', '/etc/valkey/valkey.conf' ]
+
+configs:
+  immich:
+    content: |
+      {
+        "backup": {"database": {
+          "cronExpression": "0 02 * * *",
+          "enabled": true,
+          "keepLastAmount": 14
+        }},
+        "ffmpeg": {
+          "accel": "vaapi",
+          "accelDecode": true,
+          "acceptedAudioCodecs": ["aac", "mp3", "libopus"],
+          "acceptedContainers": ["mov", "ogg", "webm"],
+          "acceptedVideoCodecs": ["h264"],
+          "bframes": -1,
+          "cqMode": "auto",
+          "crf": 23,
+          "gopSize": 0,
+          "maxBitrate": "0",
+          "preferredHwDevice": "auto",
+          "preset": "ultrafast",
+          "refs": 0,
+          "targetAudioCodec": "aac",
+          "targetResolution": "720",
+          "targetVideoCodec": "h264",
+          "temporalAQ": false,
+          "threads": 2,
+          "tonemap": "hable",
+          "transcode": "required",
+          "twoPass": false
+        },
+        "image": {
+          "colorspace": "srgb",
+          "extractEmbedded": false,
+          "fullsize": {
+            "enabled": false,
+            "format": "jpeg",
+            "quality": 80
+          },
+          "preview": {
+            "format": "jpeg",
+            "quality": 80,
+            "size": 1080
+          },
+          "thumbnail": {
+            "format": "webp",
+            "quality": 80,
+            "size": 250
+          }
+        },
+        "job": {
+          "backgroundTask": {"concurrency": 3},
+          "faceDetection": {"concurrency": 1},
+          "library": {"concurrency": 3},
+          "metadataExtraction": {"concurrency": 3},
+          "migration": {"concurrency": 5},
+          "notifications": {"concurrency": 5},
+          "ocr": {"concurrency": 1},
+          "search": {"concurrency": 3},
+          "sidecar": {"concurrency": 3},
+          "smartSearch": {"concurrency": 1},
+          "thumbnailGeneration": {"concurrency": 2},
+          "videoConversion": {"concurrency": 1}
+        },
+        "library": {
+          "scan": {
+            "cronExpression": "0 0 * * *",
+            "enabled": true
+          },
+          "watch": {"enabled": false}
+        },
+        "logging": {
+          "enabled": true,
+          "level": "log"
+        },
+        "machineLearning": {
+          "availabilityChecks": {
+            "enabled": true,
+            "interval": 30000,
+            "timeout": 2000
+          },
+          "clip": {
+            "enabled": true,
+            "modelName": "ViT-SO400M-16-SigLIP2-384__webli"
+          },
+          "duplicateDetection": {
+            "enabled": true,
+            "maxDistance": 0.01
+          },
+          "enabled": true,
+          "facialRecognition": {
+            "enabled": true,
+            "maxDistance": 0.5,
+            "minFaces": 3,
+            "minScore": 0.7,
+            "modelName": "buffalo_l"
+          },
+          "ocr": {
+            "enabled": true,
+            "maxResolution": 736,
+            "minDetectionScore": 0.5,
+            "minRecognitionScore": 0.8,
+            "modelName": "PP-OCRv5_mobile"
+          },
+          "urls": ["http://desktop.lan.zanbaldwin.com:3003"]
+        },
+        "map": {
+          "darkStyle": "https://tiles.immich.cloud/v1/style/dark.json",
+          "enabled": true,
+          "lightStyle": "https://tiles.immich.cloud/v1/style/light.json"
+        },
+        "metadata": {"faces": {"import": false}},
+        "newVersionCheck": {"enabled": true},
+        "nightlyTasks": {
+          "clusterNewFaces": true,
+          "databaseCleanup": true,
+          "generateMemories": true,
+          "missingThumbnails": true,
+          "startTime": "00:00",
+          "syncQuotaUsage": true
+        },
+        "notifications": {"smtp": {
+          "enabled": false,
+          "from": "",
+          "replyTo": "",
+          "transport": {
+            "host": "",
+            "ignoreCert": false,
+            "password": "",
+            "port": 587,
+            "secure": false,
+            "username": ""
+          }
+        }},
+        "oauth": {
+          "autoLaunch": false,
+          "autoRegister": true,
+          "buttonText": "Login with OAuth",
+          "clientId": "",
+          "clientSecret": "",
+          "defaultStorageQuota": null,
+          "enabled": false,
+          "issuerUrl": "",
+          "mobileOverrideEnabled": false,
+          "mobileRedirectUri": "",
+          "profileSigningAlgorithm": "none",
+          "roleClaim": "immich_role",
+          "scope": "openid email profile",
+          "signingAlgorithm": "RS256",
+          "storageLabelClaim": "preferred_username",
+          "storageQuotaClaim": "immich_quota",
+          "timeout": 30000,
+          "tokenEndpointAuthMethod": "client_secret_post"
+        },
+        "passwordLogin": {"enabled": true},
+        "reverseGeocoding": {"enabled": true},
+        "server": {
+          "externalDomain": "",
+          "loginPageMessage": "",
+          "publicUsers": true
+        },
+        "storageTemplate": {
+          "enabled": false,
+          "hashVerificationEnabled": true,
+          "template": "{{y}}/{{y}}-{{MM}}-{{dd}}/{{filename}}"
+        },
+        "templates": {"email": {
+          "albumInviteTemplate": "",
+          "albumUpdateTemplate": "",
+          "welcomeTemplate": ""
+        }},
+        "theme": {"customCss": ""},
+        "trash": {
+          "days": 30,
+          "enabled": true
+        },
+        "user": {"deleteDelay": 7}
+      }
+  initdb:
+    content: |
+      CREATE EXTENSION IF NOT EXISTS vchord CASCADE;
+  dbpass:
+    content: '2FUb74B3Z5wfMEn8TjpU4X95e5W5PYeL'
+  dbconfig:
+    content: |
+      listen_addresses = '*'
+      ## Zan's "Not On My Machine" Settings
+      max_connections = 20
+      shared_buffers = 256MB
+      effective_cache_size = 512MB
+      work_mem = 2MB
+      maintenance_work_mem = 64MB
+      temp_buffers = 4MB
+      max_worker_processes = 4
+      max_parallel_workers = 4
+      max_parallel_workers_per_gather = 1
+      max_parallel_maintenance_workers = 1
+      autovacuum = on
+      autovacuum_naptime = 30s
+      autovacuum_vacuum_scale_factor = 0.2
+      autovacuum_analyze_scale_factor = 0.1
+      autovacuum_max_workers = 2
+      autovacuum_work_mem = 32MB
+      wal_level = replica
+      max_wal_size = 512MB
+      min_wal_size = 64MB
+      checkpoint_timeout = 20min
+      checkpoint_completion_target = 0.9
+      # "off" should be fine on ZFS (otherwise use "local").
+      synchronous_commit = off
+      log_min_duration_statement = 250ms
+      log_checkpoints = off
+      log_autovacuum_min_duration = 1s
+      log_statement = 'none'
+      ## Immich's HDD Postgres Settings
+      shared_preload_libraries = 'vchord.so'
+      search_path = '"$$user", public'
+      # max_wal_size = 5GB
+      # shared_buffers = 512MB
+      wal_compression = on
+      #work_mem = 16MB
+      # autovacuum_vacuum_scale_factor = 0.1
+      # autovacuum_analyze_scale_factor = 0.05
+      autovacuum_vacuum_cost_limit = 1000
+  dbhealth:
+    content: |
+      #!/usr/bin/env bash
+      read_env_or_file() {
+          local VAR_NAME="$$1"
+          local FILE_VAR_NAME="$${VAR_NAME}_FILE"
+          if [[ -n "$${!FILE_VAR_NAME}" && -f "$${!FILE_VAR_NAME}" && -s "$${!FILE_VAR_NAME}" ]]; then
+              cat "$${!FILE_VAR_NAME}"
+          else
+              echo "$${!VAR_NAME}"
+          fi
+      }
+      POSTGRES_DB=$$(read_env_or_file "POSTGRES_DB")
+      POSTGRES_USER=$$(read_env_or_file "POSTGRES_USER")
+      POSTGRES_PASSWORD=$$(read_env_or_file "POSTGRES_PASSWORD")
+      export POSTGRES_DB POSTGRES_USER POSTGRES_PASSWORD
+      pg_isready --dbname="$${POSTGRES_DB}" --username="$${POSTGRES_USER}" || exit $?;
+      CHKSUM_ERROR_COUNT="$$(psql --dbname="$${POSTGRES_DB}" --username="$${POSTGRES_USER}" --tuples-only --no-align --command='SELECT COALESCE(SUM(checksum_failures), 0) FROM pg_stat_database')";
+      if [ "$${CHKSUM_ERROR_COUNT}" != '0' ]; then
+        echo "checksum failure count is $${CHKSUM_ERROR_COUNT}";
+        exit 1
+      fi
+  valkey:
+    content: |
+      appendonly yes
+      appendfsync everysec
+      auto-aof-rewrite-percentage 100
+      auto-aof-rewrite-min-size 32mb
+      save 60 100
+      maxmemory 200mb
+      maxmemory-policy allkeys-lru

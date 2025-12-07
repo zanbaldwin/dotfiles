@@ -1,0 +1,27 @@
+name: 'immich'
+services:
+
+  machine-learning:
+    image: 'ghcr.io/immich-app/immich-machine-learning:v2.3.1-cuda'
+    restart: 'unless-stopped'
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: 'nvidia'
+              count: 1
+              capabilities:
+                - 'gpu'
+    environment:
+      TZ: 'Europe/Amsterdam'
+    volumes:
+      - type: 'volume'
+        source: 'models'
+        target: '/cache'
+        read_only: false
+    healthcheck:
+      disable: false
+
+volumes:
+  models:
+    driver: 'local'

@@ -1,0 +1,25 @@
+name: 'containers'
+services:
+
+  updates:
+    image: 'ghcr.io/sergi0g/cup:latest'
+    restart: 'unless-stopped'
+    configs:
+      - source: 'cup'
+        target: '/cup.json'
+        mode: '0600'
+    ports:
+      - target: 8000
+        published: 8321
+        protocol: 'tcp'
+        mode: 'host'
+    volumes:
+      - type: 'bind'
+        source: '/var/run/docker.sock'
+        target: '/var/run/docker.sock'
+        read_only: true
+    command: [ '-c', '/cup.json', 'serve' ]
+
+configs:
+  cup:
+    content: '{"refresh_interval":"0 */30 * * * *"}'

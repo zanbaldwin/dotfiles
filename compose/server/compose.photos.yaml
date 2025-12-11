@@ -1,0 +1,108 @@
+name: 'photos'
+services:
+
+  server:
+    image: 'ghcr.io/immich-app/immich-server:v2.3.1'
+    restart: 'unless-stopped'
+    deploy:
+      resources:
+        limits:
+          memory: '2G'
+    networks:
+      - 'cache'
+      - 'database'
+    environment:
+      TZ: 'Europe/Amsterdam'
+      IMMICH_ENV: 'production'
+      IMMICH_MEDIA_LOCATION: '/data/class2'
+      IMMICH_CONFIG_FILE: '/etc/immich/config.json'
+      DB_HOSTNAME: 'postgres'
+      DB_USERNAME: 'immich'
+      DB_PASSWORD_FILE: '/run/secrets/dbpass'
+      DB_DATABASE_NAME: 'immich'
+      DB_VECTOR_EXTENSION: 'vectorchord'
+      DB_STORAGE_TYPE: 'HDD'
+      DB_POOL_SIZE: '25'
+      REDIS_HOSTNAME: 'valkey'
+    secrets:
+      - 'dbpass'
+    configs:
+      - source: 'immich'
+        target: '/etc/immich/config.json'
+    ports:
+      - target: 2283
+        published: 2283
+        protocol: 'tcp'
+        host_ip: '127.0.0.1'
+    volumes:
+      - type: 'bind'
+        source: '/mnt/tank4/class1/photos'
+        target: '/data/class1'
+        read_only: true
+      - type: 'bind'
+        source: '/mnt/tank4/class2/photos'
+        target: '/data/class2'
+        read_only: false
+      - type: 'bind'
+        source: '/mnt/fast/apps/immich'
+        target: '/usr/src/app/upload'
+        read_only: false
+      - type: 'bind'
+        source: '/etc/localtime'
+        target: '/etc/localtime'
+        read_only: true
+    devices:
+      # Hardware-accelerated Transcoding (N100M)
+      - '/dev/dri:/dev/dri'
+
+networks:
+  cache:
+    external: true
+  database:
+    external: true
+
+secrets:
+  dbpass:
+    file: '/mnt/tank4/class1/secrets/postgres'
+
+configs:
+  immich:
+    content: |
+      {
+        "ffmpeg": {
+          "accel": "vaapi",
+          "accelDecode": true,
+          "threads": 2
+        },
+        "image": {"colorspace": "srgb"},
+        "job": {
+          "backgroundTask": {"concurrency": 3},
+          "faceDetection": {"concurrency": 1},
+          "library": {"concurrency": 3},
+          "metadataExtraction": {"concurrency": 3},
+          "migration": {"concurrency": 5},
+          "notifications": {"concurrency": 5},
+          "ocr": {"concurrency": 1},
+          "search": {"concurrency": 3},
+          "sidecar": {"concurrency": 3},
+          "smartSearch": {"concurrency": 1},
+          "thumbnailGeneration": {"concurrency": 2},
+          "videoConversion": {"concurrency": 1}
+        },
+        "library": {"watch": {"enabled": false}},
+        "machineLearning": {
+          "clip": {"modelName": "ViT-SO400M-16-SigLIP2-384__webli"},
+          "facialRecognition": {"modelName": "buffalo_l"},
+          "urls": ["http://desktop.lan.zanbaldwin.com:3003"],
+          "availabilityChecks": {
+            "enabled": true,
+            "interval": 300000,
+            "timeout": 2000
+          }
+        },
+        "newVersionCheck": {"enabled": true},
+        "server": {"externalDomain": "https://photos.lan.zanbaldwin.com"},
+        "storageTemplate": {
+          "template": "{{filetypefull}}/{{y}}/{{MM}}-{{MMMM}}/W{{WW}}/{{y}}{{MM}}{{dd}}T{{HH}}{{mm}}{{ss}}-{{filename}}"
+        }
+      }

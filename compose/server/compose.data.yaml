@@ -1,71 +1,29 @@
-name: 'immich'
+name: 'data'
 services:
 
-  server:
-    image: 'ghcr.io/immich-app/immich-server:v2.3.1'
-    restart: 'unless-stopped'
-    deploy:
-      resources:
-        limits:
-          memory: '2G'
-    environment:
-      TZ: 'Europe/Amsterdam'
-      IMMICH_ENV: 'production'
-      IMMICH_MEDIA_LOCATION: '/data'
-      THUMB_LOCATION: '/data/thumbs'
-      IMMICH_CONFIG_FILE: '/etc/immich/config.json'
-      DB_HOSTNAME: 'database'
-      DB_USERNAME: 'immich'
-      DB_PASSWORD_FILE: '/run/secrets/dbpass'
-      DB_DATABASE_NAME: 'immich'
-      DB_VECTOR_EXTENSION: 'vectorchord'
-      DB_STORAGE_TYPE: 'HDD'
-      REDIS_HOSTNAME: 'cache'
-    configs:
-      - source: 'immich'
-        target: '/etc/immich/config.json'
-      - source: 'dbpass'
-        target: '/run/secrets/dbpass'
-    ports:
-      - target: 2283
-        published: 2283
-        protocol: 'tcp'
-        mode: 'host'
-    volumes:
-      - type: 'bind'
-        source: '/mnt/tank4/class2/media/photos'
-        target: '/data'
-        read_only: false
-      - type: 'bind'
-        source: '/etc/localtime'
-        target: '/etc/localtime'
-        read_only: true
-    depends_on:
-      cache:
-        condition: 'service_healthy'
-      database:
-        condition: 'service_healthy'
-    healthcheck:
-      disable: false
-    devices:
-      # Hardware-accelerated Transcoding (N100M)
-      - '/dev/dri:/dev/dri'
-
-  database:
+  postgres:
     image: 'tensorchord/vchord-postgres:pg18-v0.5.3'
     restart: 'unless-stopped'
     healthcheck:
       test: [ 'CMD', 'bash', '/usr/local/bin/healthcheck.sh' ]
+      interval: '30s'
+      timeout: '10s'
+      retries: 3
+      start_period: '40s'
     shm_size: '256mb'
     deploy:
       resources:
         limits:
           memory: '1G'
+    networks:
+      - 'database'
     environment:
       POSTGRES_PASSWORD_FILE: '/run/secrets/dbpass'
-      POSTGRES_USER: 'immich'
-      POSTGRES_DB: 'immich'
+      POSTGRES_USER: 'main'
+      POSTGRES_DB: 'main'
       POSTGRES_INITDB_ARGS: '--data-checksums'
+    secrets:
+      - 'dbpass'
     configs:
       - source: 'initdb'
         target: '/docker-entrypoint-initdb.d/enable-vectorchord.sql'
@@ -73,75 +31,58 @@ services:
         target: '/etc/postgresql/postgresql.conf'
       - source: 'dbhealth'
         target: '/usr/local/bin/healthcheck.sh'
-      - source: 'dbpass'
-        target: '/run/secrets/dbpass'
+    # Don't define port mappings as we only want to be available to other services inside Docker.
+    ports: {}
     volumes:
       - type: 'bind'
-        source: '/mnt/fast/apps/immich/database'
+        source: '/mnt/fast/apps/postgres'
+        # As of Postgres 18+ the recommendation is to mount `/var/lib/postgres`
+        # as the data directory will now be named according to the major version
+        # to assist in upgrade migrations.
         target: '/var/lib/postgresql'
         read_only: false
     command: [ 'postgres', '-c', 'config_file=/etc/postgresql/postgresql.conf' ]
 
-  cache:
+  valkey:
     image: 'valkey/valkey:9.0-alpine'
     restart: 'unless-stopped'
     deploy:
       resources:
         limits:
           memory: '256M'
+    networks:
+      - 'cache'
     healthcheck:
-      test: [ 'CMD', 'valkey-cli', 'ping', '--loglevel', 'warning' ]
+      test: [ 'CMD', 'valkey-cli', '--raw', 'ping' ]
+      interval: '30s'
+      timeout: '10s'
+      retries: 3
+      start_period: '40s'
     configs:
       - source: 'valkey'
         target: '/etc/valkey/valkey.conf'
+    # Don't define port mappings as we only want to be available to other services inside Docker.
+    ports: {}
     command: [ 'valkey-server', '/etc/valkey/valkey.conf' ]
 
+networks:
+  cache:
+    name: 'cache'
+    driver: 'bridge'
+    attachable: true
+  database:
+    name: 'database'
+    driver: 'bridge'
+    attachable: true
+
+secrets:
+  dbpass:
+    file: '/mnt/tank4/class1/secrets/postgres'
+
 configs:
-  immich:
-    content: |
-      {
-        "ffmpeg": {
-          "accel": "vaapi",
-          "accelDecode": true,
-          "threads": 2
-        },
-        "image": {"colorspace": "srgb"},
-        "job": {
-          "backgroundTask": {"concurrency": 3},
-          "faceDetection": {"concurrency": 1},
-          "library": {"concurrency": 3},
-          "metadataExtraction": {"concurrency": 3},
-          "migration": {"concurrency": 5},
-          "notifications": {"concurrency": 5},
-          "ocr": {"concurrency": 1},
-          "search": {"concurrency": 3},
-          "sidecar": {"concurrency": 3},
-          "smartSearch": {"concurrency": 1},
-          "thumbnailGeneration": {"concurrency": 2},
-          "videoConversion": {"concurrency": 1}
-        },
-        "library": {"watch": {"enabled": false}},
-        "machineLearning": {
-          "clip": {"modelName": "ViT-SO400M-16-SigLIP2-384__webli"},
-          "facialRecognition": {"modelName": "buffalo_l"},
-          "urls": ["http://desktop.lan.zanbaldwin.com:3003"],
-          "availabilityChecks": {
-            "enabled": true,
-            "interval": 300000,
-            "timeout": 2000
-          }
-        },
-        "newVersionCheck": {"enabled": true},
-        "server": {"externalDomain": "https://photos.lan.zanbaldwin.com"},
-        "storageTemplate": {
-          "template": "{{filetypefull}}/{{y}}/{{MM}}-{{MMMM}}/W{{WW}}/{{y}}{{MM}}{{dd}}T{{HH}}{{mm}}{{ss}}-{{filename}}"
-        }
-      }
   initdb:
     content: |
       CREATE EXTENSION IF NOT EXISTS vchord CASCADE;
-  dbpass:
-    content: '2FUb74B3Z5wfMEn8TjpU4X95e5W5PYeL'
   dbconfig:
     content: |
       listen_addresses = '*'
@@ -151,9 +92,9 @@ configs:
       wal_compression = on
       autovacuum_vacuum_cost_limit = 1000
       ## Zan's "Not On My Machine" Settings
-      max_connections = 20
+      max_connections = 35
       shared_buffers = 256MB
-      effective_cache_size = 512MB
+      effective_cache_size = 768MB
       work_mem = 2MB
       maintenance_work_mem = 64MB
       temp_buffers = 4MB
@@ -173,7 +114,7 @@ configs:
       checkpoint_timeout = 20min
       checkpoint_completion_target = 0.9
       # "off" should be fine on ZFS (otherwise use "local").
-      synchronous_commit = off
+      synchronous_commit = local
       log_min_duration_statement = 250ms
       log_checkpoints = off
       log_autovacuum_min_duration = 1s
@@ -207,5 +148,5 @@ configs:
       auto-aof-rewrite-percentage 100
       auto-aof-rewrite-min-size 32mb
       save 60 100
-      maxmemory 200mb
+      maxmemory 180mb
       maxmemory-policy allkeys-lru

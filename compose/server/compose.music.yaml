@@ -4,24 +4,24 @@ services:
   navidrome:
     image: 'deluan/navidrome:0.59.0'
     restart: 'unless-stopped'
+    user: '${PUID:-950}:${PGID:-950}'
+    environment:
+      TZ: 'Europe/Amsterdam'
+    configs:
+      - source: 'navidrome'
+        target: '/etc/navidrome.toml'
     ports:
       - target: 4533
         published: 4533
         protocol: 'tcp'
-        mode: 'host'
-    environment:
-      # Optional: put your config options customization here. Examples:
-      # ND_LOGLEVEL: debug
-    configs:
-      - source: 'navidrome'
-        target: '/etc/navidrome.toml'
+        host_ip: '127.0.0.1'
     volumes:
       - type: 'bind'
         source: '/mnt/fast/apps/navidrome'
         target: '/data'
         read_only: false
       - type: 'bind'
-        source: '/mnt/tank4/class2/media/music'
+        source: '/mnt/tank4/class2/music'
         target: '/music'
         read_only: true
     command: [ 'navidrome', '--configfile', '/etc/navidrome.toml' ]

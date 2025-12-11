@@ -12,7 +12,7 @@ services:
       - target: 8000
         published: 8321
         protocol: 'tcp'
-        mode: 'host'
+        host_ip: '127.0.0.1'
     volumes:
       - type: 'bind'
         source: '/var/run/docker.sock'

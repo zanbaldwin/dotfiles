@@ -1,0 +1,65 @@
+name: 'books'
+services:
+
+  server:
+    image: 'linuxserver/calibre:8.16.2'
+    restart: 'unless-stopped'
+    environment:
+      TZ: 'Europe/Amsterdam'
+      PUID: '${PUID:-950}'
+      PGID: '${PGID:-950}'
+    deploy:
+      resources:
+        limits:
+          memory: '512M'
+    ports:
+      - target: 2254
+        published: 2254
+        protocol: 'tcp'
+        host_ip: '127.0.0.1'
+    volumes:
+      - type: 'bind'
+        source: '/mnt/tank4/class1/books'
+        target: '/books'
+        read_only: false
+      - type: 'bind'
+        source: '/mnt/fast/apps/calibre/server'
+        target: '/config'
+        read_only: false
+    # Override default command to run calibre-server instead of GUI
+    command:
+      - '/usr/bin/calibre-server'
+      - '/books'
+      - '--port'
+      - '2254'
+      - '--listen-on'
+      # All interfaces INSIDE container (restricted by the port mapping below).
+      - '0.0.0.0'
+      - '--enable-auth'
+      - '--auth-mode'
+      - 'basic'
+      - '--userdb'
+      - '/config/users.db'
+
+  web:
+    image: 'linuxserver/calibre-web:0.6.25'
+    restart: 'unless-stopped'
+    environment:
+      TZ: 'Europe/Amsterdam'
+      DOCKER_MODS: 'linuxserver/mods:universal-calibre'
+      PUID: '${PUID:-950}'
+      PGID: '${PGID:-950}'
+    ports:
+      - target: 8083
+        published: 8083
+        protocol: 'tcp'
+        host_ip: '127.0.0.1'
+    volumes:
+      - type: 'bind'
+        source: '/mnt/tank4/class1/books'
+        target: '/books'
+        read_only: true
+      - type: 'bind'
+        source: '/mnt/fast/apps/calibre/web'
+        target: '/config'
+        read_only: false

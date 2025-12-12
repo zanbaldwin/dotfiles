@@ -9,7 +9,8 @@ services:
       TS_STATE_DIR: '/var/lib/tailscale'
       TS_AUTH_ONCE: 'true'
       TS_ENABLE_HEALTH_CHECK: 'true'
-      TS_LOCAL_ADDR_PORT: '127.0.0.1:8575'
+      TS_LOCAL_ADDR_PORT: '0.0.0.0:8575'
+      TS_EXTRA_ARGS: '--accept-routes'
     healthcheck:
       test: [ 'CMD-SHELL', 'wget --spider -q "http://127.0.0.1:8575/healthz"' ]
       interval: '30s'

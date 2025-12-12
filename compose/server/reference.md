@@ -30,7 +30,6 @@ TrueNAS
 
 | Service                | Port   | Proxy Domain                 |
 |------------------------|--------|------------------------------|
-| Calibre Content Server | `2254` | `calibre.lan.zanbaldwin.com` |
 | Calibre Web            | `8083` | `books.lan.zanbaldwin.com`   |
 | Container Updates      | `8321` | `cup.nas.lan.zanbaldwin.com` |
 | Next Explorer          | `3453` | `files.lan.zanbaldwin.com`   |

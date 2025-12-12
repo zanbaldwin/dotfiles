@@ -4,7 +4,7 @@ if [ -f "${HOME}/.cargo/env" ]; then
     source "${HOME}/.cargo/env"
 fi
 
-TOOLBOX_DIRECTORY="$(dirname "$(readlink -f "$0")")"
+TOOLBOX_DIRECTORY="$(dirname "$(readlink -f -- "$0")")"
 . "${TOOLBOX_DIRECTORY}/stable-version.sh"
 
 # Zellij Plugins

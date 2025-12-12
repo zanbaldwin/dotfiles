@@ -2,7 +2,7 @@
 
 export GIT_DISCOVERY_ACROSS_FILESYSTEM=0
 
-BASHRC_INCLUDE_DIRECTORY="$(dirname "$(readlink -f "$0")")"
+BASHRC_INCLUDE_DIRECTORY="$(dirname "$(readlink -f -- "$0")")"
 if [ -f "${BASHRC_INCLUDE_DIRECTORY}/../../../toolbox/stable-version.sh" ]; then
     . "${BASHRC_INCLUDE_DIRECTORY}/../../../toolbox/stable-version.sh"
 fi

@@ -1,6 +1,6 @@
 sudo dnf install --assumeyes fontconfig-devel git
 
-TOOLBOX_DIRECTORY="$(dirname "$(readlink -f "$0")")"
+TOOLBOX_DIRECTORY="$(dirname "$(readlink -f -- "$0")")"
 . "${TOOLBOX_DIRECTORY}/stable-version.sh"
 
 export ALACRITTY_GIT_REPO="https://github.com/alacritty/alacritty.git"

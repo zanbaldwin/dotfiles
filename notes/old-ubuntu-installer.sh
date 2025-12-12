@@ -151,7 +151,7 @@ install_as_user() {
     mkdir -p "${HOME}/.ssh"
 
     # Stow Configuration Files
-    SCRIPT_DIRECTORY="$(dirname "$(readlink -f "$0")")"
+    SCRIPT_DIRECTORY="$(dirname "$(readlink -f -- "$0")")"
     stow --dir="${SCRIPT_DIRECTORY}" --target="${HOME}" alacritty
     stow --dir="${SCRIPT_DIRECTORY}" --target="${HOME}" bash
     stow --dir="${SCRIPT_DIRECTORY}" --target="${HOME}" cargo

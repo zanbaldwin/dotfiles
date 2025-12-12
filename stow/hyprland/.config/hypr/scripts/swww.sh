@@ -1,7 +1,7 @@
 #!/bin/bash
 
-HYPRLAND_SCRIPTS_DIRECTORY="$(dirname "$(readlink -f "$0")")"
-WALLPAPER_DIRECTORY="$(readlink -f "${HYPRLAND_SCRIPTS_DIRECTORY}/../../../../wallpaper/.local/share/wallpaper")"
+HYPRLAND_SCRIPTS_DIRECTORY="$(dirname "$(readlink -f -- "$0")")"
+WALLPAPER_DIRECTORY="$(readlink -f -- "${HYPRLAND_SCRIPTS_DIRECTORY}/../../../../wallpaper/.local/share/wallpaper")"
 
 if [ ! -d "${WALLPAPER_DIRECTORY}" ]; then
     echo "Directory not found: ${WALLPAPER_DIRECTORY}"

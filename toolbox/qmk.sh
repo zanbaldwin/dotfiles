@@ -4,7 +4,7 @@ KEYBOARD="splitkb/aurora/corne"
 REVISION="rev1"
 KEYMAP_NAME="zanbaldwin"
 
-TOOLBOX_SCRIPT_DIRECTORY="$(dirname "$(readlink -f "$0")")"
+TOOLBOX_SCRIPT_DIRECTORY="$(dirname "$(readlink -f -- "$0")")"
 QMK_FIRMWARE_DIRECTORY="${HOME}/.local/share/qmk"
 
 sudo dnf upgrade --assumeyes

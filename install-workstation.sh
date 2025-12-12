@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-THIS_DIR="$(dirname "$(readlink -f "$0")")"
+THIS_DIR="$(dirname "$(readlink -f -- "$0")")"
 
 # Installation scripts that work on the host, rather than a toolbox container.
 bash "${THIS_DIR}/toolbox/fonts.sh"

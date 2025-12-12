@@ -25,7 +25,7 @@ else
     echo "GNU Stow already installed."
 fi
 
-TOOLBOX_SCRIPT_DIRECTORY="$(dirname "$(readlink -f "$0")")"
+TOOLBOX_SCRIPT_DIRECTORY="$(dirname "$(readlink -f -- "$0")")"
 
 STOW_DIR="${TOOLBOX_SCRIPT_DIRECTORY}/../stow"
 TARGET_DIR="${HOME}"

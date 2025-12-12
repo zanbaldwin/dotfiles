@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-THIS_DIR="$(dirname "$(readlink -f "$0")")"
+THIS_DIR="$(dirname "$(readlink -f -- "$0")")"
 
 # Get the command requiring `sudo` out of the way first, so that the user can
 # leave this running.

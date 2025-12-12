@@ -32,7 +32,7 @@ services:
       - source: 'dbhealth'
         target: '/usr/local/bin/healthcheck.sh'
     # Don't define port mappings as we only want to be available to other services inside Docker.
-    ports: {}
+    ports: []
     volumes:
       - type: 'bind'
         source: '/mnt/fast/apps/postgres'
@@ -62,7 +62,7 @@ services:
       - source: 'valkey'
         target: '/etc/valkey/valkey.conf'
     # Don't define port mappings as we only want to be available to other services inside Docker.
-    ports: {}
+    ports: []
     command: [ 'valkey-server', '/etc/valkey/valkey.conf' ]
 
 networks:

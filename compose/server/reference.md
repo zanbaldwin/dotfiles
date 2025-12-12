@@ -45,3 +45,9 @@ TrueNAS
 - `postgres/immich`
 - `cloudflare` (DNS Zone API Key)
 - `tailscale` (machine auth key)
+
+# Mounts
+
+```
+nas.lan.zanbaldwin.com:<server-path> <local-path> nfs rw,vers=4.1,proto=tcp,_netdev,nofail,x-systemd.automount,x-systemd.idle=10min,x-systemd.device-timeout=10s 0 0
+```

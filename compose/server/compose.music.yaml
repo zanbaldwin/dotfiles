@@ -4,17 +4,16 @@ services:
   navidrome:
     image: 'deluan/navidrome:0.59.0'
     restart: 'unless-stopped'
-    user: '${PUID:-950}:${PGID:-950}'
+    user: '1000:1000'
     environment:
       TZ: 'Europe/Amsterdam'
     configs:
       - source: 'navidrome'
-        target: '/etc/navidrome.toml'
+        target: '/data/navidrome.toml'
     ports:
       - target: 4533
         published: 4533
         protocol: 'tcp'
-        host_ip: '127.0.0.1'
     volumes:
       - type: 'bind'
         source: '/mnt/fast/apps/navidrome'
@@ -24,7 +23,7 @@ services:
         source: '/mnt/tank4/class2/music'
         target: '/music'
         read_only: true
-    command: [ 'navidrome', '--configfile', '/etc/navidrome.toml' ]
+    command: [ '--configfile', '/data/navidrome.toml' ]
 
 configs:
   navidrome:

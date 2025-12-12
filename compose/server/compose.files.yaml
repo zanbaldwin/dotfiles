@@ -10,13 +10,10 @@ services:
       PUBLIC_URL: 'https://files.lan.zanbaldwin.com'
       SEARCH_DEEP: 'false'
       EDITOR_EXTENSIONS: 'toml,dockerfile,makefile'
-      PUID: '${PUID:-950}'
-      PGID: '${PGID:-950}'
     ports:
       - target: 3000
         published: 3453
         protocol: 'tcp'
-        host_ip: '127.0.0.1'
     volumes:
       - type: 'bind'
         source: '/mnt/fast/apps/explorer'

@@ -1,3 +1,13 @@
+# Database Setup
+# ==============
+#
+# CREATE USER immich WITH ENCRYPTED PASSWORD '<password>';
+# CREATE DATABASE immich;
+# ALTER DATABASE immich OWNER TO immich;
+# \c immich
+# CREATE EXTENSION vchord CASCADE;
+# CREATE EXTENSION earthdistance CASCADE;
+
 name: 'photos'
 services:
 
@@ -33,7 +43,6 @@ services:
       - target: 2283
         published: 2283
         protocol: 'tcp'
-        host_ip: '127.0.0.1'
     volumes:
       - type: 'bind'
         source: '/mnt/tank4/class1/photos'

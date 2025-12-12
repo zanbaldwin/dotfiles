@@ -6,6 +6,7 @@ services:
     restart: 'unless-stopped'
     network_mode: 'host'
     environment:
+      TS_AUTHKEY: 'file:/run/secrets/authkey'
       TS_STATE_DIR: '/var/lib/tailscale'
       TS_AUTH_ONCE: 'true'
       TS_ENABLE_HEALTH_CHECK: 'true'

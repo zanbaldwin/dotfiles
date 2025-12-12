@@ -77,7 +77,7 @@ networks:
 
 secrets:
   dbpass:
-    file: '/mnt/tank4/class1/secrets/postgres'
+    file: '/mnt/tank4/class1/secrets/postgres/main'
 
 configs:
   initdb:

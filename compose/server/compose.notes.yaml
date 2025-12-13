@@ -1,0 +1,44 @@
+name: 'notes'
+services:
+
+  # Database Setup
+  # ==============
+  #   CREATE USER memos WITH ENCRYPTED PASSWORD '<password>';
+  #   CREATE DATABASE memos;
+  #   \c memos
+  #   ALTER DATABASE memos OWNER TO memos;
+  #   ALTER SCHEMA public OWNER TO memos;
+  #   GRANT USAGE, CREATE ON SCHEMA public TO memos;
+  memos:
+    image: 'neosmemo/memos:0.25.3'
+    restart: 'unless-stopped'
+    networks:
+      - 'database'
+    environment:
+      TZ: 'Europe/Amsterdam'
+      MEMOS_MODE: 'prod'
+      MEMOS_ADDR: '0.0.0.0'
+      MEMOS_PORT: '5230'
+      MEMOS_DATA: '/var/opt/memos'
+      MEMOS_DRIVER: 'postgres'
+      MEMOS_DSN_FILE: '/run/secrets/memodsn'
+      MEMOS_INSTANCE_URL: 'https://notes.lan.zanbaldwin.com'
+    secrets:
+      - 'memodsn'
+    ports:
+      - target: 5230
+        published: 5230
+        protocol: 'tcp'
+    volumes:
+      - type: 'bind'
+        source: '/mnt/fast/apps/memos'
+        target: '/var/opt/memos'
+        read_only: false
+
+networks:
+  database:
+    external: true
+
+secrets:
+  memodsn:
+    file: '/mnt/tank4/class1/secrets/postgres/memos_dsn'

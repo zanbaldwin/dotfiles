@@ -1,16 +1,14 @@
-# Database Setup
-# ==============
-#
-# CREATE USER immich WITH ENCRYPTED PASSWORD '<password>';
-# CREATE DATABASE immich;
-# ALTER DATABASE immich OWNER TO immich;
-# \c immich
-# CREATE EXTENSION vchord CASCADE;
-# CREATE EXTENSION earthdistance CASCADE;
-
 name: 'photos'
 services:
 
+  # Database Setup
+  # ==============
+  #   CREATE USER immich WITH ENCRYPTED PASSWORD '<password>';
+  #   CREATE DATABASE immich;
+  #   \c immich
+  #   ALTER DATABASE immich OWNER TO immich;
+  #   CREATE EXTENSION vchord CASCADE;
+  #   CREATE EXTENSION earthdistance CASCADE;
   server:
     image: 'ghcr.io/immich-app/immich-server:v2.3.1'
     restart: 'unless-stopped'

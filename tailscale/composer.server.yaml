@@ -1,0 +1,36 @@
+name: 'network'
+services:
+
+  tailscale:
+    image: 'tailscale/tailscale:v1.90.9'
+    restart: 'unless-stopped'
+    network_mode: 'host'
+    environment:
+      TS_AUTHKEY: 'file:/run/secrets/authkey'
+      TS_STATE_DIR: '/var/lib/tailscale'
+      TS_AUTH_ONCE: 'true'
+      TS_ENABLE_HEALTH_CHECK: 'true'
+      TS_LOCAL_ADDR_PORT: '0.0.0.0:8575'
+      TS_ROUTES: '192.168.1.0/24'
+    healthcheck:
+      test: [ 'CMD-SHELL', 'wget --spider -q "http://127.0.0.1:8575/healthz"' ]
+      interval: '30s'
+      timeout: '5s'
+      retries: 5
+      start_period: '30s'
+    secrets:
+      - 'authkey'
+    volumes:
+      - type: 'bind'
+        source: '/mnt/fast/apps/tailscale'
+        target: '/var/lib/tailscale'
+        read_only: false
+    devices:
+      - '/dev/net/tun:/dev/net/tun'
+    cap_add:
+      - 'net_admin'
+      - 'sys_module'
+
+secrets:
+  authkey:
+    file: '/mnt/tank4/class1/secrets/tailscale'

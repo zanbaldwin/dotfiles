@@ -1,0 +1,24 @@
+name: 'books'
+services:
+
+  web:
+    image: 'linuxserver/calibre-web:0.6.25'
+    restart: 'unless-stopped'
+    environment:
+      TZ: 'Europe/Amsterdam'
+      DOCKER_MODS: 'linuxserver/mods:universal-calibre'
+      PUID: '${PUID:-1000}'
+      PGID: '${PGID:-1000}'
+    ports:
+      - target: 8083
+        published: 8083
+        protocol: 'tcp'
+    volumes:
+      - type: 'bind'
+        source: '/mnt/tank4/class1/books/Calibre'
+        target: '/books'
+        read_only: true
+      - type: 'bind'
+        source: '/mnt/fast/apps/calibre'
+        target: '/config'
+        read_only: false

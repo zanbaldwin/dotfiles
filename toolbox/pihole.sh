@@ -16,6 +16,7 @@ apt-get update
 DEBIAN_FRONTEND='noninteractive' apt-get install -y
     'fail2ban' \
     'tailscale' \
+    'ufw' \
     'unbound'
 
 curl -fsSL 'https://install.pi-hole.net' -o '/tmp/pihole.sh'
@@ -119,3 +120,12 @@ bash '/tmp/pihole.sh'
 
 # The following command is interactive...
 tailscale up --accept-dns=false
+
+# Local Network
+ufw allow from '192.168.0.0/16' to any port 443
+ufw allow from '192.168.0.0/16' to any port 22
+# Tailscale
+ufw allow from '100.64.0.0/10' to any port 443
+ufw allow from '100.64.0.0/10' to any port 22
+systemctl enable --now 'ufw'
+ufw enable

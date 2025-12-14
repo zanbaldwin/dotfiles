@@ -11,6 +11,7 @@ services:
       TS_ENABLE_HEALTH_CHECK: 'true'
       TS_LOCAL_ADDR_PORT: '0.0.0.0:8575'
       TS_EXTRA_ARGS: '--accept-routes'
+      TS_USERSPACE: 'false'
     healthcheck:
       test: [ 'CMD-SHELL', 'wget --spider -q "http://127.0.0.1:8575/healthz"' ]
       interval: '30s'

@@ -11,7 +11,12 @@ services:
       TS_AUTH_ONCE: 'true'
       TS_ENABLE_HEALTH_CHECK: 'true'
       TS_LOCAL_ADDR_PORT: '0.0.0.0:8575'
+      # To forward to subnets, use kernel networking with the following options:
+      # # /etc/sysctl.d/99-tailscale.conf
+      # net.ipv4.ip_forward = 1
+      # net.ipv6.conf.all.forwarding = 1
       TS_ROUTES: '192.168.1.0/24'
+      TS_USERSPACE: 'false'
     healthcheck:
       test: [ 'CMD-SHELL', 'wget --spider -q "http://127.0.0.1:8575/healthz"' ]
       interval: '30s'

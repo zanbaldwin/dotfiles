@@ -1,0 +1,60 @@
+name: 'backup'
+services:
+
+  backrest:
+    image: 'garethgeorge/backrest:v1.10.1'
+    restart: 'unless-stopped'
+    deploy:
+      resources:
+        limits:
+          memory: '512M'
+    environment:
+      TZ: 'Europe/Amsterdam'
+      BACKREST_DATA: '/data'
+      BACKREST_CONFIG: '/config/config.json'
+      XDG_CACHE_HOME: '/cache'
+      BACKREST_PORT: '9898'
+    secrets:
+      - 'backblaze_id'
+      - 'backblaze_key'
+    ports:
+      - target: 9898
+        published: 9898
+        protocol: 'tcp'
+    volumes:
+      # Backrest application data
+      - type: 'bind'
+        source: '/mnt/fast/apps/backrest/data'
+        target: '/data'
+        read_only: false
+      - type: 'bind'
+        source: '/mnt/fast/apps/backrest/config'
+        target: '/config'
+        read_only: false
+      - type: 'bind'
+        source: '/mnt/fast/apps/backrest/cache'
+        target: '/cache'
+        read_only: false
+      # Backup sources (read-only)
+      - type: 'bind'
+        source: '/mnt/tank4/class1'
+        target: '/source/class1'
+        read_only: true
+      - type: 'bind'
+        source: '/mnt/tank4/class2'
+        target: '/source/class2'
+        read_only: true
+      - type: 'bind'
+        source: '/mnt/tank4/backups'
+        target: '/source/backups'
+        read_only: true
+      - type: 'bind'
+        source: '/mnt/fast/apps'
+        target: '/source/apps'
+        read_only: true
+
+secrets:
+  backblaze_id:
+    file: '/mnt/tank4/class1/secrets/backblaze/id'
+  backblaze_key:
+    file: '/mnt/tank4/class1/secrets/backblaze/key'

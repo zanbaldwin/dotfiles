@@ -15,7 +15,8 @@ TrueNAS
  │       ├─ proxy
  │       │   ├─ config
  │       │   └─ certs
- │       └─ tailscale
+ │       ├─ tailscale
+ │       └─ backrest
  └─ pool(tank4)
      ├─ class1
      │   ├─ secrets
@@ -30,6 +31,7 @@ TrueNAS
 
 | Service                | Port   | Proxy Domain                 |
 |------------------------|--------|------------------------------|
+| Backrest               | `9898` | `backup.lan.zanbaldwin.com`  |
 | Calibre Web            | `8083` | `books.lan.zanbaldwin.com`   |
 | Container Updates      | `8321` | `cup.nas.lan.zanbaldwin.com` |
 | Next Explorer          | `3453` | `files.lan.zanbaldwin.com`   |

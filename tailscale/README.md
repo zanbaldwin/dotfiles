@@ -13,5 +13,6 @@ My TrueNAS server is running Immich as a service. When connected to my home LAN,
 
 On my Tailnet, I have set my TrueNAS server to be a subnet router for `192.168.1.0/24` (approved in the admin console), and have set the kernel settings described in `truenas-tailscale-settings.conf`.
 
+> I have a connection to my server via TeamViewer in order to manually execute commands if you need me to, but I cannot copy and paste output back to you.
+
 You are running on my laptop, and you need to diagnose why I can't access Immich through `photos.lan.zanbaldwin.com`.
-I have a connection to my server via TeamViewer in order to manually execute commands if you need me to, but I cannot copy and paste output back to you.

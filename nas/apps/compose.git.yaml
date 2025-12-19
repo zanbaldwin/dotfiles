@@ -1,0 +1,51 @@
+name: 'git'
+services:
+
+  forgejo:
+    image: 'codeberg.org/forgejo/forgejo:13.0.3'
+    restart: 'unless-stopped'
+    networks:
+      - 'database'
+    depends_on:
+      postgres:
+        condition: 'service_healthy'
+    environment:
+      TZ: 'Europe/Amstedam'
+      USER_UID: '${PUID:-1000}'
+      USER_GID: '${PGID:-1000}'
+      FORGEJO__database__DB_TYPE: 'postgres'
+      FORGEJO__database__HOST: 'postgres:5432'
+      FORGEJO__database__NAME: 'forgejo'
+      FORGEJO__database__USER: 'forgejo'
+      FORGEJO__database__PASSWD__FILE: '/run/secrets/dbpass'
+    configs:
+      - source: 'forgejo'
+        target: '/etc/forgejo/app.ini'
+    ports:
+      - target: 3000
+        published: 3645
+        protocol: 'tcp'
+      - target: 22
+        published: 484
+        protocol: 'tcp'
+    volumes:
+      - type: 'bind'
+        source: '/mnt/tank4/class2/code'
+        target: '/data'
+        read_only: false
+      - type: 'bind'
+        source: '/etc/localtime'
+        target: '/etc/localtime'
+        read_only: true
+      - type: 'bind'
+        source: '/etc/timezone'
+        target: '/etc/timezone'
+        read_only: true
+
+secrets:
+  dbpass:
+    file: '/mnt/tank4/class1/secrets/postgres/forgejo'
+
+configs:
+  forgejo:
+    content: ''

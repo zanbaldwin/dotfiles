@@ -42,8 +42,6 @@
             }
         ]
     },
-    // Files / Trimming
-    "editor.formatOnSave": true,
     "files.autoSave": "onFocusChange",
     "files.eol": "\n",
     "files.trimFinalNewlines": true,
@@ -73,23 +71,13 @@
     "rust-analyzer.inlayHints.parameterHints": true,
     "rust-analyzer.lens.enable": false,
     "telemetry.telemetryLevel": "off",
-    // Terminal
-    "terminal.integrated.defaultProfile.linux": "flatpak-bash",
-    "terminal.integrated.profiles.linux": {
-        "flatpak-bash": {
-            "args": [
-                "bash"
-            ],
-            "path": "host-spawn"
-        }
-    },
     // Theme
     //"workbench.colorTheme": "React Theme",
     "workbench.editor.autoLockGroups": {
         "mainThreadWebview-markdown.preview": true
     },
     "workbench.fontAliasing": "auto",
-    "workbench.iconTheme": "material-icon-theme",
+    "workbench.iconTheme": "gruvbox-material-icon-theme",
     "material-icon-theme.saturation": 0.75,
     // Recommended Settings
     "editor.emptySelectionClipboard": false,
@@ -102,7 +90,7 @@
     // Minimalistic Editor (Silence the Noise)
     "breadcrumbs.enabled": false,
     "scm.diffDecorations": "all",
-    "editor.hover.enabled": true,
+    "editor.hover.enabled": "on",
     "editor.matchBrackets": "near",
     "workbench.tips.enabled": false,
     "editor.colorDecorators": false,
@@ -128,7 +116,18 @@
     "window.menuBarVisibility": "toggle",
     "[typst]": {
         "editor.wordSeparators": "`~!@#$%^&*()=+[{]}\\|;:'\",.<>/?",
-        "editor.formatOnSave": true
+    },
+    "[markdown]": {
+        "editor.unicodeHighlight.ambiguousCharacters": true,
+        "editor.unicodeHighlight.invisibleCharacters": false,
+        "diffEditor.ignoreTrimWhitespace": false,
+        "editor.formatOnSave": false,
+        "editor.wordWrap": "on",
+        "editor.quickSuggestions": {
+            "comments": "off",
+            "strings": "off",
+            "other": "off"
+        }
     },
     "[typst-code]": {
         "editor.wordSeparators": "`~!@#$%^&*()=+[{]}\\|;:'\",.<>/?"
@@ -140,4 +139,6 @@
         "*.json5": "jsonc"
     },
     "explorer.confirmDragAndDrop": false,
+    "workbench.secondarySideBar.defaultVisibility": "hidden",
+    "editor.formatOnSave": true
 }

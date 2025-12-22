@@ -31,7 +31,7 @@ services:
         read_only: false
 
   openwebui:
-    image: 'ghcr.io/open-webui/open-webui:v0.6.41'
+    image: 'ghcr.io/open-webui/open-webui:v0.6.43'
     restart: 'unless-stopped'
     environment:
       OLLAMA_BASE_URL: 'http://ollama:11434'

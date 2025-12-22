@@ -1,14 +1,19 @@
 name: 'git'
 services:
 
+  # Database Setup
+  # ==============
+  #   CREATE USER forgejo WITH ENCRYPTED PASSWORD '<password>';
+  #   CREATE DATABASE forgejo;
+  #   \c forgejo
+  #   ALTER DATABASE forgejo OWNER TO forgejo;
+  #   ALTER SCHEMA public OWNER TO forgejo;
+  #   GRANT USAGE, CREATE ON SCHEMA public TO forgejo;
   forgejo:
     image: 'codeberg.org/forgejo/forgejo:13.0.3'
     restart: 'unless-stopped'
     networks:
       - 'database'
-    depends_on:
-      postgres:
-        condition: 'service_healthy'
     environment:
       TZ: 'Europe/Amstedam'
       USER_UID: '${PUID:-1000}'
@@ -19,8 +24,12 @@ services:
       FORGEJO__database__USER: 'forgejo'
       FORGEJO__database__PASSWD__FILE: '/run/secrets/dbpass'
     configs:
+      # Config is actually loaded from `/data/gitea/conf/app.ini`,
+      # but it's good to keep a reference of what should be.
       - source: 'forgejo'
         target: '/etc/forgejo/app.ini'
+    secrets:
+      - 'dbpass'
     ports:
       - target: 3000
         published: 3645
@@ -30,8 +39,12 @@ services:
         protocol: 'tcp'
     volumes:
       - type: 'bind'
-        source: '/mnt/tank4/class2/code'
+        source: '/mnt/tank4/class3/forgejo'
         target: '/data'
+        read_only: false
+      - type: 'bind'
+        source: '/mnt/tank4/class2/code'
+        target: '/data/git/repositories'
         read_only: false
       - type: 'bind'
         source: '/etc/localtime'
@@ -41,6 +54,10 @@ services:
         source: '/etc/timezone'
         target: '/etc/timezone'
         read_only: true
+
+networks:
+  database:
+    external: true
 
 secrets:
   dbpass:

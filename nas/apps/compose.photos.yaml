@@ -22,7 +22,7 @@ services:
     environment:
       TZ: 'Europe/Amsterdam'
       IMMICH_ENV: 'production'
-      IMMICH_MEDIA_LOCATION: '/data/class2'
+      IMMICH_MEDIA_LOCATION: '/data'
       DB_HOSTNAME: 'postgres'
       DB_USERNAME: 'immich'
       DB_PASSWORD_FILE: '/run/secrets/dbpass'
@@ -43,17 +43,17 @@ services:
         protocol: 'tcp'
     volumes:
       - type: 'bind'
-        source: '/mnt/tank4/class1/photos'
-        target: '/data/class1'
-        read_only: true
+        source: '/mnt/tank4/class3/immich'
+        target: '/data'
+        read_only: false
       - type: 'bind'
         source: '/mnt/tank4/class2/photos'
-        target: '/data/class2'
+        target: '/data/library'
         read_only: false
       - type: 'bind'
-        source: '/mnt/fast/apps/immich'
-        target: '/usr/src/app/upload'
-        read_only: false
+        source: '/mnt/tank4/class1/photos'
+        target: '/external'
+        read_only: true
       - type: 'bind'
         source: '/etc/localtime'
         target: '/etc/localtime'
@@ -76,27 +76,39 @@ configs:
   immich:
     content: |
       {
-        "backup": {"database": {
-          "cronExpression": "0 02 * * *",
-          "enabled": false,
-          "keepLastAmount": 14
-        }},
+        "backup": {
+          "database": {
+            "cronExpression": "0 02 * * *",
+            "enabled": false,
+            "keepLastAmount": 14
+          }
+        },
         "ffmpeg": {
           "accel": "vaapi",
           "accelDecode": true,
-          "acceptedAudioCodecs": ["aac", "mp3", "libopus"],
-          "acceptedContainers": ["mov", "ogg", "webm"],
-          "acceptedVideoCodecs": ["av1"],
+          "acceptedAudioCodecs": [
+            "aac",
+            "mp3",
+            "libopus"
+          ],
+          "acceptedContainers": [
+            "mov",
+            "ogg",
+            "webm"
+          ],
+          "acceptedVideoCodecs": [
+            "av1"
+          ],
           "bframes": -1,
           "cqMode": "auto",
-          "crf": 35,
+          "crf": 23,
           "gopSize": 0,
           "maxBitrate": "0",
           "preferredHwDevice": "auto",
           "preset": "faster",
           "refs": 0,
           "targetAudioCodec": "aac",
-          "targetResolution": "1080",
+          "targetResolution": "720",
           "targetVideoCodec": "av1",
           "temporalAQ": false,
           "threads": 0,
@@ -124,26 +136,54 @@ configs:
           }
         },
         "job": {
-          "backgroundTask": {"concurrency": 5},
-          "faceDetection": {"concurrency": 1},
-          "library": {"concurrency": 3},
-          "metadataExtraction": {"concurrency": 3},
-          "migration": {"concurrency": 5},
-          "notifications": {"concurrency": 5},
-          "ocr": {"concurrency": 1},
-          "search": {"concurrency": 5},
-          "sidecar": {"concurrency": 3},
-          "smartSearch": {"concurrency": 1},
-          "thumbnailGeneration": {"concurrency": 2},
-          "videoConversion": {"concurrency": 1},
-          "workflow": {"concurrency": 5}
+          "backgroundTask": {
+            "concurrency": 5
+          },
+          "faceDetection": {
+            "concurrency": 2
+          },
+          "library": {
+            "concurrency": 5
+          },
+          "metadataExtraction": {
+            "concurrency": 5
+          },
+          "migration": {
+            "concurrency": 5
+          },
+          "notifications": {
+            "concurrency": 5
+          },
+          "ocr": {
+            "concurrency": 1
+          },
+          "search": {
+            "concurrency": 5
+          },
+          "sidecar": {
+            "concurrency": 5
+          },
+          "smartSearch": {
+            "concurrency": 2
+          },
+          "thumbnailGeneration": {
+            "concurrency": 3
+          },
+          "videoConversion": {
+            "concurrency": 1
+          },
+          "workflow": {
+            "concurrency": 5
+          }
         },
         "library": {
           "scan": {
-            "cronExpression": "0 0 * * *",
+            "cronExpression": "0 4 * * *",
             "enabled": true
           },
-          "watch": {"enabled": false}
+          "watch": {
+            "enabled": false
+          }
         },
         "logging": {
           "enabled": true,
@@ -178,14 +218,20 @@ configs:
             "minRecognitionScore": 0.8,
             "modelName": "LATIN__PP-OCRv5_mobile"
           },
-          "urls": ["http://desktop.lan.zanbaldwin.com:3003"]
+          "urls": [
+            "http://desktop.lan.zanbaldwin.com:3003"
+          ]
         },
         "map": {
           "darkStyle": "https://tiles.immich.cloud/v1/style/dark.json",
           "enabled": true,
           "lightStyle": "https://tiles.immich.cloud/v1/style/light.json"
         },
-        "metadata": {"faces": {"import": true}},
+        "metadata": {
+          "faces": {
+            "import": true
+          }
+        },
         "newVersionCheck": {
           "enabled": true
         },
@@ -232,17 +278,21 @@ configs:
           "timeout": 30000,
           "tokenEndpointAuthMethod": "client_secret_post"
         },
-        "passwordLogin": {"enabled": true},
-        "reverseGeocoding": {"enabled": true},
+        "passwordLogin": {
+          "enabled": true
+        },
+        "reverseGeocoding": {
+          "enabled": true
+        },
         "server": {
           "externalDomain": "https://photos.lan.zanbaldwin.com",
-          "loginPageMessage": "",
+          "loginPageMessage": "Fuck off, y'all",
           "publicUsers": false
         },
         "storageTemplate": {
           "enabled": true,
           "hashVerificationEnabled": true,
-          "template": "{{filetypefull}}/{{y}}/{{MM}}-{{MMMM}}/W{{WW}}/{{y}}{{MM}}{{dd}}T{{HH}}{{mm}}{{ss}}-{{filename}}"
+          "template": "{{filetypefull}}/{{y}}/{{MM}}-{{MMMM}}/{{y}}{{MM}}{{dd}}T{{HH}}{{mm}}{{ss}}-{{filename}}"
         },
         "templates": {
           "email": {
@@ -251,10 +301,14 @@ configs:
             "welcomeTemplate": ""
           }
         },
-        "theme": {"customCss": ""},
+        "theme": {
+          "customCss": ""
+        },
         "trash": {
           "days": 30,
           "enabled": true
         },
-        "user": {"deleteDelay": 7}
+        "user": {
+          "deleteDelay": 7
+        }
       }

@@ -43,8 +43,11 @@ configs:
     content: |
       #!/bin/sh
       # Prioritize LAN routes over Tailscale subnet routes
-      ip rule add from 192.168.1.0/24 to 192.168.1.0/24 lookup main priority 5200 2>/dev/null || true
-      # Ensure non-LAN traffic to 192.168.1.0/24 uses Tailscale
-      ip rule add from all to 192.168.1.0/24 lookup 52 priority 5255 2>/dev/null || true
+      # When on home LAN (source 192.168.1.x): use direct routing via main table
+      # When on other network: this rule won't match, falls through to Tailscale at priority 5270
+      ip rule add from 192.168.1.0/24 to 192.168.1.0/24 lookup main priority 5000 2>/dev/null || true
+      # TODO: When establishing an SSH connection, Linux doesn't determine the source IP until the rules have been evaluated and an interface chosen.
+      #       Meaning this rule fails and it defaults over to the Tailscale 52 table. Which, due to Tailscale ACLs, will fail to connect.
+      #       However, we still need to keep Tailscale subnet routing in this config so that it can be accessed remotely when AWAY from LAN.
       echo "LAN routes prioritised..."
       exec /usr/local/bin/containerboot "$@"

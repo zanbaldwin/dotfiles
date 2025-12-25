@@ -19,11 +19,15 @@ services:
       timeout: '5s'
       retries: 5
       start_period: '30s'
+    configs:
+      - source: 'init'
+        target: '/init.sh'
     volumes:
       - type: 'volume'
         source: 'tailscale'
         target: '/var/lib/tailscale'
         read_only: false
+    command: [ '/bin/sh', '/init.sh' ]
     devices:
       - '/dev/net/tun:/dev/net/tun'
     cap_add:
@@ -33,3 +37,14 @@ services:
 volumes:
   tailscale:
     driver: 'local'
+
+configs:
+  init:
+    content: |
+      #!/bin/sh
+      # Prioritize LAN routes over Tailscale subnet routes
+      ip rule add from 192.168.1.0/24 to 192.168.1.0/24 lookup main priority 5200 2>/dev/null || true
+      # Ensure non-LAN traffic to 192.168.1.0/24 uses Tailscale
+      ip rule add from all to 192.168.1.0/24 lookup 52 priority 5255 2>/dev/null || true
+      echo "LAN routes prioritised..."
+      exec /usr/local/bin/containerboot "$@"

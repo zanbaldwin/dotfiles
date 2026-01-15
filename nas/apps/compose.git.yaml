@@ -10,7 +10,7 @@ services:
   #   ALTER SCHEMA public OWNER TO forgejo;
   #   GRANT USAGE, CREATE ON SCHEMA public TO forgejo;
   forgejo:
-    image: 'codeberg.org/forgejo/forgejo:13.0.3'
+    image: 'codeberg.org/forgejo/forgejo:14.0'
     restart: 'unless-stopped'
     networks:
       - 'database'

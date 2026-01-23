@@ -1,0 +1,5 @@
+*
+!/skills/**
+!/.gitignore
+!/CLAUDE.md
+!/settings.json

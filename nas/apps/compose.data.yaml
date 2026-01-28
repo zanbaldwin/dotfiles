@@ -44,7 +44,7 @@ services:
     command: [ 'postgres', '-c', 'config_file=/etc/postgresql/postgresql.conf' ]
 
   valkey:
-    image: 'valkey/valkey:9.0-alpine'
+    image: 'valkey/valkey:9.0.1-alpine'
     restart: 'unless-stopped'
     deploy:
       resources:

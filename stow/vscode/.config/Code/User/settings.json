@@ -140,5 +140,25 @@
     },
     "explorer.confirmDragAndDrop": false,
     "workbench.secondarySideBar.defaultVisibility": "hidden",
-    "editor.formatOnSave": true
+    "editor.formatOnSave": true,
+    "RainbowBrackets.depreciation-notice": false,
+    "chat.mcp.access": "none",
+    "chat.mcp.autostart": "never",
+    "chat.mcp.gallery.enabled": true,
+    "gitlens.gitkraken.mcp.autoEnabled": false,
+    "explorer.fileNesting.patterns": {
+        "*.ts": "${capture}.js",
+        "*.js": "${capture}.js.map, ${capture}.min.js, ${capture}.d.ts",
+        "*.jsx": "${capture}.js",
+        "*.tsx": "${capture}.ts",
+        "tsconfig.json": "tsconfig.*.json",
+        "package.json": "package-lock.json, yarn.lock, pnpm-lock.yaml, bun.lockb, bun.lock",
+        "Cargo.toml": "Cargo.lock",
+        "*.sqlite": "${capture}.${extname}-*",
+        "*.db": "${capture}.${extname}-*",
+        "*.sqlite3": "${capture}.${extname}-*",
+        "*.db3": "${capture}.${extname}-*",
+        "*.sdb": "${capture}.${extname}-*",
+        "*.s3db": "${capture}.${extname}-*"
+    }
 }

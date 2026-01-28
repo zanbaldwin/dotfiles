@@ -244,7 +244,7 @@ user_pref("urlclassifier.trackingSkipURLs", "");
 user_pref("urlclassifier.features.socialtracking.skipURLs", "");
 
 // SYNC & VIEW
-user_pref("identity.fxaccounts.enabled", false); // disable Firefox Sync
+user_pref("identity.fxaccounts.enabled", true); // disable Firefox Sync
 user_pref("browser.firefox-view.feature-tour", "{\"screen\":\"\",\"complete\":true}"); // disable the Firefox View tour from popping up
 
 // Incognito HTTPS-only mode: Warn me before loading sites that don't support HTTPS when using Private Browsing windows.
@@ -257,9 +257,9 @@ user_pref("dom.security.https_only_mode_error_page_user_suggestions", true);
 // visit https://github.com/yokoffing/Betterfox/blob/main/Smoothfox.js
 // Enter your scrolling overrides below this line:
 
-    /*************************************************
-     * OPTION: INSTANT SCROLLING (SIMPLE ADJUSTMENT) *
-     *************************************************/
+/*************************************************
+ * OPTION: INSTANT SCROLLING (SIMPLE ADJUSTMENT) *
+ *************************************************/
 // recommended for 60hz+ displays
 user_pref("apz.overscroll.enabled", true); // DEFAULT NON-LINUX
 user_pref("general.smoothScroll", true); // DEFAULT

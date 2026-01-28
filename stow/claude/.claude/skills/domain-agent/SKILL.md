@@ -1,7 +1,6 @@
 ---
-name: 'Domain Agent'
+name: 'domain-agent'
 description: 'Generates specialized, context-rich subagent prompts by exploring the codebase and gathering task-specific requirements'
-context: 'fork'
 disable-model-invocation: true
 user-invocable: true
 allowed-tools: Read, Grep, Glob, WebFetch, WebSearch

@@ -136,7 +136,8 @@
     "tinymist.formatterIndentSize": 4,
     "chat.commandCenter.enabled": false,
     "files.associations": {
-        "*.json5": "jsonc"
+        "*.json5": "jsonc",
+        "*.tf": "hcl"
     },
     "explorer.confirmDragAndDrop": false,
     "workbench.secondarySideBar.defaultVisibility": "hidden",

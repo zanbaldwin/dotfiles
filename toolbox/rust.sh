@@ -81,6 +81,9 @@ command -v 'tokio-console' >'/dev/null' 2>&1        || cargo install 'tokio-cons
 command -v 'cargo-install-update' >'/dev/null' 2>&1 || cargo install 'cargo-update' --locked  # Update all installed binaries
 command -v 'tree-sitter' >'/dev/null' 2>&1          || cargo install 'tree-sitter-cli' --locked
 
+command -v 'typst' >'/dev/null' 2>&1                || cargo install 'typst-cli' --locked     # Typst
+command -v 'typstyle' >'/dev/null' 2>&1             || cargo install 'typstyle' --locked      # Typst Linter/Formatter
+
 # The following are kept for reference, but I don't think I want to use them
 #command -v 'zoxide' >'/dev/null' 2>&1               || cargo install 'zoxide'                 # `cd` alternative
 #command -v 'sccache' >'/dev/null' 2>&1              || cargo install 'sccache'                # Build Artifact Cache

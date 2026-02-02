@@ -1,0 +1,14 @@
+[Unit]
+Description=NFS mount for Music
+After=network-online.target
+Wants=network-online.target
+
+[Mount]
+What=nas.lan.zanbaldwin.com:/mnt/tank4/class2/music
+Where=/home/zan/Music
+Type=nfs
+Options=rw,vers=4.1,proto=tcp,_netdev,nofail
+TimeoutSec=10s
+
+[Install]
+WantedBy=multi-user.target

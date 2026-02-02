@@ -1,57 +1,101 @@
 // VSCode uses too many different paths to load setting depending on how it is
-// installed (Flatpak, RPM, etc). You'll have to manually copy the file contents
+// installed (Flatpak, RPM, etc). You may have to manually copy the file contents
 // over, remembering to copy them back when you make changes.
 {
-    // Get rid of the annoying things
+    "[markdown]": {
+        "diffEditor.ignoreTrimWhitespace": false,
+        "editor.formatOnSave": false,
+        "editor.quickSuggestions": {
+            "comments": "off",
+            "other": "off",
+            "strings": "off"
+        },
+        "editor.unicodeHighlight.ambiguousCharacters": true,
+        "editor.unicodeHighlight.invisibleCharacters": false,
+        "editor.wordWrap": "on"
+    },
+    "[typst-code]": {
+        "editor.wordSeparators": "`~!@#$%^&*()=+[{]}\\|;:'\",.<>/?"
+    },
+    "[typst]": {
+        "editor.wordSeparators": "`~!@#$%^&*()=+[{]}\\|;:'\",.<>/?"
+    },
+    "chat.commandCenter.enabled": false,
+    "chat.mcp.access": "none",
+    "chat.mcp.autostart": "never",
+    "chat.mcp.gallery.enabled": true,
     "diffEditor.codeLens": false,
-    "editor.codeLens": false,
     "diffEditor.ignoreTrimWhitespace": false,
+    "diffEditor.renderSideBySide": false,
     "editor.codeActionsOnSave": {},
-    "explorer.confirmDelete": false,
-    "extensions.ignoreRecommendations": true,
-    "editor.find.autoFindInSelection": "multiline",
-    "editor.inlineSuggest.enabled": true,
+    "editor.codeLens": false,
     "editor.copyWithSyntaxHighlighting": false,
-    // VIEWING
-    "workbench.editor.showTabs": "multiple",
-    "window.zoomLevel": 1.00,
-    "editor.minimap.renderCharacters": false,
+    "editor.cursorBlinking": "phase",
+    "editor.cursorStyle": "line-thin",
+    "editor.detectIndentation": false,
+    "editor.emptySelectionClipboard": false,
+    "editor.find.autoFindInSelection": "multiline",
+    "editor.fontFamily": "'JetBrainsMono Nerd Font', 'JetBrains Mono', 'FiraCode Nerd Font', 'Fira Code', 'UbuntuMono Nerd Font', 'Ubuntu Mono', Menlo, Monaco, monospace",
+    "editor.fontLigatures": true,
+    "editor.fontSize": 15,
+    "editor.formatOnSave": true,
+    "editor.guides.bracketPairs": "active",
+    "editor.inlineSuggest.enabled": true,
+    "editor.inlineSuggest.fontFamily": "'Monaspace Krypton NF', 'Monaspace Krypton', 'JetBrainsMono Nerd Font', 'FiraCode Nerd Font', 'Fira Code', 'UbuntuMono Nerd Font', 'Ubuntu Mono', Menlo, Monaco, monospace",
+    "editor.lineHeight": 1.6,
+    "editor.lineNumbers": "on",
     "editor.minimap.enabled": true,
     "editor.minimap.maxColumn": 120,
-    "editor.lineNumbers": "interval",
+    "editor.minimap.renderCharacters": false,
+    "editor.multiCursorModifier": "alt",
     "editor.renderWhitespace": "trailing",
     "editor.rulers": [
         80,
-        120
+        120,
     ],
-    "editor.guides.indentation": true,
-    "editor.guides.bracketPairs": "active",
-    "editor.cursorBlinking": "phase",
-    "editor.cursorStyle": "line-thin",
-    // Font
-    "editor.fontFamily": "'JetBrainsMono Nerd Font', 'FiraCode Nerd Font', 'Fira Code', 'UbuntuMono Nerd Font', 'Ubuntu Mono', Menlo, Monaco, 'Courier New', monospace",
-    "editor.fontLigatures": true,
+    "editor.snippetSuggestions": "inline",
     "editor.tokenColorCustomizations": {
         "textMateRules": [
             {
                 "scope": "comment",
                 "settings": {
-                    "fontStyle": "italic",
-                    "fontFamily": "'Monaspace Radon', 'JetBrainsMono Nerd Font', 'FiraCode Nerd Font', 'Fira Code', 'UbuntuMono Nerd Font', 'Ubuntu Mono', Menlo, Monaco, 'Courier New', monospace",
+                    "fontFamily": "'Monaspace Radon NF', 'Monaspace Radon', 'JetBrainsMono Nerd Font', 'JetBrains Mono', 'FiraCode Nerd Font', 'Fira Code', 'UbuntuMono Nerd Font', 'Ubuntu Mono', Menlo, Monaco, monospace",
+                    "fontStyle": "italic"
                 }
             }
         ]
     },
+    "explorer.confirmDelete": false,
+    "explorer.confirmDragAndDrop": false,
+    "explorer.fileNesting.patterns": {
+        "*.db": "${capture}.${extname}-*",
+        "*.db3": "${capture}.${extname}-*",
+        "*.js": "${capture}.js.map, ${capture}.min.js, ${capture}.d.ts",
+        "*.jsx": "${capture}.js",
+        "*.s3db": "${capture}.${extname}-*",
+        "*.sdb": "${capture}.${extname}-*",
+        "*.sqlite": "${capture}.${extname}-*",
+        "*.sqlite3": "${capture}.${extname}-*",
+        "*.ts": "${capture}.js",
+        "*.tsx": "${capture}.ts",
+        "Cargo.toml": "Cargo.lock",
+        "package.json": "package-lock.json, yarn.lock, pnpm-lock.yaml, bun.lockb, bun.lock",
+        "tsconfig.json": "tsconfig.*.json"
+    },
+    "extensions.ignoreRecommendations": true,
+    "files.associations": {
+        "*.json5": "jsonc",
+        "*.tf": "hcl",
+        "*.typ": "typst"
+    },
     "files.autoSave": "onFocusChange",
     "files.eol": "\n",
+    "files.insertFinalNewline": true,
     "files.trimFinalNewlines": true,
     "files.trimTrailingWhitespace": true,
-    "files.insertFinalNewline": true,
-    // Git
     "git.autofetch": "all",
     "git.autoStash": true,
     "git.openRepositoryInParentFolders": "never",
-    // Copilot
     "github.copilot.advanced": {},
     "github.copilot.enable": {
         "*": true,
@@ -63,37 +107,43 @@
         "document"
     ],
     "gitlens.currentLine.scrollable": false,
+    "gitlens.gitkraken.mcp.autoEnabled": false,
+    "material-icon-theme.saturation": 0.75,
+    "RainbowBrackets.depreciation-notice": false,
     "redhat.telemetry.enabled": false,
-    // Rust
     "rust-analyzer.inlayHints.bindingModeHints.enable": true,
     "rust-analyzer.inlayHints.lifetimeElisionHints.enable": "skip_trivial",
     "rust-analyzer.inlayHints.lifetimeElisionHints.useParameterNames": true,
     "rust-analyzer.inlayHints.parameterHints": true,
     "rust-analyzer.lens.enable": false,
     "telemetry.telemetryLevel": "off",
-    // Theme
-    //"workbench.colorTheme": "React Theme",
+    "terminal.integrated.defaultProfile.linux": "flatpak-bash",
+    "terminal.integrated.profiles.linux": {
+        "flatpak-bash": {
+            "args": [
+                "--host",
+                "bash"
+            ],
+            "path": "flatpak-spawn"
+        }
+    },
+    "tinymist.formatterIndentSize": 4,
+    "tinymist.formatterMode": "typstyle",
+    "window.nativeFullScreen": true,
+    "window.newWindowDimensions": "inherit",
+    "window.zoomLevel": 0,
     "workbench.editor.autoLockGroups": {
         "mainThreadWebview-markdown.preview": true
     },
+    "workbench.editor.showTabs": "multiple",
     "workbench.fontAliasing": "auto",
     "workbench.iconTheme": "gruvbox-material-icon-theme",
-    "material-icon-theme.saturation": 0.75,
-    // Recommended Settings
-    "editor.emptySelectionClipboard": false,
-    "window.newWindowDimensions": "inherit",
-    "editor.multiCursorModifier": "alt",
-    "diffEditor.renderSideBySide": false,
-    "editor.snippetSuggestions": "inline",
-    "editor.detectIndentation": false,
-    "window.nativeFullScreen": true,
+    "workbench.secondarySideBar.defaultVisibility": "hidden",
+    "workbench.settings.applyToAllProfiles": [],
     // Minimalistic Editor (Silence the Noise)
     "breadcrumbs.enabled": false,
     "scm.diffDecorations": "all",
     "editor.hover.enabled": "on",
-    "editor.matchBrackets": "near",
-    "workbench.tips.enabled": false,
-    "editor.colorDecorators": false,
     "git.decorations.enabled": false,
     "workbench.startupEditor": "none",
     "editor.lightbulb.enabled": "off",
@@ -102,7 +152,7 @@
     "editor.renderLineHighlight": "gutter",
     "editor.occurrencesHighlight": "singleFile",
     "problems.decorations.enabled": false,
-    "editor.renderControlCharacters": false,
+    "editor.renderControlCharacters": true,
     "editor.hideCursorInOverviewRuler": true,
     "editor.gotoLocation.multipleReferences": "goto",
     "editor.gotoLocation.multipleDefinitions": "goto",
@@ -113,53 +163,7 @@
     "workbench.statusBar.visible": true,
     "workbench.activityBar.location": "top",
     "debug.allowBreakpointsEverywhere": true,
-    "window.menuBarVisibility": "toggle",
-    "[typst]": {
-        "editor.wordSeparators": "`~!@#$%^&*()=+[{]}\\|;:'\",.<>/?",
-    },
-    "[markdown]": {
-        "editor.unicodeHighlight.ambiguousCharacters": true,
-        "editor.unicodeHighlight.invisibleCharacters": false,
-        "diffEditor.ignoreTrimWhitespace": false,
-        "editor.formatOnSave": false,
-        "editor.wordWrap": "on",
-        "editor.quickSuggestions": {
-            "comments": "off",
-            "strings": "off",
-            "other": "off"
-        }
-    },
-    "[typst-code]": {
-        "editor.wordSeparators": "`~!@#$%^&*()=+[{]}\\|;:'\",.<>/?"
-    },
-    "tinymist.formatterMode": "typstyle",
-    "tinymist.formatterIndentSize": 4,
-    "chat.commandCenter.enabled": false,
-    "files.associations": {
-        "*.json5": "jsonc",
-        "*.tf": "hcl"
-    },
-    "explorer.confirmDragAndDrop": false,
-    "workbench.secondarySideBar.defaultVisibility": "hidden",
-    "editor.formatOnSave": true,
-    "RainbowBrackets.depreciation-notice": false,
-    "chat.mcp.access": "none",
-    "chat.mcp.autostart": "never",
-    "chat.mcp.gallery.enabled": true,
-    "gitlens.gitkraken.mcp.autoEnabled": false,
-    "explorer.fileNesting.patterns": {
-        "*.ts": "${capture}.js",
-        "*.js": "${capture}.js.map, ${capture}.min.js, ${capture}.d.ts",
-        "*.jsx": "${capture}.js",
-        "*.tsx": "${capture}.ts",
-        "tsconfig.json": "tsconfig.*.json",
-        "package.json": "package-lock.json, yarn.lock, pnpm-lock.yaml, bun.lockb, bun.lock",
-        "Cargo.toml": "Cargo.lock",
-        "*.sqlite": "${capture}.${extname}-*",
-        "*.db": "${capture}.${extname}-*",
-        "*.sqlite3": "${capture}.${extname}-*",
-        "*.db3": "${capture}.${extname}-*",
-        "*.sdb": "${capture}.${extname}-*",
-        "*.s3db": "${capture}.${extname}-*"
-    }
+    "window.menuBarVisibility": "visible",
+    "editor.matchBrackets": "near",
+    "workbench.tips.enabled": false,
 }

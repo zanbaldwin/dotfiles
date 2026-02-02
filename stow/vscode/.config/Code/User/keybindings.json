@@ -1,0 +1,12 @@
+[
+    {
+        "key": "escape",
+        "command": "hideSuggestWidget",
+        "when": "suggestWidgetVisible"
+    },
+    {
+        "key": "shift+escape",
+        "command": "-hideSuggestWidget",
+        "when": "suggestWidgetVisible"
+    }
+]

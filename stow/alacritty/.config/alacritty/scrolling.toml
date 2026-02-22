@@ -1,8 +1,0 @@
-[scrolling]
-# Maximum number of lines in the scrollback buffer.
-# Specifying '0' will disable scrolling.
-# Disable scrolling. Whatever multiplexer being used (Tmux, Zellij, etc)
-# should handle that instead.
-history = 0
-# Scrolling distance multiplier.
-#multiplier = 3

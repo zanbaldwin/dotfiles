@@ -55,3 +55,7 @@ if command -v "podman" >"/dev/null" 2>&1; then
         fi
     }
 fi
+
+if command -v "toolbox" >'/dev/null' 2>&1; then
+    alias tb="toolbox";
+fi

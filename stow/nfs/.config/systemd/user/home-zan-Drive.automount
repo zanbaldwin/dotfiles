@@ -1,6 +1,5 @@
 [Unit]
 Description=Automount NFS Drive
-After=network-online.target
 
 [Automount]
 Where=/home/zan/Drive

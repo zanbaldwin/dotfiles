@@ -1,6 +1,5 @@
 [Unit]
 Description=Automount NFS Music
-After=network-online.target
 
 [Automount]
 Where=/home/zan/Music

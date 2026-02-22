@@ -44,6 +44,6 @@ keybind = "ctrl+,=unbind"
 keybind = shift+enter=text:\x1b\r
 
 # Shaders
-custom-shader-animation = false
-#custom-shader = "./shaders/in-game-crt.glsl"
+custom-shader-animation = true
 #custom-shader = "./shaders/glow-rgbsplit-twitchy.glsl"
+custom-shader = "./shaders/mouse/cursor_blaze_no_trail.glsl"

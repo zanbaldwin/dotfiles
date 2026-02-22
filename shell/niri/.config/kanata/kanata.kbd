@@ -1,0 +1,16 @@
+(defcfg
+  process-unmapped-keys yes
+)
+
+(defsrc
+  caps lsft rsft
+)
+
+(deflayer default
+  @cap @oss @oss
+)
+
+(defalias
+  cap (tap-hold-press 200 200 caps lmet)
+  oss (one-shot 500 lsft)
+)

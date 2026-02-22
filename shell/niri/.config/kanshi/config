@@ -1,0 +1,26 @@
+output "eDP-1" {
+    mode "1920x1200@60.001"
+    scale 1.0
+    transform "normal"
+    alias $INTERNAL
+}
+
+profile laptop {
+    output $INTERNAL enable
+}
+
+profile docked-ultrawide {
+    output $INTERNAL enable
+    output DP-1 enable mode 5120x2160 scale 1.0 position -1600,-2160
+}
+
+profile docked-4k {
+    output $INTERNAL enable
+    output DP-2 enable mode 3840x2160 scale 1.0 position 1280,0
+}
+
+profile double-docked-4k {
+    output $INTERNAL disable
+    output DP-2 enable mode 3840x2160 scale 1.0 position 0,0
+    output DP-3 enable mode 3840x2160 scale 1.0 position 3840,0
+}

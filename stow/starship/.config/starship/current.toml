@@ -8,6 +8,7 @@ $status\
 $os\
 $username\
 $hostname\
+$container\
 [ ](bg:orange)\
 [ ](bg:yellow fg:orange)\
 $directory\
@@ -110,7 +111,7 @@ Pop = ""
 show_always = true
 format = '[ $user]($style)'
 disabled = false
-style_user = "bg:orange fg:dark_foreground"
+style_user = "bg:orange fg:dark_foreground bold"
 style_root = "red"
 
 [hostname]
@@ -119,6 +120,11 @@ ssh_only = true
 format = "[$ssh_symbol]($style blue)[$hostname]($style)"
 style = "bg:orange fg:dark_foreground"
 ssh_symbol = "🌐 "
+
+[container]
+format = '[ $symbol $name]($style)'
+style = 'bg:orange fg:dark_red bold'
+disabled = false
 
 [directory]
 home_symbol = "🏠"

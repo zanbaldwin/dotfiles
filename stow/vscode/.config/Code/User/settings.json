@@ -37,7 +37,7 @@
     "editor.find.autoFindInSelection": "multiline",
     "editor.fontFamily": "'JetBrainsMono Nerd Font', 'JetBrains Mono', 'FiraCode Nerd Font', 'Fira Code', 'UbuntuMono Nerd Font', 'Ubuntu Mono', Menlo, Monaco, monospace",
     "editor.fontLigatures": true,
-    "editor.fontSize": 15,
+    "editor.fontSize": 14.5,
     "editor.formatOnSave": true,
     "editor.guides.bracketPairs": "active",
     "editor.inlineSuggest.enabled": true,
@@ -54,38 +54,39 @@
         120,
     ],
     "editor.snippetSuggestions": "inline",
-    "editor.tokenColorCustomizations": {
-        "textMateRules": [
-            {
-                "scope": "comment",
-                "settings": {
-                    "fontFamily": "'Monaspace Radon NF', 'Monaspace Radon', 'JetBrainsMono Nerd Font', 'JetBrains Mono', 'FiraCode Nerd Font', 'Fira Code', 'UbuntuMono Nerd Font', 'Ubuntu Mono', Menlo, Monaco, monospace",
-                    "fontStyle": "italic"
-                }
-            }
-        ]
-    },
+    // "editor.tokenColorCustomizations": {
+    //     "textMateRules": [
+    //         {
+    //             "scope": "comment",
+    //             "settings": {
+    //                 "fontFamily": "'Monaspace Radon NF', 'Monaspace Radon', 'JetBrainsMono Nerd Font', 'JetBrains Mono', 'FiraCode Nerd Font', 'Fira Code', 'UbuntuMono Nerd Font', 'Ubuntu Mono', Menlo, Monaco, monospace",
+    //                 "fontStyle": "italic"
+    //             }
+    //         }
+    //     ]
+    // },
     "explorer.confirmDelete": false,
     "explorer.confirmDragAndDrop": false,
     "explorer.fileNesting.patterns": {
-        "*.db": "${capture}.${extname}-*",
-        "*.db3": "${capture}.${extname}-*",
+        "*.ts": "${capture}.js",
         "*.js": "${capture}.js.map, ${capture}.min.js, ${capture}.d.ts",
         "*.jsx": "${capture}.js",
+        "*.tsx": "${capture}.ts",
+        "tsconfig.json": "tsconfig.*.json",
+        "package.json": "package-lock.json, yarn.lock, pnpm-lock.yaml, bun.lockb, bun.lock",
+        "Cargo.toml": "Cargo.lock",
+        "*.db": "${capture}.${extname}-*",
+        "*.db3": "${capture}.${extname}-*",
         "*.s3db": "${capture}.${extname}-*",
         "*.sdb": "${capture}.${extname}-*",
         "*.sqlite": "${capture}.${extname}-*",
-        "*.sqlite3": "${capture}.${extname}-*",
-        "*.ts": "${capture}.js",
-        "*.tsx": "${capture}.ts",
-        "Cargo.toml": "Cargo.lock",
-        "package.json": "package-lock.json, yarn.lock, pnpm-lock.yaml, bun.lockb, bun.lock",
-        "tsconfig.json": "tsconfig.*.json"
+        "*.sqlite3": "${capture}.${extname}-*"
     },
     "extensions.ignoreRecommendations": true,
     "files.associations": {
         "*.json5": "jsonc",
         "*.tf": "hcl",
+        "*.tfvars": "hcl",
         "*.typ": "typst"
     },
     "files.autoSave": "onFocusChange",
@@ -118,6 +119,7 @@
     "rust-analyzer.lens.enable": false,
     "telemetry.telemetryLevel": "off",
     "terminal.integrated.defaultProfile.linux": "flatpak-bash",
+    "terminal.integrated.fontSize": 15,
     "terminal.integrated.profiles.linux": {
         "flatpak-bash": {
             "args": [
@@ -131,7 +133,7 @@
     "tinymist.formatterMode": "typstyle",
     "window.nativeFullScreen": true,
     "window.newWindowDimensions": "inherit",
-    "window.zoomLevel": 0,
+    "window.zoomLevel": 0.5,
     "workbench.editor.autoLockGroups": {
         "mainThreadWebview-markdown.preview": true
     },
@@ -139,7 +141,12 @@
     "workbench.fontAliasing": "auto",
     "workbench.iconTheme": "gruvbox-material-icon-theme",
     "workbench.secondarySideBar.defaultVisibility": "hidden",
-    "workbench.settings.applyToAllProfiles": [],
+    "yaml.format.enable": true,
+    "yaml.format.singleQuote": true,
+    "yaml.format.bracketSpacing": true,
+    "yaml.format.printWidth": 120,
+    "yaml.format.trailingComma": true,
+    "yaml.format.proseWrap": "preserve",
     // Minimalistic Editor (Silence the Noise)
     "breadcrumbs.enabled": false,
     "scm.diffDecorations": "all",
@@ -166,4 +173,6 @@
     "window.menuBarVisibility": "visible",
     "editor.matchBrackets": "near",
     "workbench.tips.enabled": false,
+    "terminal.integrated.lineHeight": 1.2,
+    "editor.inlineSuggest.edits.showCollapsed": true,
 }

@@ -21,10 +21,10 @@ if command -v 'dnf' >'/dev/null' 2>&1; then
         'openssl-devel' \
         'perl' \
         'pkg-config'
-elif command -v 'apt' >'/dev/null' 2>&1; then
+elif command -v 'apt-get' >'/dev/null' 2>&1; then
     # Using Ubuntu now, use Ubuntu package manager and package names.
-    sudo apt update
-    sudo apt install -y \
+    sudo apt-get update
+    sudo apt-get install -y \
         'build-essential' \
         'clang' \
         'cmake' \
@@ -61,6 +61,7 @@ command -v 'onefetch' >'/dev/null' 2>&1             || cargo install 'onefetch' 
 command -v 'zellij' >'/dev/null' 2>&1               || cargo install 'zellij' --locked    # Terminal Multiplexer (tmux replacement)
 command -v 'atuin' >'/dev/null' 2>&1                || cargo install 'atuin' --locked     # Better Bash History
 command -v 'rg' >'/dev/null' 2>&1                   || cargo install 'ripgrep' --locked   # It's just fast
+command -v 'fnm' >'/dev/null' 2>&1                  || cargo install 'fnm' --locked       # Fast Node Manager
 
 # Other tools that I want to try to start using more
 # Useful Rust binaries that I want on my machine, or tools I want to try to

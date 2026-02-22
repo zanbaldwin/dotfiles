@@ -8,5 +8,15 @@
         "key": "shift+escape",
         "command": "-hideSuggestWidget",
         "when": "suggestWidgetVisible"
+    },
+    {
+        "key": "escape",
+        "command": "closeFindWidget",
+        "when": "editorFocus && findWidgetVisible && !isComposing"
+    },
+    {
+        "key": "shift+escape",
+        "command": "-closeFindWidget",
+        "when": "editorFocus && findWidgetVisible && !isComposing"
     }
 ]

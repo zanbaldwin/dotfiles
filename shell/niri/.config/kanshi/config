@@ -1,26 +1,47 @@
 output "eDP-1" {
-    mode "1920x1200@60.001"
     scale 1.0
-    transform "normal"
     alias $INTERNAL
+}
+output "Samsung Electric Company LU28R55 H4ZT600868" {
+    scale 1.0
+    alias $LEFT4K
+}
+output "Samsung Electric Company LU28R55 BROKEN" {
+    alias $RIGHT4K
+}
+output "Philips Consumer Electronics Company PHL 499P9 AU02345007801" {
+    scale 1.0
+    alias $ULTRAWIDE
 }
 
 profile laptop {
-    output $INTERNAL enable
+    output $INTERNAL enable position 0,0
 }
-
 profile docked-ultrawide {
-    output $INTERNAL enable
-    output DP-1 enable mode 5120x2160 scale 1.0 position -1600,-2160
+    output $INTERNAL enable position 1600,1440
+    output $ULTRAWIDE enable position 0,0
+}
+profile docked-4k-left {
+    output $INTERNAL enable position 2880,2160
+    output $LEFT4K enable position 0,0
+}
+profile docked-4k-right {
+    output $INTERNAL enable position 0,2160
+    output $RIGHT4K enable position 960,0
+}
+profile docked-4k-both {
+    output $INTERNAL enable position 2880,2160
+    output $LEFT4K enable position 0,0
+    output $RIGHT4K enable position 3840,0
 }
 
-profile docked-4k {
-    output $INTERNAL enable
-    output DP-2 enable mode 3840x2160 scale 1.0 position 1280,0
+profile desktop-left {
+    output $LEFT4K enable position 0,0
 }
-
-profile double-docked-4k {
-    output $INTERNAL disable
-    output DP-2 enable mode 3840x2160 scale 1.0 position 0,0
-    output DP-3 enable mode 3840x2160 scale 1.0 position 3840,0
+profile desktop-right {
+    output $RIGHT4K enable position 0,0
+}
+profile desktop-both {
+    output $LEFT4K enable position 0,0
+    output $RIGHT4K enable position 3840,0
 }

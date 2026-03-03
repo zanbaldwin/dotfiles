@@ -3,14 +3,13 @@
 )
 
 (defsrc
-  caps lsft rsft
+  caps
 )
 
 (deflayer default
-  @cap @oss @oss
+  @cap
 )
 
 (defalias
-  cap (tap-hold-press 200 200 caps lmet)
-  oss (one-shot 500 lsft)
+  cap (tap-hold-press 300 300 caps lmet)
 )

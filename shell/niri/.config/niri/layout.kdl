@@ -1,8 +1,15 @@
+// Example: enable rounded corners for all windows.
+// (This example rule is commented out with a "/-" in front.)
+window-rule {
+    geometry-corner-radius 20
+    clip-to-geometry true
+}
+
 // Settings that influence how windows are positioned and sized.
 // Find more information on the wiki:
 // https://niri-wm.github.io/niri/Configuration:-Layout
 layout {
-    // Set gaps around windows in logical pixels.
+    // A gap of 16px for the default screen (the internal laptop screen).
     gaps 16
 
     // When to center a column when changing focus, options are:
@@ -11,7 +18,12 @@ layout {
     // - "always", the focused column will always be centered.
     // - "on-overflow", focusing a column will center it if it doesn't fit
     //   together with the previously focused column.
-    center-focused-column "on-overflow"
+    center-focused-column "always"
+    always-center-single-column
+    empty-workspace-above-first
+    default-column-display "normal"
+    // If you leave the brackets empty, the windows themselves will decide their initial width.
+    default-column-width {}
 
     // You can customize the widths that "switch-preset-column-width" (Mod+R) toggles between.
     preset-column-widths {
@@ -21,18 +33,12 @@ layout {
         proportion 0.33333
         proportion 0.5
         proportion 0.66667
-
         // Fixed sets the width in logical pixels exactly.
         // fixed 1920
     }
 
     // You can also customize the heights that "switch-preset-window-height" (Mod+Shift+R) toggles between.
     // preset-window-heights { }
-
-    // You can change the default width of the new windows.
-    default-column-width { proportion 0.5; }
-    // If you leave the brackets empty, the windows themselves will decide their initial width.
-    // default-column-width {}
 
     // By default focus ring and border are rendered as a solid background rectangle
     // behind windows. That is, they will show up through semitransparent windows.
@@ -59,7 +65,7 @@ layout {
         // - CSS-like notation: "rgb(255, 127, 0)", rgba(), hsl() and a few others.
 
         // Color of the ring on the active monitor.
-        active-color "#7fc8ff"
+        active-color "#247e4d"
 
         // Color of the ring on inactive monitors.
         //
@@ -87,20 +93,20 @@ layout {
     border {
         // The settings are the same as for the focus ring.
         // If you enable the border, you probably want to disable the focus ring.
-
-        width 2
-        active-color "#89b4fa"
-        inactive-color "#313244"
+        on
+        width 3
+        // active-color "#1fa15e"
+        // inactive-color "#49567e"
 
         // Color of the border around windows that request your attention.
-        urgent-color "#9b0000"
+        urgent-color "#840303"
 
         // Gradients can use a few different interpolation color spaces.
         // For example, this is a pastel rainbow gradient via in="oklch longer hue".
         //
-        // active-gradient from="#e5989b" to="#ffb4a2" angle=45 relative-to="workspace-view" in="oklch longer hue"
+        active-gradient from="#1c7845" to="#73b115" angle=45 relative-to="workspace-view" // in="oklch longer hue"
 
-        // inactive-gradient from="#505050" to="#808080" angle=45 relative-to="workspace-view"
+        inactive-gradient from="#343e5b" to="#3a3175" angle=45 relative-to="workspace-view"
     }
 
     // You can enable drop shadows for windows.
@@ -128,13 +134,13 @@ layout {
         // pixels and match the CSS box-shadow properties.
 
         // Softness controls the shadow blur radius.
-        softness 30
+        softness 25
 
         // Spread expands the shadow.
-        spread 5
+        spread 10
 
         // Offset moves the shadow relative to the window.
-        offset x=0 y=5
+        offset x=0 y=0
 
         // You can also change the shadow color and opacity.
         color "#0007"

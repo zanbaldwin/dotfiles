@@ -37,19 +37,7 @@ animations {
     // off
 
     // Slow down all animations by this factor. Values below 1 speed them up instead.
-    // slowdown 3.0
+    slowdown 1.4
 }
-
-
-
-// Example: enable rounded corners for all windows.
-// (This example rule is commented out with a "/-" in front.)
-window-rule {
-    geometry-corner-radius 20
-    clip-to-geometry true
-}
-
-workspace "personal"
-workspace "wedevelop"
 
 include "keybinds.kdl"

@@ -2,10 +2,10 @@
 THIS_DIR="$(dirname "$(readlink -f -- "$0")")"
 
 # Niri
-sudo dnf install  --setopt=install_weak_deps=False --assumeyes 'niri'
+sudo dnf install --setopt=install_weak_deps=False --assumeyes 'niri'
 
 # Kanshi
-sudo dnf install  --setopt=install_weak_deps=False --assumeyes 'kanshi'
+sudo dnf install --setopt=install_weak_deps=False --assumeyes 'kanshi'
 
 # Kanata
 cargo install --locked 'kanata'
@@ -23,7 +23,15 @@ sudo udevadm control --reload-rules && sudo udevadm trigger
 systemctl --user enable 'kanata.service'
 
 # Quickshell
-sudo dnf install  --setopt=install_weak_deps=False --assumeyes 'jemalloc'
+sudo dnf install --setopt=install_weak_deps=False --assumeyes 'jemalloc'
 toolbox rm -f quickshell || true
 toolbox create quickshell
 toolbox run --container='quickshell' bash "${THIS_DIR}/toolbox.sh"
+
+# Utilities
+sudo dnf install --setopt=install_weak_deps=False --assumeyes \
+    'brightnessctl' \
+    'playerctl' \
+    'swayidle' \
+    'swaylock' \
+    'wpctl'

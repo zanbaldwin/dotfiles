@@ -4,9 +4,40 @@
 // Find more information on the wiki:
 // https://niri-wm.github.io/niri/Configuration:-Outputs
 // Remember to uncomment the node by removing "/-"!
+
+gestures {
+    hot-corners {
+        off
+    }
+}
+
 output "eDP-1" {
     mode "1920x1200@60.001"
     scale 1.0
     transform "normal"
-    // Do NOT use variable refresh rate for the internal screen!
+    focus-at-startup
+}
+
+output "Samsung Electric Company LU28R55 H4ZT600868" {
+    mode "3840x2160@60.000"
+    scale 1.0
+    transform "normal"
+    focus-at-startup
+    layout {
+        gaps 32
+    }
+}
+
+output "Samsung Electric Company LU28R55 BROKEN" {
+    mode "3840x2160@60.000"
+    scale 1.0
+    transform "normal"
+    focus-at-startup
+}
+
+output "Philips Consumer Electronics Company PHL 499P9 AU02345007801" {
+    mode "5120x1440@59.977"
+    scale 1.0
+    transform "normal"
+    focus-at-startup
 }

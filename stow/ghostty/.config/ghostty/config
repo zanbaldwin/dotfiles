@@ -11,7 +11,7 @@ window-width = 200
 clipboard-trim-trailing-spaces = true
 
 # Shell
-command = "zellij attach --create"
+command = "zellij"
 # Pass Ctrl+Shift+C through to Zellij to copy
 # pane selection, not terminal selection.
 keybind = "ctrl+shift+c=unbind"

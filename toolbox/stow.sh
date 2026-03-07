@@ -9,6 +9,7 @@ mkdir -p \
     "${HOME}/.config/flakes" \
     "${HOME}/.config/systemd/user/default.target.wants" \
     "${HOME}/.local/share/applications" \
+    "${HOME}/.local/share/icons/hicolor/scalable/apps" \
     "${HOME}/.ssh/conf.d" \
     "${HOME}/.ssh/keys" \
     "${HOME}/.dotfiles/stow/vscode/.var/app/com.visualstudio.code/config/Code"

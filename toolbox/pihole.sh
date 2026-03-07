@@ -1,6 +1,10 @@
 #!/usr/bin/env bash
 # Assuming "Raspberry Pi Trixie (64bit)"
 
+# WARNING!
+# This script includes interactive commands.
+# It should be used as a REFERENCE, and NOT be executed directly.
+
 apt-get update
 DEBIAN_FRONTEND="noninteractive" apt-get upgrade -y
 DEBIAN_FRONTEND="noninteractive" apt-get install -y \
@@ -13,7 +17,7 @@ curl -fsSL "https://pkgs.tailscale.com/stable/raspbian/${DEBIAN_VERSION}.noarmor
 curl -fsSL "https://pkgs.tailscale.com/stable/raspbian/${DEBIAN_VERSION}.tailscale-keyring.list" | tee '/etc/apt/sources.list.d/tailscale.list'
 apt-get update
 
-DEBIAN_FRONTEND='noninteractive' apt-get install -y
+DEBIAN_FRONTEND='noninteractive' apt-get install -y \
     'fail2ban' \
     'tailscale' \
     'ufw' \
@@ -73,6 +77,15 @@ server:
     private-address: 203.0.113.0/24
     private-address: 255.255.255.255/32
     private-address: 2001:db8::/32
+    # Increase TCP connection limits (default 10 is too low for Pi-hole FTL)
+    incoming-num-tcp: 50
+    outgoing-num-tcp: 20
+    # Constrain memory usage for low-RAM devices
+    msg-cache-size: 16m
+    rrset-cache-size: 32m
+    key-cache-size: 16m
+    # Disable subnetcache module (not needed for a local resolver, saves memory)
+    module-config: "validator iterator"
 forward-zone:
     # Forward all Tailscale domains to their MagicDNS
     name: 'ts.net.'
@@ -96,7 +109,7 @@ cat >'/etc/logrotate.d/unbound' <<EOF
 EOF
 systemctl disable --now 'unbound-resolvconf.service'
 systemctl restart 'unbound'
-systemctl restart 'logrotate'
+systemctl enable 'logrotate.timer'
 
 # cat >'/etc/pihole/setupVars.conf' <<EOF
 # WEBPASSWORD=<some_double_sha256_hash>
@@ -109,7 +122,8 @@ systemctl restart 'logrotate'
 # PIHOLE_DNS_1=127.0.0.1#5335
 # DNS_FQDN_REQUIRED=true
 # DNS_BOGUS_PRIV=true
-# DNSSEC=true
+# # DNS is already validated by Unbound, double-validation is redundant.
+# DNSSEC=false
 # TEMPERATUREUNIT=C
 # WEBUIBOXEDLAYOUT=traditional
 # API_QUERY_LOG_SHOW=all
@@ -123,9 +137,11 @@ tailscale up --accept-dns=false
 
 # Local Network
 ufw allow from '192.168.0.0/16' to any port 443
+ufw allow from '192.168.0.0/16' to any port 53
 ufw allow from '192.168.0.0/16' to any port 22
 # Tailscale
 ufw allow from '100.64.0.0/10' to any port 443
+ufw allow from '100.64.0.0/10' to any port 53
 ufw allow from '100.64.0.0/10' to any port 22
 systemctl enable --now 'ufw'
 ufw enable

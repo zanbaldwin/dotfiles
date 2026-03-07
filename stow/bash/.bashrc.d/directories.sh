@@ -64,3 +64,8 @@ alias cd..="cd .."
 alias back="cd -"
 alias cdgit='cd $(git rev-parse --show-toplevel)'
 alias mkdir="mkdir -pv"
+
+function mkcd {
+    mkdir -pv "${1}" || return $?
+    cd "${1}" || return $?
+}

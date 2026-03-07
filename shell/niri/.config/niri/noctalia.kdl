@@ -2,7 +2,9 @@
 // Note that running niri as a session supports xdg-desktop-autostart,
 // which may be more convenient to use.
 // See the binds section below for more spawn examples.
-spawn-sh-at-startup "qs -c 'noctalia' --no-duplicate"
+
+// Quickshell is started using SystemD instead.
+// spawn-sh-at-startup "qs -c 'noctalia' --no-duplicate"
 
 // Set the overview wallpaper on the backdrop.
 layer-rule {
@@ -13,10 +15,4 @@ layer-rule {
 debug {
   // Allows notification actions and window activation from Noctalia.
   honor-xdg-activation-with-invalid-serial
-}
-
-// Set the overview wallpaper on the backdrop.
-layer-rule {
-  match namespace="^noctalia-overview*"
-  place-within-backdrop true
 }

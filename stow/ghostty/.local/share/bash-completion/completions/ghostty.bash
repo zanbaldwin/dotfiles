@@ -1,5 +1,11 @@
 _ghostty() {
 
+  # compat: mapfile -t COMPREPLY < <( "$@" )
+  _compreply() {
+    COMPREPLY=()
+    while IFS='' read -r line; do COMPREPLY+=("$line"); done < <( "$@" )
+  }
+
   # -o nospace requires we add back a space when a completion is finished
   # and not part of a --key= completion
   _add_spaces() {
@@ -10,16 +16,18 @@ _ghostty() {
 
   _fonts() {
     local IFS=$'\n'
-    mapfile -t COMPREPLY < <( compgen -P '"' -S '"' -W "$($ghostty +list-fonts | grep '^[A-Z]' )" -- "$cur")
+    COMPREPLY=()
+    while read -r line; do COMPREPLY+=("$line"); done < <( compgen -P '"' -S '"' -W "$($ghostty +list-fonts | grep '^[A-Z]' )" -- "$cur")
   }
 
   _themes() {
     local IFS=$'\n'
-    mapfile -t COMPREPLY < <( compgen -P '"' -S '"' -W "$($ghostty +list-themes | sed -E 's/^(.*) \(.*$/\1/')" -- "$cur")
+    COMPREPLY=()
+    while read -r line; do COMPREPLY+=("$line"); done < <( compgen -P '"' -S '"' -W "$($ghostty +list-themes | sed -E 's/^(.*) \(.*$/\1/')" -- "$cur")
   }
 
   _files() {
-    mapfile -t COMPREPLY < <( compgen -o filenames -f -- "$cur" )
+    _compreply compgen -o filenames -f -- "$cur"
     for i in "${!COMPREPLY[@]}"; do
       if [[ -d "${COMPREPLY[i]}" ]]; then
         COMPREPLY[i]="${COMPREPLY[i]}/";
@@ -31,7 +39,7 @@ _ghostty() {
   }
 
   _dirs() {
-    mapfile -t COMPREPLY < <( compgen -o dirnames -d -- "$cur" )
+    _compreply compgen -o dirnames -d -- "$cur"
     for i in "${!COMPREPLY[@]}"; do
       if [[ -d "${COMPREPLY[i]}" ]]; then
         COMPREPLY[i]="${COMPREPLY[i]}/";
@@ -45,6 +53,7 @@ _ghostty() {
   _handle_config() {
     local config="--help"
     config+=" --version"
+    config+=" --language="
     config+=" --font-family="
     config+=" --font-family-bold="
     config+=" --font-family-italic="
@@ -61,6 +70,7 @@ _ghostty() {
     config+=" --font-variation-italic="
     config+=" --font-variation-bold-italic="
     config+=" --font-codepoint-map="
+    config+=" --clipboard-codepoint-map="
     config+=" '--font-thicken '"
     config+=" --font-thicken-strength="
     config+=" --font-shaping-break="
@@ -92,8 +102,11 @@ _ghostty() {
     config+=" --selection-background="
     config+=" '--selection-clear-on-typing '"
     config+=" '--selection-clear-on-copy '"
+    config+=" --selection-word-chars="
     config+=" --minimum-contrast="
     config+=" --palette="
+    config+=" '--palette-generate '"
+    config+=" '--palette-harmonious '"
     config+=" --cursor-color="
     config+=" --cursor-opacity="
     config+=" --cursor-style="
@@ -103,6 +116,7 @@ _ghostty() {
     config+=" '--mouse-hide-while-typing '"
     config+=" --scroll-to-bottom="
     config+=" --mouse-shift-capture="
+    config+=" '--mouse-reporting '"
     config+=" --mouse-scroll-multiplier="
     config+=" --background-opacity="
     config+=" '--background-opacity-cells '"
@@ -110,29 +124,41 @@ _ghostty() {
     config+=" --unfocused-split-opacity="
     config+=" --unfocused-split-fill="
     config+=" --split-divider-color="
+    config+=" --split-preserve-zoom="
+    config+=" --search-foreground="
+    config+=" --search-background="
+    config+=" --search-selected-foreground="
+    config+=" --search-selected-background="
     config+=" --command="
     config+=" --initial-command="
+    config+=" --notify-on-command-finish="
+    config+=" --notify-on-command-finish-action="
+    config+=" --notify-on-command-finish-after="
     config+=" --env="
     config+=" --input="
     config+=" '--wait-after-command '"
     config+=" --abnormal-command-exit-runtime="
     config+=" --scrollback-limit="
+    config+=" --scrollbar="
     config+=" --link="
     config+=" '--link-url '"
     config+=" --link-previews="
     config+=" '--maximize '"
-    config+=" '--fullscreen '"
+    config+=" --fullscreen="
     config+=" --title="
     config+=" --class="
     config+=" --x11-instance-name="
     config+=" --working-directory="
     config+=" --keybind="
+    config+=" --key-remap="
     config+=" --window-padding-x="
     config+=" --window-padding-y="
     config+=" '--window-padding-balance '"
     config+=" --window-padding-color="
     config+=" '--window-vsync '"
     config+=" '--window-inherit-working-directory '"
+    config+=" '--tab-inherit-working-directory '"
+    config+=" '--split-inherit-working-directory '"
     config+=" '--window-inherit-font-size '"
     config+=" --window-decoration="
     config+=" --window-title-font-family="
@@ -200,6 +226,7 @@ _ghostty() {
     config+=" --macos-hidden="
     config+=" '--macos-auto-secure-input '"
     config+=" '--macos-secure-input-indication '"
+    config+=" '--macos-applescript '"
     config+=" --macos-icon="
     config+=" --macos-custom-icon="
     config+=" --macos-icon-frame="
@@ -229,6 +256,7 @@ _ghostty() {
     config+=" --auto-update-channel="
 
     case "$prev" in
+      --language) return ;;
       --font-family) _fonts ;;
       --font-family-bold) _fonts ;;
       --font-family-italic) _fonts ;;
@@ -237,7 +265,7 @@ _ghostty() {
       --font-style-bold) return ;;
       --font-style-italic) return ;;
       --font-style-bold-italic) return ;;
-      --font-synthetic-style) mapfile -t COMPREPLY < <( compgen -W "bold no-bold italic no-italic bold-italic no-bold-italic" -- "$cur" ); _add_spaces ;;
+      --font-synthetic-style) _compreply compgen -W "bold no-bold italic no-italic bold-italic no-bold-italic" -- "$cur"; _add_spaces ;;
       --font-feature) return ;;
       --font-size) return ;;
       --font-variation) return ;;
@@ -245,10 +273,11 @@ _ghostty() {
       --font-variation-italic) return ;;
       --font-variation-bold-italic) return ;;
       --font-codepoint-map) return ;;
+      --clipboard-codepoint-map) return ;;
       --font-thicken) return ;;
       --font-thicken-strength) return ;;
-      --font-shaping-break) mapfile -t COMPREPLY < <( compgen -W "cursor no-cursor" -- "$cur" ); _add_spaces ;;
-      --alpha-blending) mapfile -t COMPREPLY < <( compgen -W "native linear linear-corrected" -- "$cur" ); _add_spaces ;;
+      --font-shaping-break) _compreply compgen -W "cursor no-cursor" -- "$cur"; _add_spaces ;;
+      --alpha-blending) _compreply compgen -W "native linear linear-corrected" -- "$cur"; _add_spaces ;;
       --adjust-cell-width) return ;;
       --adjust-cell-height) return ;;
       --adjust-font-baseline) return ;;
@@ -262,31 +291,35 @@ _ghostty() {
       --adjust-cursor-height) return ;;
       --adjust-box-thickness) return ;;
       --adjust-icon-height) return ;;
-      --grapheme-width-method) mapfile -t COMPREPLY < <( compgen -W "legacy unicode" -- "$cur" ); _add_spaces ;;
-      --freetype-load-flags) mapfile -t COMPREPLY < <( compgen -W "hinting no-hinting force-autohint no-force-autohint monochrome no-monochrome autohint no-autohint" -- "$cur" ); _add_spaces ;;
+      --grapheme-width-method) _compreply compgen -W "legacy unicode" -- "$cur"; _add_spaces ;;
+      --freetype-load-flags) _compreply compgen -W "hinting no-hinting force-autohint no-force-autohint monochrome no-monochrome autohint no-autohint light no-light" -- "$cur"; _add_spaces ;;
       --theme) _themes ;;
       --background) return ;;
       --foreground) return ;;
       --background-image) return ;;
       --background-image-opacity) return ;;
-      --background-image-position) mapfile -t COMPREPLY < <( compgen -W "top-left top-center top-right center-left center-center center-right bottom-left bottom-center bottom-right center" -- "$cur" ); _add_spaces ;;
-      --background-image-fit) mapfile -t COMPREPLY < <( compgen -W "contain cover stretch none" -- "$cur" ); _add_spaces ;;
+      --background-image-position) _compreply compgen -W "top-left top-center top-right center-left center-center center-right bottom-left bottom-center bottom-right center" -- "$cur"; _add_spaces ;;
+      --background-image-fit) _compreply compgen -W "contain cover stretch none" -- "$cur"; _add_spaces ;;
       --background-image-repeat) return ;;
       --selection-foreground) return ;;
       --selection-background) return ;;
       --selection-clear-on-typing) return ;;
       --selection-clear-on-copy) return ;;
+      --selection-word-chars) return ;;
       --minimum-contrast) return ;;
       --palette) return ;;
+      --palette-generate) return ;;
+      --palette-harmonious) return ;;
       --cursor-color) return ;;
       --cursor-opacity) return ;;
-      --cursor-style) mapfile -t COMPREPLY < <( compgen -W "bar block underline block_hollow" -- "$cur" ); _add_spaces ;;
+      --cursor-style) _compreply compgen -W "bar block underline block_hollow" -- "$cur"; _add_spaces ;;
       --cursor-style-blink) return ;;
       --cursor-text) return ;;
       --cursor-click-to-move) return ;;
       --mouse-hide-while-typing) return ;;
-      --scroll-to-bottom) mapfile -t COMPREPLY < <( compgen -W "keystroke no-keystroke output no-output" -- "$cur" ); _add_spaces ;;
-      --mouse-shift-capture) mapfile -t COMPREPLY < <( compgen -W "false true always never" -- "$cur" ); _add_spaces ;;
+      --scroll-to-bottom) _compreply compgen -W "keystroke no-keystroke output no-output" -- "$cur"; _add_spaces ;;
+      --mouse-shift-capture) _compreply compgen -W "false true always never" -- "$cur"; _add_spaces ;;
+      --mouse-reporting) return ;;
       --mouse-scroll-multiplier) return ;;
       --background-opacity) return ;;
       --background-opacity-cells) return ;;
@@ -294,113 +327,126 @@ _ghostty() {
       --unfocused-split-opacity) return ;;
       --unfocused-split-fill) return ;;
       --split-divider-color) return ;;
+      --split-preserve-zoom) _compreply compgen -W "navigation no-navigation" -- "$cur"; _add_spaces ;;
+      --search-foreground) return ;;
+      --search-background) return ;;
+      --search-selected-foreground) return ;;
+      --search-selected-background) return ;;
       --command) return ;;
       --initial-command) return ;;
+      --notify-on-command-finish) _compreply compgen -W "never unfocused always" -- "$cur"; _add_spaces ;;
+      --notify-on-command-finish-action) _compreply compgen -W "bell no-bell notify no-notify" -- "$cur"; _add_spaces ;;
+      --notify-on-command-finish-after) return ;;
       --env) return ;;
       --input) return ;;
       --wait-after-command) return ;;
       --abnormal-command-exit-runtime) return ;;
       --scrollback-limit) return ;;
+      --scrollbar) _compreply compgen -W "system never" -- "$cur"; _add_spaces ;;
       --link) return ;;
       --link-url) return ;;
-      --link-previews) mapfile -t COMPREPLY < <( compgen -W "false true osc8" -- "$cur" ); _add_spaces ;;
+      --link-previews) _compreply compgen -W "false true osc8" -- "$cur"; _add_spaces ;;
       --maximize) return ;;
-      --fullscreen) return ;;
+      --fullscreen) _compreply compgen -W "false true non-native non-native-visible-menu non-native-padded-notch" -- "$cur"; _add_spaces ;;
       --title) return ;;
       --class) return ;;
       --x11-instance-name) return ;;
       --working-directory) _dirs ;;
       --keybind) return ;;
+      --key-remap) return ;;
       --window-padding-x) return ;;
       --window-padding-y) return ;;
       --window-padding-balance) return ;;
-      --window-padding-color) mapfile -t COMPREPLY < <( compgen -W "background extend extend-always" -- "$cur" ); _add_spaces ;;
+      --window-padding-color) _compreply compgen -W "background extend extend-always" -- "$cur"; _add_spaces ;;
       --window-vsync) return ;;
       --window-inherit-working-directory) return ;;
+      --tab-inherit-working-directory) return ;;
+      --split-inherit-working-directory) return ;;
       --window-inherit-font-size) return ;;
-      --window-decoration) mapfile -t COMPREPLY < <( compgen -W "auto client server none" -- "$cur" ); _add_spaces ;;
+      --window-decoration) _compreply compgen -W "auto client server none" -- "$cur"; _add_spaces ;;
       --window-title-font-family) return ;;
-      --window-subtitle) mapfile -t COMPREPLY < <( compgen -W "false working-directory" -- "$cur" ); _add_spaces ;;
-      --window-theme) mapfile -t COMPREPLY < <( compgen -W "auto system light dark ghostty" -- "$cur" ); _add_spaces ;;
-      --window-colorspace) mapfile -t COMPREPLY < <( compgen -W "srgb display-p3" -- "$cur" ); _add_spaces ;;
+      --window-subtitle) _compreply compgen -W "false working-directory" -- "$cur"; _add_spaces ;;
+      --window-theme) _compreply compgen -W "auto system light dark ghostty" -- "$cur"; _add_spaces ;;
+      --window-colorspace) _compreply compgen -W "srgb display-p3" -- "$cur"; _add_spaces ;;
       --window-height) return ;;
       --window-width) return ;;
       --window-position-x) return ;;
       --window-position-y) return ;;
-      --window-save-state) mapfile -t COMPREPLY < <( compgen -W "default never always" -- "$cur" ); _add_spaces ;;
+      --window-save-state) _compreply compgen -W "default never always" -- "$cur"; _add_spaces ;;
       --window-step-resize) return ;;
-      --window-new-tab-position) mapfile -t COMPREPLY < <( compgen -W "current end" -- "$cur" ); _add_spaces ;;
-      --window-show-tab-bar) mapfile -t COMPREPLY < <( compgen -W "always auto never" -- "$cur" ); _add_spaces ;;
+      --window-new-tab-position) _compreply compgen -W "current end" -- "$cur"; _add_spaces ;;
+      --window-show-tab-bar) _compreply compgen -W "always auto never" -- "$cur"; _add_spaces ;;
       --window-titlebar-background) return ;;
       --window-titlebar-foreground) return ;;
-      --resize-overlay) mapfile -t COMPREPLY < <( compgen -W "always never after-first" -- "$cur" ); _add_spaces ;;
-      --resize-overlay-position) mapfile -t COMPREPLY < <( compgen -W "center top-left top-center top-right bottom-left bottom-center bottom-right" -- "$cur" ); _add_spaces ;;
+      --resize-overlay) _compreply compgen -W "always never after-first" -- "$cur"; _add_spaces ;;
+      --resize-overlay-position) _compreply compgen -W "center top-left top-center top-right bottom-left bottom-center bottom-right" -- "$cur"; _add_spaces ;;
       --resize-overlay-duration) return ;;
       --focus-follows-mouse) return ;;
-      --clipboard-read) mapfile -t COMPREPLY < <( compgen -W "allow deny ask" -- "$cur" ); _add_spaces ;;
-      --clipboard-write) mapfile -t COMPREPLY < <( compgen -W "allow deny ask" -- "$cur" ); _add_spaces ;;
+      --clipboard-read) _compreply compgen -W "allow deny ask" -- "$cur"; _add_spaces ;;
+      --clipboard-write) _compreply compgen -W "allow deny ask" -- "$cur"; _add_spaces ;;
       --clipboard-trim-trailing-spaces) return ;;
       --clipboard-paste-protection) return ;;
       --clipboard-paste-bracketed-safe) return ;;
       --title-report) return ;;
       --image-storage-limit) return ;;
-      --copy-on-select) mapfile -t COMPREPLY < <( compgen -W "false true clipboard" -- "$cur" ); _add_spaces ;;
-      --right-click-action) mapfile -t COMPREPLY < <( compgen -W "ignore paste copy copy-or-paste context-menu" -- "$cur" ); _add_spaces ;;
+      --copy-on-select) _compreply compgen -W "false true clipboard" -- "$cur"; _add_spaces ;;
+      --right-click-action) _compreply compgen -W "ignore paste copy copy-or-paste context-menu" -- "$cur"; _add_spaces ;;
       --click-repeat-interval) return ;;
       --config-file) _files ;;
       --config-default-files) return ;;
-      --confirm-close-surface) mapfile -t COMPREPLY < <( compgen -W "false true always" -- "$cur" ); _add_spaces ;;
+      --confirm-close-surface) _compreply compgen -W "false true always" -- "$cur"; _add_spaces ;;
       --quit-after-last-window-closed) return ;;
       --quit-after-last-window-closed-delay) return ;;
       --initial-window) return ;;
       --undo-timeout) return ;;
-      --quick-terminal-position) mapfile -t COMPREPLY < <( compgen -W "top bottom left right center" -- "$cur" ); _add_spaces ;;
+      --quick-terminal-position) _compreply compgen -W "top bottom left right center" -- "$cur"; _add_spaces ;;
       --quick-terminal-size) return ;;
-      --gtk-quick-terminal-layer) mapfile -t COMPREPLY < <( compgen -W "overlay top bottom background" -- "$cur" ); _add_spaces ;;
+      --gtk-quick-terminal-layer) _compreply compgen -W "overlay top bottom background" -- "$cur"; _add_spaces ;;
       --gtk-quick-terminal-namespace) return ;;
-      --quick-terminal-screen) mapfile -t COMPREPLY < <( compgen -W "main mouse macos-menu-bar" -- "$cur" ); _add_spaces ;;
+      --quick-terminal-screen) _compreply compgen -W "main mouse macos-menu-bar" -- "$cur"; _add_spaces ;;
       --quick-terminal-animation-duration) return ;;
       --quick-terminal-autohide) return ;;
-      --quick-terminal-space-behavior) mapfile -t COMPREPLY < <( compgen -W "remain move" -- "$cur" ); _add_spaces ;;
-      --quick-terminal-keyboard-interactivity) mapfile -t COMPREPLY < <( compgen -W "none on-demand exclusive" -- "$cur" ); _add_spaces ;;
-      --shell-integration) mapfile -t COMPREPLY < <( compgen -W "none detect bash elvish fish zsh" -- "$cur" ); _add_spaces ;;
-      --shell-integration-features) mapfile -t COMPREPLY < <( compgen -W "cursor no-cursor sudo no-sudo title no-title ssh-env no-ssh-env ssh-terminfo no-ssh-terminfo path no-path" -- "$cur" ); _add_spaces ;;
+      --quick-terminal-space-behavior) _compreply compgen -W "remain move" -- "$cur"; _add_spaces ;;
+      --quick-terminal-keyboard-interactivity) _compreply compgen -W "none on-demand exclusive" -- "$cur"; _add_spaces ;;
+      --shell-integration) _compreply compgen -W "none detect bash elvish fish nushell zsh" -- "$cur"; _add_spaces ;;
+      --shell-integration-features) _compreply compgen -W "cursor no-cursor sudo no-sudo title no-title ssh-env no-ssh-env ssh-terminfo no-ssh-terminfo path no-path" -- "$cur"; _add_spaces ;;
       --command-palette-entry) return ;;
-      --osc-color-report-format) mapfile -t COMPREPLY < <( compgen -W "none 8-bit 16-bit" -- "$cur" ); _add_spaces ;;
+      --osc-color-report-format) _compreply compgen -W "none 8-bit 16-bit" -- "$cur"; _add_spaces ;;
       --vt-kam-allowed) return ;;
       --custom-shader) _files ;;
-      --custom-shader-animation) mapfile -t COMPREPLY < <( compgen -W "false true always" -- "$cur" ); _add_spaces ;;
-      --bell-features) mapfile -t COMPREPLY < <( compgen -W "system no-system audio no-audio attention no-attention title no-title border no-border" -- "$cur" ); _add_spaces ;;
+      --custom-shader-animation) _compreply compgen -W "false true always" -- "$cur"; _add_spaces ;;
+      --bell-features) _compreply compgen -W "system no-system audio no-audio attention no-attention title no-title border no-border" -- "$cur"; _add_spaces ;;
       --bell-audio-path) return ;;
       --bell-audio-volume) return ;;
-      --app-notifications) mapfile -t COMPREPLY < <( compgen -W "clipboard-copy no-clipboard-copy config-reload no-config-reload" -- "$cur" ); _add_spaces ;;
-      --macos-non-native-fullscreen) mapfile -t COMPREPLY < <( compgen -W "false true visible-menu padded-notch" -- "$cur" ); _add_spaces ;;
-      --macos-window-buttons) mapfile -t COMPREPLY < <( compgen -W "visible hidden" -- "$cur" ); _add_spaces ;;
-      --macos-titlebar-style) mapfile -t COMPREPLY < <( compgen -W "native transparent tabs hidden" -- "$cur" ); _add_spaces ;;
-      --macos-titlebar-proxy-icon) mapfile -t COMPREPLY < <( compgen -W "visible hidden" -- "$cur" ); _add_spaces ;;
-      --macos-dock-drop-behavior) mapfile -t COMPREPLY < <( compgen -W "new-tab window" -- "$cur" ); _add_spaces ;;
+      --app-notifications) _compreply compgen -W "clipboard-copy no-clipboard-copy config-reload no-config-reload" -- "$cur"; _add_spaces ;;
+      --macos-non-native-fullscreen) _compreply compgen -W "false true visible-menu padded-notch" -- "$cur"; _add_spaces ;;
+      --macos-window-buttons) _compreply compgen -W "visible hidden" -- "$cur"; _add_spaces ;;
+      --macos-titlebar-style) _compreply compgen -W "native transparent tabs hidden" -- "$cur"; _add_spaces ;;
+      --macos-titlebar-proxy-icon) _compreply compgen -W "visible hidden" -- "$cur"; _add_spaces ;;
+      --macos-dock-drop-behavior) _compreply compgen -W "new-tab new-window" -- "$cur"; _add_spaces ;;
       --macos-option-as-alt) return ;;
       --macos-window-shadow) return ;;
-      --macos-hidden) mapfile -t COMPREPLY < <( compgen -W "never always" -- "$cur" ); _add_spaces ;;
+      --macos-hidden) _compreply compgen -W "never always" -- "$cur"; _add_spaces ;;
       --macos-auto-secure-input) return ;;
       --macos-secure-input-indication) return ;;
-      --macos-icon) mapfile -t COMPREPLY < <( compgen -W "official blueprint chalkboard microchip glass holographic paper retro xray custom custom-style" -- "$cur" ); _add_spaces ;;
+      --macos-applescript) return ;;
+      --macos-icon) _compreply compgen -W "official blueprint chalkboard microchip glass holographic paper retro xray custom custom-style" -- "$cur"; _add_spaces ;;
       --macos-custom-icon) return ;;
-      --macos-icon-frame) mapfile -t COMPREPLY < <( compgen -W "aluminum beige plastic chrome" -- "$cur" ); _add_spaces ;;
+      --macos-icon-frame) _compreply compgen -W "aluminum beige plastic chrome" -- "$cur"; _add_spaces ;;
       --macos-icon-ghost-color) return ;;
       --macos-icon-screen-color) return ;;
-      --macos-shortcuts) mapfile -t COMPREPLY < <( compgen -W "allow deny ask" -- "$cur" ); _add_spaces ;;
-      --linux-cgroup) mapfile -t COMPREPLY < <( compgen -W "never always single-instance" -- "$cur" ); _add_spaces ;;
+      --macos-shortcuts) _compreply compgen -W "allow deny ask" -- "$cur"; _add_spaces ;;
+      --linux-cgroup) _compreply compgen -W "never always single-instance" -- "$cur"; _add_spaces ;;
       --linux-cgroup-memory-limit) return ;;
       --linux-cgroup-processes-limit) return ;;
       --linux-cgroup-hard-fail) return ;;
       --gtk-opengl-debug) return ;;
-      --gtk-single-instance) mapfile -t COMPREPLY < <( compgen -W "false true detect" -- "$cur" ); _add_spaces ;;
+      --gtk-single-instance) _compreply compgen -W "false true detect" -- "$cur"; _add_spaces ;;
       --gtk-titlebar) return ;;
-      --gtk-tabs-location) mapfile -t COMPREPLY < <( compgen -W "top bottom" -- "$cur" ); _add_spaces ;;
+      --gtk-tabs-location) _compreply compgen -W "top bottom" -- "$cur"; _add_spaces ;;
       --gtk-titlebar-hide-when-maximized) return ;;
-      --gtk-toolbar-style) mapfile -t COMPREPLY < <( compgen -W "flat raised raised-border" -- "$cur" ); _add_spaces ;;
-      --gtk-titlebar-style) mapfile -t COMPREPLY < <( compgen -W "native tabs" -- "$cur" ); _add_spaces ;;
+      --gtk-toolbar-style) _compreply compgen -W "flat raised raised-border" -- "$cur"; _add_spaces ;;
+      --gtk-titlebar-style) _compreply compgen -W "native tabs" -- "$cur"; _add_spaces ;;
       --gtk-wide-tabs) return ;;
       --gtk-custom-css) _files ;;
       --desktop-notifications) return ;;
@@ -408,16 +454,17 @@ _ghostty() {
       --faint-opacity) return ;;
       --term) return ;;
       --enquiry-response) return ;;
-      --async-backend) mapfile -t COMPREPLY < <( compgen -W "auto epoll io_uring" -- "$cur" ); _add_spaces ;;
+      --async-backend) _compreply compgen -W "auto epoll io_uring" -- "$cur"; _add_spaces ;;
       --auto-update) return ;;
       --auto-update-channel) return ;;
-      *) mapfile -t COMPREPLY < <( compgen -W "$config" -- "$cur" ) ;;
+      *) _compreply compgen -W "$config" -- "$cur" ;;
     esac
 
     return 0
   }
 
   _handle_actions() {
+    local help="'--help ' --help"
     local list_fonts="--family= --style= '--bold ' '--italic ' --help"
     local list_keybinds="'--default ' '--docs ' '--plain ' --help"
     local list_themes="'--path ' '--plain ' --color= --help"
@@ -430,13 +477,19 @@ _ghostty() {
     local new_window="--class= --help"
 
     case "${COMP_WORDS[1]}" in
+      +help)
+        case $prev in
+          --help) return ;;
+          *) _compreply compgen -W "$help" -- "$cur" ;;
+        esac
+      ;;
       +list-fonts)
         case $prev in
           --family) return;;
           --style) return;;
           --bold) return ;;
           --italic) return ;;
-          *) mapfile -t COMPREPLY < <( compgen -W "$list_fonts" -- "$cur" ) ;;
+          *) _compreply compgen -W "$list_fonts" -- "$cur" ;;
         esac
       ;;
       +list-keybinds)
@@ -444,27 +497,27 @@ _ghostty() {
           --default) return ;;
           --docs) return ;;
           --plain) return ;;
-          *) mapfile -t COMPREPLY < <( compgen -W "$list_keybinds" -- "$cur" ) ;;
+          *) _compreply compgen -W "$list_keybinds" -- "$cur" ;;
         esac
       ;;
       +list-themes)
         case $prev in
           --path) return ;;
           --plain) return ;;
-          --color) mapfile -t COMPREPLY < <( compgen -W "all dark light" -- "$cur" ); _add_spaces ;;
-          *) mapfile -t COMPREPLY < <( compgen -W "$list_themes" -- "$cur" ) ;;
+          --color) _compreply compgen -W "all dark light" -- "$cur"; _add_spaces ;;
+          *) _compreply compgen -W "$list_themes" -- "$cur" ;;
         esac
       ;;
       +list-colors)
         case $prev in
           --plain) return ;;
-          *) mapfile -t COMPREPLY < <( compgen -W "$list_colors" -- "$cur" ) ;;
+          *) _compreply compgen -W "$list_colors" -- "$cur" ;;
         esac
       ;;
       +list-actions)
         case $prev in
           --docs) return ;;
-          *) mapfile -t COMPREPLY < <( compgen -W "$list_actions" -- "$cur" ) ;;
+          *) _compreply compgen -W "$list_actions" -- "$cur" ;;
         esac
       ;;
       +ssh-cache)
@@ -474,7 +527,7 @@ _ghostty() {
           --remove) return;;
           --host) return;;
           --expire-days) return;;
-          *) mapfile -t COMPREPLY < <( compgen -W "$ssh_cache" -- "$cur" ) ;;
+          *) _compreply compgen -W "$ssh_cache" -- "$cur" ;;
         esac
       ;;
       +show-config)
@@ -482,31 +535,31 @@ _ghostty() {
           --default) return ;;
           --changes-only) return ;;
           --docs) return ;;
-          *) mapfile -t COMPREPLY < <( compgen -W "$show_config" -- "$cur" ) ;;
+          *) _compreply compgen -W "$show_config" -- "$cur" ;;
         esac
       ;;
       +validate-config)
         case $prev in
           --config-file) return ;;
-          *) mapfile -t COMPREPLY < <( compgen -W "$validate_config" -- "$cur" ) ;;
+          *) _compreply compgen -W "$validate_config" -- "$cur" ;;
         esac
       ;;
       +show-face)
         case $prev in
           --cp) return;;
           --string) return;;
-          --style) mapfile -t COMPREPLY < <( compgen -W "regular bold italic bold_italic" -- "$cur" ); _add_spaces ;;
-          --presentation) mapfile -t COMPREPLY < <( compgen -W "text emoji" -- "$cur" ); _add_spaces ;;
-          *) mapfile -t COMPREPLY < <( compgen -W "$show_face" -- "$cur" ) ;;
+          --style) _compreply compgen -W "regular bold italic bold_italic" -- "$cur"; _add_spaces ;;
+          --presentation) _compreply compgen -W "text emoji" -- "$cur"; _add_spaces ;;
+          *) _compreply compgen -W "$show_face" -- "$cur" ;;
         esac
       ;;
       +new-window)
         case $prev in
           --class) return;;
-          *) mapfile -t COMPREPLY < <( compgen -W "$new_window" -- "$cur" ) ;;
+          *) _compreply compgen -W "$new_window" -- "$cur" ;;
         esac
       ;;
-      *) mapfile -t COMPREPLY < <( compgen -W "--help" -- "$cur" ) ;;
+      *) _compreply compgen -W "--help" -- "$cur" ;;
     esac
 
     return 0
@@ -516,6 +569,8 @@ _ghostty() {
   local topLevel="-e"
   topLevel+=" --help"
   topLevel+=" --version"
+  topLevel+=" +version"
+  topLevel+=" +help"
   topLevel+=" +list-fonts"
   topLevel+=" +list-keybinds"
   topLevel+=" +list-themes"
@@ -546,7 +601,7 @@ _ghostty() {
   else                    prev="${COMP_WORDS[COMP_CWORD-1]}"
   fi
 
-  # current completion is double quoted add a space so the curor progresses
+  # current completion is double quoted add a space so the cursor progresses
   if [[ "$2" == \"*\" ]]; then
     COMPREPLY=( "$cur " );
     return;
@@ -557,7 +612,7 @@ _ghostty() {
       case "${COMP_WORDS[1]}" in
         -e | --help | --version) return 0 ;;
         --*) _handle_config ;;
-        *) mapfile -t COMPREPLY < <( compgen -W "${topLevel}" -- "$cur" ); _add_spaces ;;
+        *) _compreply compgen -W "${topLevel}" -- "$cur"; _add_spaces ;;
       esac
       ;;
     *)

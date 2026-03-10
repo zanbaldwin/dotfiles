@@ -8,7 +8,7 @@ Requires=dbus.socket
 Type=notify-reload
 ReloadSignal=SIGUSR2
 BusName=com.mitchellh.ghostty
-ExecStart=/app/zig-out/bin/ghostty --gtk-single-instance=true --initial-window=false
+ExecStart=/home/zan/bin/ghostty --gtk-single-instance=true --initial-window=false
 
 [Install]
 WantedBy=graphical-session.target

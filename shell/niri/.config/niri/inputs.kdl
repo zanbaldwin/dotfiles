@@ -1,3 +1,9 @@
+// GTK 4.20+ stopped handling Compose/dead keys on Wayland.
+// https://github.com/niri-wm/niri/wiki/Application-Issues
+environment {
+    GTK_IM_MODULE "simple"
+}
+
 // Input device configuration.
 // Find the full list of options on the wiki:
 // https://niri-wm.github.io/niri/Configuration:-Input

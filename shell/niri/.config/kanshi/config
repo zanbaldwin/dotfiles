@@ -19,7 +19,7 @@ profile laptop {
 }
 profile docked-ultrawide {
     output $INTERNAL enable position 1600,1440
-    output $ULTRAWIDE enable position 0,0
+    output $ULTRAWIDE enable mode 5120x1440@59.977Hz position 0,0
 }
 profile docked-4k-left {
     output $INTERNAL enable position 2880,2160

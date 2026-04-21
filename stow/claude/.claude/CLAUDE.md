@@ -13,6 +13,7 @@ This helps build a comprehensive knowledge base for the codebase over time.
 
 ## Scope Discipline
 **CRITICAL: Minimal changes only. Zero scope creep.**
+When fixing bugs, stay focused on the minimal fix. Do not refactor surrounding code, add stubs, or make changes beyond what was asked unless explicitly requested.
 
 ### Rules
 - Change ONLY what was explicitly requested in current prompt
@@ -24,6 +25,8 @@ This helps build a comprehensive knowledge base for the codebase over time.
 - **Before:** State plan. "I will modify `Class::method()` to fix X" (confirm minimal scope)
 - **During:** If related work discovered (tests/templates) → STOP, ask permission
 - **After:** Report changes made + list related work NOT implemented → await direction
+
+When I ask you to 'explore' a codebase, write findings to a markdown file (e.g., EXPLORE.md) and do NOT start implementing changes unless explicitly asked. Planning sessions are planning-only.
 
 ### Prohibited
 - Adding features/enhancements not requested

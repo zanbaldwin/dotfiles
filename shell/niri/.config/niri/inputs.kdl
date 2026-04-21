@@ -2,6 +2,7 @@
 // https://github.com/niri-wm/niri/wiki/Application-Issues
 environment {
     GTK_IM_MODULE "simple"
+    XMODIFIERS "@im=none"
 }
 
 // Input device configuration.

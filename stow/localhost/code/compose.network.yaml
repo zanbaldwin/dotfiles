@@ -1,53 +1,52 @@
 name: 'network'
 services:
-
-  tailscale:
-    image: 'tailscale/tailscale:v1.90.9'
-    restart: 'unless-stopped'
-    network_mode: 'host'
-    environment:
-      TS_STATE_DIR: '/var/lib/tailscale'
-      TS_AUTH_ONCE: 'true'
-      TS_ENABLE_HEALTH_CHECK: 'true'
-      TS_LOCAL_ADDR_PORT: '0.0.0.0:8575'
-      TS_EXTRA_ARGS: '--accept-routes'
-      TS_USERSPACE: 'false'
-      TS_ACCEPT_DNS: 'true'
-    healthcheck:
-      test: [ 'CMD-SHELL', 'wget --spider -q "http://127.0.0.1:8575/healthz"' ]
-      interval: '30s'
-      timeout: '5s'
-      retries: 5
-      start_period: '30s'
-    configs:
-      - source: 'init'
-        target: '/init.sh'
-    volumes:
-      - type: 'volume'
-        source: 'tailscale'
-        target: '/var/lib/tailscale'
-        read_only: false
-    command: [ '/bin/sh', '/init.sh' ]
-    devices:
-      - '/dev/net/tun:/dev/net/tun'
-    cap_add:
-      - 'net_admin'
-      - 'sys_module'
+    tailscale:
+        image: 'tailscale/tailscale:v1.92.5'
+        restart: 'always'
+        network_mode: 'host'
+        environment:
+            TS_STATE_DIR: '/var/lib/tailscale'
+            TS_AUTH_ONCE: 'true'
+            TS_ENABLE_HEALTH_CHECK: 'true'
+            TS_LOCAL_ADDR_PORT: '0.0.0.0:8575'
+            TS_EXTRA_ARGS: '--accept-routes'
+            TS_USERSPACE: 'false'
+            TS_ACCEPT_DNS: 'true'
+        healthcheck:
+            test: ['CMD-SHELL', 'wget --spider -q "http://127.0.0.1:8575/healthz"']
+            interval: '30s'
+            timeout: '5s'
+            retries: 5
+            start_period: '30s'
+        configs:
+            - source: 'init'
+              target: '/init.sh'
+        volumes:
+            - type: 'volume'
+              source: 'tailscale'
+              target: '/var/lib/tailscale'
+              read_only: false
+        command: ['/bin/sh', '/init.sh']
+        devices:
+            - '/dev/net/tun:/dev/net/tun'
+        cap_add:
+            - 'net_admin'
+            - 'sys_module'
 
 volumes:
-  tailscale:
-    driver: 'local'
+    tailscale:
+        driver: 'local'
 
 configs:
-  init:
-    content: |
-      #!/bin/sh
-      # Prioritize LAN routes over Tailscale subnet routes
-      # When on home LAN (source 192.168.1.x): use direct routing via main table
-      # When on other network: this rule won't match, falls through to Tailscale at priority 5270
-      ip rule add from 192.168.1.0/24 to 192.168.1.0/24 lookup main priority 5000 2>/dev/null || true
-      # TODO: When establishing an SSH connection, Linux doesn't determine the source IP until the rules have been evaluated and an interface chosen.
-      #       Meaning this rule fails and it defaults over to the Tailscale 52 table. Which, due to Tailscale ACLs, will fail to connect.
-      #       However, we still need to keep Tailscale subnet routing in this config so that it can be accessed remotely when AWAY from LAN.
-      echo "LAN routes prioritised..."
-      exec /usr/local/bin/containerboot "$@"
+    init:
+        content: |
+            #!/bin/sh
+            # Prioritize LAN routes over Tailscale subnet routes
+            # When on home LAN (source 192.168.1.x): use direct routing via main table
+            # When on other network: this rule won't match, falls through to Tailscale at priority 5270
+            ip rule add from 192.168.1.0/24 to 192.168.1.0/24 lookup main priority 5000 2>/dev/null || true
+            # TODO: When establishing an SSH connection, Linux doesn't determine the source IP until the rules have been evaluated and an interface chosen.
+            #       Meaning this rule fails and it defaults over to the Tailscale 52 table. Which, due to Tailscale ACLs, will fail to connect.
+            #       However, we still need to keep Tailscale subnet routing in this config so that it can be accessed remotely when AWAY from LAN.
+            echo "LAN routes prioritised..."
+            exec /usr/local/bin/containerboot "$@"

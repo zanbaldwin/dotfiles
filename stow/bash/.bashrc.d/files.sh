@@ -14,6 +14,8 @@ command -v "bat" >"/dev/null" 2>&1 && {
     alias less="bat --theme=DarkNeon";
 }
 
+alias md="mdterm"
+
 # ripgrep is fast, yo.
 command -v "rg" >"/dev/null" 2>&1 && {
     alias grep="rg";

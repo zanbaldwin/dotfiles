@@ -27,3 +27,8 @@ window-rule {
     match app-id=r#"itwarden$"#
     block-out-from "screen-capture"
 }
+
+window-rule {
+    match app-id="t3-code-desktop"
+    draw-border-with-background false
+}

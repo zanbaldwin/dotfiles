@@ -1,0 +1,12 @@
+[Unit]
+Description=Quickshell
+After=graphical-session.target
+ConditionEnvironment=XDG_CURRENT_DESKTOP=niri
+
+[Service]
+ExecStart=%h/.local/bin/qs --config='noctalia' --no-duplicate
+Restart=on-failure
+RestartSec=2
+
+[Install]
+WantedBy=graphical-session.target

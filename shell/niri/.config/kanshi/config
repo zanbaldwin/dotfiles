@@ -13,6 +13,10 @@ output "Philips Consumer Electronics Company PHL 499P9 AU02345007801" {
     scale 1.0
     alias $ULTRAWIDE
 }
+output "Philips Consumer Electronics Company PHL 499P9 AU02345007799" {
+    scale 1.0
+    alias $ULTRAWIDE
+}
 
 profile laptop {
     output $INTERNAL enable position 0,0

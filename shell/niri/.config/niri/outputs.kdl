@@ -41,3 +41,10 @@ output "Philips Consumer Electronics Company PHL 499P9 AU02345007801" {
     transform "normal"
     focus-at-startup
 }
+
+output "Philips Consumer Electronics Company PHL 499P9 AU02345007799" {
+    mode "5120x1440@59.977"
+    scale 1.0
+    transform "normal"
+    focus-at-startup
+}

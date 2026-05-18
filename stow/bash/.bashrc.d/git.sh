@@ -37,7 +37,7 @@ command -v "jj" >"/dev/null" 2>&1 && {
             if command "jj" "status"; then
                 echo ""
                 echo -e "\e[4mRevision Changes:\e[0m"
-                command "jj" --ignore-working-copy obslog --stat  --template="builtin_log_comfortable"
+                command "jj" --ignore-working-copy evolog --stat
 
                 echo ""
                 echo -e "\e[4mHistory Log:\e[0m"

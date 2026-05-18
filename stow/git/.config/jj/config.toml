@@ -6,7 +6,7 @@ name = "Zan Baldwin"
 email = "hello@zanbaldwin.com"
 
 [git]
-auto-local-bookmark = true
+# auto-local-bookmark = true # DEPRECATED
 push-branch-prefix = "z/push-"
 
 [template-aliases]
@@ -70,3 +70,6 @@ latest = ["util", "exec", "--", "bash", "-lc", "jj ff && jj up", ""]
 "ahead_behind()" = "trunk()..@ | @..trunk() | trunk() | @:: | fork_point(trunk() | @)"
 # Quick Git-like parent selector: p(n) ~ HEAD~n
 "p(n)" = "@- | ancestors(@, n)"
+
+[remotes.origin]
+auto-track-bookmarks = "*"

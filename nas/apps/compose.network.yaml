@@ -1,7 +1,7 @@
 name: 'network'
 services:
     tailscale:
-        image: 'tailscale/tailscale:v1.90.9'
+        image: 'tailscale/tailscale:v1.96.5'
         restart: 'unless-stopped'
         network_mode: 'host'
         environment:
@@ -37,4 +37,4 @@ services:
 
 secrets:
     authkey:
-        file: '/mnt/tank4/class1/secrets/tailscale'
+        file: '/mnt/tank4/secrets/tailscale'

@@ -1,7 +1,7 @@
 name: 'backup'
 services:
     backrest:
-        image: 'garethgeorge/backrest:v1.13.0'
+        image: 'garethgeorge/backrest:v1.13.0-alpine'
         restart: 'unless-stopped'
         deploy:
             resources:
@@ -36,24 +36,12 @@ services:
               read_only: false
             # Backup sources (read-only)
             - type: 'bind'
-              source: '/mnt/tank4/class1'
-              target: '/source/class1'
-              read_only: true
-            - type: 'bind'
-              source: '/mnt/tank4/class2'
-              target: '/source/class2'
-              read_only: true
-            - type: 'bind'
-              source: '/mnt/tank4/backups'
-              target: '/source/backups'
-              read_only: true
-            - type: 'bind'
-              source: '/mnt/fast/apps'
-              target: '/source/apps'
+              source: '/mnt/tank4'
+              target: '/source'
               read_only: true
 
 secrets:
     backblaze_id:
-        file: '/mnt/tank4/class1/secrets/backblaze/id'
+        file: '/mnt/tank4/secrets/backblaze/id'
     backblaze_key:
-        file: '/mnt/tank4/class1/secrets/backblaze/key'
+        file: '/mnt/tank4/secrets/backblaze/key'

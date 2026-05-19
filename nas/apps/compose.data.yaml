@@ -43,7 +43,7 @@ services:
         command: ['postgres', '-c', 'config_file=/etc/postgresql/postgresql.conf']
 
     valkey:
-        image: 'valkey/valkey:9.0.4-alpine'
+        image: 'valkey/valkey:9.1.0-alpine'
         restart: 'unless-stopped'
         deploy:
             resources:
@@ -76,7 +76,7 @@ networks:
 
 secrets:
     dbpass:
-        file: '/mnt/tank4/class1/secrets/postgres/main'
+        file: '/mnt/tank4/secrets/postgres/main'
 
 configs:
     initdb:

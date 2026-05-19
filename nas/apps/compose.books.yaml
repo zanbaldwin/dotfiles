@@ -14,7 +14,7 @@ services:
               protocol: 'tcp'
         volumes:
             - type: 'bind'
-              source: '/mnt/tank4/class1/books/Calibre'
+              source: '/mnt/tank4/books/Calibre'
               target: '/books'
               read_only: true
             - type: 'bind'

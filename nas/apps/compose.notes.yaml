@@ -40,4 +40,4 @@ networks:
 
 secrets:
     memodsn:
-        file: '/mnt/tank4/class1/secrets/postgres/memos_dsn'
+        file: '/mnt/tank4/secrets/postgres/memos_dsn'

@@ -35,4 +35,4 @@ services:
 
 secrets:
     cloudflare:
-        file: '/mnt/tank4/class1/secrets/cloudflare'
+        file: '/mnt/tank4/secrets/cloudflare'

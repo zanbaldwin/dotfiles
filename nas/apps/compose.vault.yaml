@@ -12,7 +12,7 @@ services:
         networks:
             - 'database'
         environment:
-            DATABASE_URL_FILE: '/run/secret/vaultdsn'
+            DATABASE_URL_FILE: '/run/secrets/vaultdsn'
         secrets:
             - 'vaultdsn'
         ports:
@@ -24,7 +24,7 @@ services:
               target: '/data/config.json'
         volumes:
             - type: 'bind'
-              source: '/mnt/tank4/class1/secrets/vault'
+              source: '/mnt/fast/apps/vaultwarden'
               target: '/data'
               read_only: false
 
@@ -34,7 +34,7 @@ networks:
 
 secrets:
     vaultdsn:
-        file: '/mnt/tank4/class1/secrets/postgres/vault_dsn'
+        file: '/mnt/tank4/secrets/postgres/vault_dsn'
 
 configs:
     vaultwarden:

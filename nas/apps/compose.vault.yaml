@@ -2,10 +2,10 @@ name: 'vault'
 services:
     # Database Setup
     # ==============
-    #   CREATE USER immich WITH ENCRYPTED PASSWORD '<password>';
-    #   CREATE DATABASE immich;
-    #   \c immich
-    #   ALTER DATABASE immich OWNER TO immich;
+    #   CREATE USER vaultwarden WITH ENCRYPTED PASSWORD '<password>';
+    #   CREATE DATABASE vaultwarden;
+    #   \c vaultwarden
+    #   ALTER DATABASE vaultwarden OWNER TO vaultwarden;
     server:
         image: 'vaultwarden/server:1.36.0'
         restart: 'unless-stopped'
@@ -41,7 +41,7 @@ configs:
         content: |
             {
                 "domain": "https://vault.lan.zanbaldwin.com",
-                "signups_allowed": true,
+                "signups_allowed": false,
                 "sends_allowed": false,
                 "invitations_allowed": true,
                 "emergency_access_allowed": true,

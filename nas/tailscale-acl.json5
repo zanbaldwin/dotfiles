@@ -1,0 +1,161 @@
+{
+    // Define grants that govern access for users, groups, autogroups, tags,
+    // Tailscale IP addresses, and subnet ranges.
+    "grants": [
+        // ====================================================================
+        // DNS Access - Everyone needs DNS
+        // ====================================================================
+        {
+            "src": [
+                "*"
+            ],
+            "dst": [
+                "tag:dns"
+            ],
+            "ip": [
+                "udp:53",
+                "tcp:53"
+            ]
+        },
+        // ====================================================================
+        // LAN Subnet Access via Subnet Router (TrueNAS)
+        // ====================================================================
+        // All clients can access HTTPS services on LAN (proxied through NPM).
+        {
+            "src": [
+                "tag:client"
+            ],
+            "dst": [
+                "tag:nas",
+                "192.168.1.0/24"
+            ],
+            "ip": [
+                "tcp:443",
+                "tcp:80"
+            ]
+        },
+        // Only computers can access NFS shares remotely.
+        {
+            "src": [
+                "tag:nfs"
+            ],
+            "dst": [
+                "tag:nas",
+                "192.168.1.0/24"
+            ],
+            "ip": [
+                "tcp:2049",
+                "udp:2049"
+            ]
+        },
+        // Remote clients can push+pull from Git server using SSH.
+        {
+            "src": [
+                "tag:remote"
+            ],
+            "dst": [
+                "tag:nas",
+                "192.168.1.0/24"
+            ],
+            "ip": [
+                "tcp:484"
+            ]
+        },
+        // ====================================================================
+        // Device Communication
+        // ====================================================================
+        // Client devices can communicate with each other
+        // (e.g., SSH from laptop to desktop, clipboard sync, etc.)
+        {
+            "src": [
+                "tag:client"
+            ],
+            "dst": [
+                "tag:client"
+            ],
+            "ip": [
+                "*"
+            ]
+        },
+        // Remote clients can SSH into infrastructure devices for maintanence.
+        {
+            "src": [
+                "tag:remote"
+            ],
+            "dst": [
+                "tag:infra",
+                "192.168.1.0/24"
+            ],
+            "ip": [
+                "tcp:22"
+            ]
+        }
+    ],
+    // Define device posture rules requiring devices to meet
+    // certain criteria to access parts of your system.
+    "postures": {
+        "posture:computer": [
+            "node:os IN ['linux', 'macos', 'windows']"
+        ],
+        "posture:mobile": [
+            "node:os IN ['ios', 'android']"
+        ],
+        "posture:upToDate": [
+            "node:tsReleaseTrack == 'stable'",
+            "node:tsAutoUpdate == true"
+        ]
+    },
+    // Define the tags which can be applied to devices and by which users.
+    // Note: "ssh" section omitted - Tailscale SSH not available on containerized deployments.
+    "tagOwners": {
+        // For human-operated machines I own and trust
+        "tag:client": [
+            "hello@zanbaldwin.com"
+        ],
+        // For clients that may access from outside the home LAN
+        "tag:remote": [
+            "hello@zanbaldwin.com"
+        ],
+        // For always-on LAN infrastructure
+        "tag:infra": [
+            "hello@zanbaldwin.com"
+        ],
+        // For NAS-specific ACLs
+        "tag:nas": [
+            "hello@zanbaldwin.com"
+        ],
+        // For Pi-hole / DNS resolvers
+        "tag:dns": [
+            "hello@zanbaldwin.com"
+        ],
+        // For human-operated machines I do NOT own and trust (future)
+        "tag:guest": [
+            "hello@zanbaldwin.com"
+        ],
+        // Allow devices remote-access to NFS shares
+        "tag:nfs": [
+            "hello@zanbaldwin.com"
+        ]
+    },
+    "autoApprovers": {
+        "routes": {
+            "192.168.1.0/24": [
+                "tag:nas"
+            ]
+        }
+    },
+    // Tailscale is running in containers on the majority of devices, so
+    // Tailscale SSH wouldn't work any way. Don't define "ssh" section.
+    // Test access rules every time they're saved.
+    "tests": [
+        // Clients should always have access to services and DNS
+        {
+            "src": "tag:client",
+            "accept": [
+                "tag:dns:53",
+                "tag:nas:443",
+                "tag:nas:80"
+            ]
+        }
+    ]
+}

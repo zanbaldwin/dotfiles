@@ -20,6 +20,7 @@ TrueNAS
  └─ pool(tank4)
      ├─ class1
      │   ├─ secrets
+     │   │   └─ vault
      │   ├─ books
      │   └─ photos
      └─ class2
@@ -38,6 +39,7 @@ TrueNAS
 | Navidrome              | `4533` | `music.lan.zanbaldwin.com`   |
 | Immich                 | `2283` | `photos.lan.zanbaldwin.com`  |
 | Nginx Proxy Manager    | `81`   | `proxy.lan.zanbaldwin.com`   |
+| Vaultwarden            | `2489` | `vault.lan.zanbaldwin.com`   |
 
 # Secrets
 > `/mnt/tank4/class1/secrets`

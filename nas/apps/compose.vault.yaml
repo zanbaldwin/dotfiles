@@ -2,17 +2,17 @@ name: 'vault'
 services:
     # Database Setup
     # ==============
-    #   CREATE USER vaultwarden WITH ENCRYPTED PASSWORD '<password>';
-    #   CREATE DATABASE vaultwarden;
-    #   \c vaultwarden
-    #   ALTER DATABASE vaultwarden OWNER TO vaultwarden;
+    #   CREATE USER immich WITH ENCRYPTED PASSWORD '<password>';
+    #   CREATE DATABASE immich;
+    #   \c immich
+    #   ALTER DATABASE immich OWNER TO immich;
     server:
         image: 'vaultwarden/server:1.36.0'
         restart: 'unless-stopped'
         networks:
             - 'database'
         environment:
-            DATABASE_URL_FILE: '/run/secrets/vaultdsn'
+            DATABASE_URL_FILE: '/run/secret/vaultdsn'
         secrets:
             - 'vaultdsn'
         ports:

@@ -8,7 +8,7 @@ Planning document. No changes have been made to the NAS or to `backrest.json`.
 2. **Protection against credential theft / ransomware on the NAS:** The B2 and S3 credentials sitting on the NAS must not be able to *delete* what's already backed up.
 3. **Protection against human error:** ZFS snapshots are the first line; B2/S3 retention is the second.
 4. **Moderate retention** at B2 list pricing; longer retention for critical, shorter for media.
-5. **Two tiers, split by life-impact:** *critical* = losing this causes ongoing real-world friction (passwords, app state, code, documents). *media* = losing this is painful and irreplaceable in personal terms but you survive without it (photos, music, books, drive).
+5. **Two tiers, split by life-impact:** *critical* = losing this causes ongoing real-world friction (passwords, app state, source code, secrets). *media* = losing this is painful and irreplaceable in personal terms but you survive without it (photos, music, books, drive).
 
 ## Diagnosis: what the current config actually covers
 
@@ -16,28 +16,29 @@ The Backrest config currently has two plans:
 
 | Plan | Source | Backed up? |
 |---|---|---|
-| `B2-Class1` | `/mnt/tank4/class1` | Yes |
+| `B2-Class1` | legacy path under `/mnt/tank4` — verify in Backrest UI; predates the dataset flattening | Yes |
 | `B2-Postgres` | `/mnt/tank4/backups/postgres` | Yes |
+
+> **Note on nomenclature.** Earlier iterations of this strategy used a `class1/class2/class3` directory hierarchy on `tank4` to encode criticality. That structure has been retired — the datasets on `tank4` are now flat (`backups`, `books`, `code`, `drive`, `music`, `photos`, `secrets`). Criticality is expressed in the Backrest plan layout (which bucket + which retention shape), not in the directory layout. The legacy `B2-Class1` plan name predates this and is rotated out as part of the migration below.
 
 Compared to what's on the NAS, the following is **not currently backed up**:
 
 | Path | Size | Tier (new) | Notes |
 |---|---|---|---|
-| `class2/photos` | 69 GB | media | Immich originals. |
-| `class2/music` | 103 GB | media | |
-| `class2/code` | 162 MB | critical | Forgejo bare repos. |
-| `class2/documents` | 443 MB | critical | Assumes financial/legal docs present. |
-| `class2/drive` | 4.9 GB | media | General file dump. |
-| `class2/backups` | 339 MB | n/a | Stale `postgres.sql` leftover — delete via WebUI. |
+| `tank4/photos` | 69 GB | media | Immich originals. |
+| `tank4/music` | 103 GB | media | |
+| `tank4/code` | 162 MB | critical | Forgejo bare repos. |
+| `tank4/drive` | 4.9 GB | media | General file dump. |
+| `tank4/backups` | 339 MB | n/a | Stale `postgres.sql` leftover — delete via WebUI. |
 | `fast/apps/*` | ~32 MB | critical | NPM config + LE certs, Navidrome DB, Memos files (DB in Postgres), Calibre-Web, Tailscale state. |
-| `class3/forgejo` | 375 K | skipped | Per your decision. See "Class3 risk note" below. |
-| `class3/immich` | 24 G | skipped | Regenerable (thumbs 7.5G, encoded-video 16G, upload staging 646M). |
+| Forgejo support dirs (`ssh/`, `app.ini`, `git/lfs/`) | 375 K | skipped | Per your decision. See "Forgejo/Immich support-dir risk note" below. |
+| Immich support dirs (thumbs, encoded-video, upload staging, profile) | 24 G | skipped | Regenerable (thumbs 7.5G, encoded-video 16G, upload staging 646M). |
 
 Together this is ~178 GB of currently-unprotected data. At B2 list price (~$0.006/GiB-month) that's about **$1.07/month** of B2 storage, plus a small overhead for retention.
 
 ## Recommended structure
 
-**Two buckets, split by life-impact**: *critical* (things that disrupt life if lost) vs *media* (things that hurt to lose but you survive). **One Restic repo per bucket** with Backrest plans tagging snapshots by source. **Two-key Restic pattern** on each bucket. **Critical mirrored to AWS S3 Glacier** as a second offsite. **Skip all of class3.**
+**Two buckets, split by life-impact**: *critical* (things that disrupt life if lost) vs *media* (things that hurt to lose but you survive). **One Restic repo per bucket** with Backrest plans tagging snapshots by source. **Two-key Restic pattern** on each bucket. **Critical mirrored to AWS S3 Glacier** as a second offsite. **Skip the Forgejo/Immich support directories** (regenerable thumbs/encoded-video, in-flight uploads, SSH host keys, etc. — see risk note below).
 
 ### Buckets
 
@@ -46,7 +47,7 @@ zanbaldwin-nas-critical    ← ~1.3 GiB, life-impact data. Mirrored to B2 + S3 G
 zanbaldwin-nas-media       ← ~189 GiB, irreplaceable but survivable. B2 only.
 ```
 
-The S3 mirror exists *only* for the critical tier. Media's volume makes a second provider expensive, and the recovery path for media is "annoying but possible from other sources" (phones for photos, streaming for music, re-acquisition for books), so a single offsite is proportionate. Critical data — passwords, app state, code, financial documents — has no "other source"; provider-redundancy is where it earns its keep.
+The S3 mirror exists *only* for the critical tier. Media's volume makes a second provider expensive, and the recovery path for media is "annoying but possible from other sources" (phones for photos, streaming for music, re-acquisition for books), so a single offsite is proportionate. Critical data — passwords, app state, source code, secrets — has no "other source"; provider-redundancy is where it earns its keep.
 
 ### Restic repos
 
@@ -54,7 +55,7 @@ The S3 mirror exists *only* for the critical tier. Media's volume makes a second
 
 | Bucket | Repo URI | Plans (snapshot tags) | Approx. size |
 |---|---|---|---:|
-| `zanbaldwin-nas-critical` | `b2:zanbaldwin-nas-critical:/` | `secrets`, `postgres`, `code`, `documents`, `apps` | ~1.3 GiB |
+| `zanbaldwin-nas-critical` | `b2:zanbaldwin-nas-critical:/` | `secrets`, `postgres`, `code`, `apps` | ~1.3 GiB |
 | `zanbaldwin-nas-media` | `b2:zanbaldwin-nas-media:/` | `books`, `photos`, `music`, `drive` | ~189 GiB |
 | `zanbaldwin-nas-critical-s3` *(mirror)* | `s3:s3.eu-west-1.amazonaws.com/zanbaldwin-nas-critical-s3/` | same as B2 critical | ~1.3 GiB |
 
@@ -66,27 +67,26 @@ Trade-off vs the previous "8 repos" idea: backups within one repo are serialised
 
 | Plan tag | Source | Why critical |
 |---|---|---|
-| `secrets` | `/mnt/tank4/class1/secrets` | Postgres root password, B2 keys, Cloudflare API key, Tailscale auth key, Vaultwarden attachments/sends, Paperless secrets. |
-| `postgres` | `/mnt/tank4/class1/backups/postgres` | All app DB dumps — Vaultwarden (now Postgres-backed), Forgejo (issues/PRs/users), Immich (tags/albums), Memos. Losing this is losing every app's functional state. |
-| `code` | `/mnt/tank4/class2/code` | Forgejo bare repos. If Forgejo is the only home for any repo (no GitHub/Codeberg mirror), this *is* the source of truth. |
-| `documents` | `/mnt/tank4/class2/documents` | Tax records, contracts, IDs, scanned legal docs. Assumed to contain financial/legal-impact content; if yours doesn't, downgrade to media. |
+| `secrets` | `/mnt/tank4/secrets` | Postgres root password, B2 keys, Cloudflare API key, Tailscale auth key, Vaultwarden attachments/sends. |
+| `postgres` | `/mnt/tank4/backups/postgres` | All app DB dumps — Vaultwarden (now Postgres-backed), Forgejo (issues/PRs/users), Immich (tags/albums), Memos. Losing this is losing every app's functional state. |
+| `code` | `/mnt/tank4/code` | Forgejo bare repos. If Forgejo is the only home for any repo (no GitHub/Codeberg mirror), this *is* the source of truth. |
 | `apps` | `/mnt/fast/apps` (excludes below) | NPM proxy DB + Let's Encrypt cert state (avoids LE rate-limit pain on rebuild), Tailscale node key, Calibre/Navidrome/Memos config and per-app file state. |
 
 **Media plans (`zanbaldwin-nas-media`):**
 
 | Plan tag | Source | Why media |
 |---|---|---|
-| `books` | `/mnt/tank4/class1/books` | Calibre library — books are findable from origin. The Calibre metadata layer (tags, shelves) lives in `apps`. |
-| `photos` | `/mnt/tank4/class2/photos` *plus* `/mnt/tank4/class1/photos` if populated | Immich library. Irreplaceable personally; survivable functionally. Devices typically also retain originals. |
-| `music` | `/mnt/tank4/class2/music` | Replaceable in principle (streaming/re-rip), prohibitive effort cost. |
-| `drive` | `/mnt/tank4/class2/drive` | General file dump. |
+| `books` | `/mnt/tank4/books` | Calibre library — books are findable from origin. The Calibre metadata layer (tags, shelves) lives in `apps`. |
+| `photos` | `/mnt/tank4/photos` | Immich library. Irreplaceable personally; survivable functionally. Devices typically also retain originals. |
+| `music` | `/mnt/tank4/music` | Replaceable in principle (streaming/re-rip), prohibitive effort cost. |
+| `drive` | `/mnt/tank4/drive` | General file dump. |
 
 ### Retention shapes (applied per snapshot tag)
 
 Critical plans get long retention — you want the ability to roll back six months when you discover something was quietly corrupted:
 
 ```
-secrets, postgres, code, documents, apps:
+secrets, postgres, code, apps:
   daily=14   weekly=8   monthly=12   yearly=2
 ```
 
@@ -184,45 +184,27 @@ Either way: **remove `prunePolicy` from the NAS Backrest config** — or set it 
 
 Backrest runs as a Docker container. To run `pg_dump` against the postgres container, it would need to either (a) `docker exec` from inside Backrest — requires mounting the Docker socket into Backrest, which is root-equivalent on the host and silently undoes the entire containerization-isolation story; or (b) call a webhook on the host that runs pg_dump — extra moving part, another service to harden.
 
-The clean answer: **host cron does the dump; Backrest backs up the resulting file.** This is what you already have today, just with a few refinements:
+The clean answer: **host cron does the dump; Backrest backs up the resulting file.** The implementation lives at `cron/dump-postgres.sh` in this repo. Key design points:
 
-1. **Per-database dumps in custom format** for selective restore. Custom format (`-Fc`) is restored with `pg_restore` and supports per-table extraction:
+1. **Per-database dumps in plain SQL, deterministically formatted.** The script uses `pg_dump --inserts --column-inserts --clean --if-exists --quote-all-identifiers --disable-dollar-quoting` plus `pg_dumpall --globals-only` for roles/tablespaces. This is *deliberately* plain SQL rather than custom format (`-Fc`):
 
-   ```bash
-   #!/usr/bin/env bash
-   # /usr/local/bin/pg-dump-job.sh
-   set -euo pipefail
-   OUT=/mnt/tank4/class1/backups/postgres
-   TMP=$(mktemp -d)
-   trap "rm -rf '$TMP'" EXIT
+   - **De-dup friendliness.** Plain SQL with `--inserts --column-inserts` produces one INSERT statement per row, with fully-qualified column lists and quoted identifiers. Day-to-day diffs are line-level and localised: only the rows that actually changed produce new lines, and Restic's content-defined chunking matches the unchanged regions across snapshots. The same `postgres` tag therefore costs almost nothing per daily snapshot after the first one. `--disable-dollar-quoting` keeps function bodies as standard quoted strings, which also chunk stably.
+   - **Custom format (`-Fc`) would defeat this.** It's a compressed binary container; its byte layout changes whenever any row, OID, or internal ordering shifts. Each daily dump would re-chunk almost entirely, dragging the postgres tag's storage cost roughly linearly with snapshot count.
+   - **Atomic rotate.** The script dumps into a `mktemp -d` and only `mv`s into `/mnt/tank4/backups/postgres/` once every database succeeds, so Backrest never reads a half-written file mid-rotation.
+   - **Trade you're accepting.** Plain SQL restores via `psql -f <file>`, not `pg_restore`. There's no per-table selective restore, no parallel restore. Acceptable for the homelab scale; document it in the restore runbook.
 
-   for db in main forgejo immich memos vaultwarden; do
-     docker exec -i postgres-postgres-1 \
-       pg_dump -Fc -U main -d "$db" > "$TMP/${db}.dump"
-   done
-
-   # Globals (roles, tablespaces) for a clean rebuild
-   docker exec -i postgres-postgres-1 \
-     pg_dumpall -U main --globals-only > "$TMP/globals.sql"
-
-   # Atomic rotate — partial writes won't pollute the backup source
-   mv "$TMP"/*.dump "$TMP"/globals.sql "$OUT/"
-
-   # Notify on failure (cron will mail or we can pipe to ntfy)
-   ```
-
-   Host crontab:
+   Host crontab (TrueNAS host or the box running the postgres container):
    ```cron
    MAILTO=root
-   0 2 * * * root /usr/local/bin/pg-dump-job.sh || \
+   0 2 * * * root /usr/local/bin/dump-postgres.sh || \
      curl -fsS -d "pg_dump failed on $(hostname)" https://ntfy.sh/your-private-topic
    ```
 
-   Schedule the Backrest `postgres` plan for 03:00 — after the dump completes but before the rest of the critical plans run at 02:30… wait, swap: dump at 02:00, Backrest critical plans at 03:00 so they all pick up the freshly-rotated files.
+   Schedule: dump at 02:00, Backrest critical plans (including the `postgres` plan) at 03:00 so they pick up the freshly-rotated files.
 
-2. **Move the dump location** from `/mnt/tank4/backups/postgres/` (un-classed top-level dir) to `/mnt/tank4/class1/backups/postgres/` for consistency. With the new structure this means the `postgres` plan source path is `/mnt/tank4/class1/backups/postgres` (already reflected in the plan table in Step 6).
+2. **Dump location stays at `/mnt/tank4/backups/postgres/`.** That's where `dump-postgres.sh` already writes; the `postgres` Backrest plan's source points at the same path (reflected in the Step 6 table). No relocation needed.
 
-3. **The stale `/mnt/tank4/class2/backups/postgres.sql`** (339 MB) should be deleted via the TrueNAS WebUI.
+3. **The stale `/mnt/tank4/backups/postgres.sql`** (339 MB) should be deleted via the TrueNAS WebUI.
 
 ### Same pattern for SQLite databases
 
@@ -236,7 +218,7 @@ sqlite3 /mnt/fast/apps/navidrome/navidrome.db \
 
 Then add `navidrome.db` (the live one — Backrest could capture mid-write) and `navidrome.db-wal`, `navidrome.db-shm` to the `apps` plan's exclude list. The `.backup` file (consistent snapshot) gets included.
 
-Note: with Vaultwarden now Postgres-backed (per the recent `compose.vault.yaml` change), its SQLite database is no longer in play — `class1/secrets/vault/` holds attachments and Sends but the actual user/password data lives in postgres → covered by `pg_dump`.
+Note: with Vaultwarden now Postgres-backed (per the recent `compose.vault.yaml` change), its SQLite database is no longer in play — `tank4/secrets/vault/` holds attachments and Sends but the actual user/password data lives in postgres → covered by `pg_dump`.
 
 ## Excludes for the `apps` plan
 
@@ -247,26 +229,26 @@ Most of `fast/apps/*` is small config — back it up. But three things should be
 - `/mnt/fast/apps/paperless/log/**` — logs.
 - `/mnt/fast/apps/backrest/cache/**` — Restic local cache, regenerable.
 
-Existing excludes on the class1 plan (`**/cache`, `**/.cache`, `**/Cache`, `**/*.tmp`, `**/thumbs`, `**/node_modules`, `**/.DS_Store`, `**/.Spotlight-V100`, `**/.Trashes`) are sensible — reuse the same list on every plan.
+Existing excludes on the legacy `B2-Class1` plan (`**/cache`, `**/.cache`, `**/Cache`, `**/*.tmp`, `**/thumbs`, `**/node_modules`, `**/.DS_Store`, `**/.Spotlight-V100`, `**/.Trashes`) are sensible — reuse the same list on every plan.
 
-## Class3 risk note (informational, not a recommendation against your decision)
+## Forgejo/Immich support-dir risk note (informational, not a recommendation against your decision)
 
-You chose to skip all of `class3`. Concretely that means after a total-disaster restore:
+You chose to skip the Forgejo and Immich *support directories* that live alongside (or under) the main data datasets — they hold either regenerable derivatives (thumbs, encoded video) or small bits of host-side state. Concretely that means after a total-disaster restore:
 
-- **Forgejo SSH host keys** in `/mnt/tank4/class3/forgejo/ssh/` are lost → every existing clone gets `WARNING: REMOTE HOST IDENTIFICATION HAS CHANGED` until the user re-pins. Annoying, recoverable.
+- **Forgejo SSH host keys** under the Forgejo data dir (`ssh/`) are lost → every existing clone gets `WARNING: REMOTE HOST IDENTIFICATION HAS CHANGED` until the user re-pins. Annoying, recoverable.
 - **Forgejo `app.ini` secrets** (session keys, OAuth client secrets, JWT signing) are lost → everyone re-logs-in once. OAuth integrations to external services need their client secrets re-issued.
-- **Forgejo wiki / attachments / LFS** in `class3/forgejo/git/lfs/` are lost. Repo commits survive (those are on `class2/code`), but anything stored as an attachment or LFS pointer does not.
-- **Immich avatars** (`class3/immich/profile`) lost.
-- **Immich in-flight uploads** (`class3/immich/upload`) — anything not yet template-moved to `class2/photos`. Usually a handful of files per recent sync.
+- **Forgejo wiki / attachments / LFS** (under `git/lfs/`) are lost. Repo commits survive (those are on `tank4/code`), but anything stored as an attachment or LFS pointer does not.
+- **Immich avatars** (`profile/`) lost.
+- **Immich in-flight uploads** (`upload/`) — anything not yet template-moved to `tank4/photos`. Usually a handful of files per recent sync.
 - **Immich thumbs / encoded-video** — regenerate automatically over hours/days of CPU+GPU time.
 
-If any of those bullets sting more than expected, the surgical fix is to add a single extra source `/mnt/fast/apps`-style backup plan covering only `class3/forgejo` (~375 KB) and skip the Immich-derived dirs. It's a 375 KB add at trivial cost.
+If any of those bullets sting more than expected, the surgical fix is to add a single extra `/mnt/fast/apps`-style plan covering only the Forgejo support dir (~375 KB) and continue skipping the Immich-derived dirs. It's a 375 KB add at trivial cost.
 
 ## Cost projection
 
 ### Empirical baseline
 
-You're currently billed **$0.06 USD over ~5 months** for 12.6 GiB in `zanbaldwin-nas-backup`. That works out to **~$0.012/month** for the existing class1 + postgres backup. The reason it's so cheap is the account-wide **10 GB free tier**: only ~2.6 GiB is actually billable, giving an effective rate of ~$0.004/GiB-month on the current setup (where the free tier covers 79% of stored data).
+You're currently billed **$0.06 USD over ~5 months** for 12.6 GiB in `zanbaldwin-nas-backup`. That works out to **~$0.012/month** for the existing `secrets/books/postgres` backup. The reason it's so cheap is the account-wide **10 GB free tier**: only ~2.6 GiB is actually billable, giving an effective rate of ~$0.004/GiB-month on the current setup (where the free tier covers 79% of stored data).
 
 The free tier doesn't scale — once total stored data clears 10 GB, you pay list price (**$0.006/GiB-month**, ~$6/TB) for everything above it. Transactions (uploads, downloads, list calls) are billed separately at trivial rates for a backup workload (under $0.01/month at this scale).
 
@@ -478,24 +460,23 @@ For each new repo:
 
 **Add plans:**
 
-For the `b2-critical` repo, add 5 plans (one per source). Each plan automatically tags its snapshots with the plan ID:
+For the `b2-critical` repo, add 4 plans (one per source). Each plan automatically tags its snapshots with the plan ID:
 
 | Plan ID | Sources | Retention shape | Schedule |
 |---|---|---|---|
-| `secrets` | `/mnt/tank4/class1/secrets` | 14d/8w/12m/2y | `30 2 * * *` |
-| `postgres` | `/mnt/tank4/class1/backups/postgres` | 14d/8w/12m/2y | `0 3 * * *` (after pg_dump cron) |
-| `code` | `/mnt/tank4/class2/code` | 14d/8w/12m/2y | `30 2 * * *` |
-| `documents` | `/mnt/tank4/class2/documents` | 14d/8w/12m/2y | `30 2 * * *` |
+| `secrets` | `/mnt/tank4/secrets` | 14d/8w/12m/2y | `30 2 * * *` |
+| `postgres` | `/mnt/tank4/backups/postgres` | 14d/8w/12m/2y | `0 3 * * *` (after pg_dump cron) |
+| `code` | `/mnt/tank4/code` | 14d/8w/12m/2y | `30 2 * * *` |
 | `apps` | `/mnt/fast/apps` (excludes below) | 14d/8w/12m/2y | `30 2 * * *` |
 
 For the `b2-media` repo, add 4 plans:
 
 | Plan ID | Sources | Retention shape | Schedule |
 |---|---|---|---|
-| `books` | `/mnt/tank4/class1/books` | 7d/4w/6m/1y | `30 2 * * *` |
-| `photos` | `/mnt/tank4/class2/photos` (+ `/mnt/tank4/class1/photos` if populated) | 7d/4w/3m/1y | `30 2 * * *` |
-| `music` | `/mnt/tank4/class2/music` | 7d/4w/3m/1y | `30 2 * * *` |
-| `drive` | `/mnt/tank4/class2/drive` | 7d/4w/6m/1y | `30 2 * * *` |
+| `books` | `/mnt/tank4/books` | 7d/4w/6m/1y | `30 2 * * *` |
+| `photos` | `/mnt/tank4/photos` | 7d/4w/3m/1y | `30 2 * * *` |
+| `music` | `/mnt/tank4/music` | 7d/4w/3m/1y | `30 2 * * *` |
+| `drive` | `/mnt/tank4/drive` | 7d/4w/6m/1y | `30 2 * * *` |
 
 Within a single repo, plans queue behind each other on the repo lock — that's fine, total overnight wall-clock is still well under the schedule window.
 
@@ -710,10 +691,9 @@ Then **duplicate each critical plan** to also target this repo. Same sources, sa
 
 | Plan ID | Source | Repo |
 |---|---|---|
-| `secrets-s3` | `/mnt/tank4/class1/secrets` | `s3-critical` |
-| `postgres-s3` | `/mnt/tank4/class1/backups/postgres` | `s3-critical` |
-| `code-s3` | `/mnt/tank4/class2/code` | `s3-critical` |
-| `documents-s3` | `/mnt/tank4/class2/documents` | `s3-critical` |
+| `secrets-s3` | `/mnt/tank4/secrets` | `s3-critical` |
+| `postgres-s3` | `/mnt/tank4/backups/postgres` | `s3-critical` |
+| `code-s3` | `/mnt/tank4/code` | `s3-critical` |
 | `apps-s3` | `/mnt/fast/apps` | `s3-critical` |
 
 Schedule them to run *after* the B2 plans complete (e.g. B2 at 02:30, S3 at 03:30) so they're not contending for source-read bandwidth.
@@ -786,8 +766,8 @@ TrueNAS has its own *system config backup* (Settings → General → Manage Conf
 This strategy assumes ZFS snapshots are the local "human error" protection leg. Verify they're actually scheduled: TrueNAS → Data Protection → Periodic Snapshot Tasks.
 
 Minimum coverage:
-- `tank4/class1` — daily, 30-day retention
-- `tank4/class2` — daily, 30-day retention
+- All `tank4/*` data datasets (`secrets`, `backups`, `code`, `books`, `photos`, `music`, `drive`) — daily, 30-day retention
+- `fast/apps` — daily, 30-day retention (covers app config that the `apps` plan also offsites)
 
 Without these, B2's daily-granularity is your *only* "I deleted that yesterday" recovery, which is worse than what ZFS can give you locally for free.
 
@@ -832,10 +812,10 @@ The two-key pattern prevents an attacker on the NAS from *destroying* the offsit
 
 **14. Don't dismiss the `apps` plan as low-value** — Calibre tagging/metadata in `fast/apps/calibre/` and Navidrome's play counts/playlists/listen history in `fast/apps/navidrome/navidrome.db` are years of accumulated state. The underlying media survives without them, but losing the `apps` plan means losing all that contextual data even though "nothing is broken". Functional + sentimental value, not "skippable".
 
-**15. This document needs to live somewhere durable** — currently in `/tmp/nas/BACKUP_STRATEGY.md` on your laptop. Move it into `~/.dotfiles/nas/` (so it's in the Forgejo repo → in `class2/code` → in the backup → in B2) before the next reboot, otherwise the entire planning conversation is one `rm /tmp` away from being gone.
+**15. This document needs to live somewhere durable** — currently in `/tmp/nas/BACKUP_STRATEGY.md` on your laptop. Move it into `~/.dotfiles/nas/` (so it's in the Forgejo repo → in `tank4/code` → in the backup → in B2) before the next reboot, otherwise the entire planning conversation is one `rm /tmp` away from being gone.
 
 ## Smaller follow-up items (file these as TODOs)
 
 1. **Local "copy 2" of the 3-2-1.** With B2 + S3, you have two offsite copies of critical (1.3 GiB) but only one offsite copy of media (189 GiB on B2). ZFS + RAID-Z on `tank4` is one local copy + redundancy, but still one disk subsystem in one chassis. A periodic `restic copy` of the media repo to a USB-attached repo or a second ZFS pool gives a true second medium for the bulk data. Out of scope per the brief; raise when ready.
-2. **Stale `class2/backups/postgres.sql`** (339 MB) — delete via TrueNAS WebUI.
+2. **Stale `tank4/backups/postgres.sql`** (339 MB) — delete via TrueNAS WebUI.
 3. **`fast/home/zan`** is just the default shell skel (bashrc/profile/bash_logout). If you ever actually use it, include it in the `apps` plan or add a new `home` plan to the critical bucket.

@@ -1,0 +1,37 @@
+name: 'sites'
+services:
+    web:
+        image: 'nginx:1.31.0-alpine'
+        restart: 'unless-stopped'
+        environment:
+            TZ: 'Europe/Amsterdam'
+        ports:
+            - target: 80
+              published: 7487
+              protocol: 'tcp'
+        configs:
+            - source: 'nginx'
+              target: '/etc/nginx/conf.d/default.conf'
+        volumes:
+            - type: 'bind'
+              source: '/mnt/tank4/sites'
+              target: '/host'
+              read_only: true
+
+configs:
+    nginx:
+        content: |
+            server {
+                listen 80 default_server;
+                server_name _;
+                root /host;
+                server_tokens off;
+                charset utf-8;
+                location / {
+                    index index.html;
+                    autoindex on;
+                    autoindex_exact_size off;
+                    autoindex_localtime on;
+                    try_files $$uri $$uri/ =404;
+                }
+            }

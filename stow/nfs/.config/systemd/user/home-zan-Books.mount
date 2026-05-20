@@ -4,7 +4,7 @@ After=network-online.target
 Wants=network-online.target
 
 [Mount]
-What=nas.lan.zanbaldwin.com:/mnt/tank4/class1/books
+What=nas.lan.zanbaldwin.com:/mnt/tank4/books
 Where=/home/zan/Books
 Type=nfs
 Options=rw,vers=4.1,proto=tcp,_netdev,nofail

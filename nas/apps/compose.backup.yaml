@@ -14,8 +14,8 @@ services:
             XDG_CACHE_HOME: '/cache'
             BACKREST_PORT: '9898'
         secrets:
-            - 'backblaze_id'
-            - 'backblaze_key'
+            - 'backblaze_credentials'
+            - 'truenas_api_key'
         ports:
             - target: 9898
               published: 9898
@@ -41,7 +41,7 @@ services:
               read_only: true
 
 secrets:
-    backblaze_id:
-        file: '/mnt/tank4/secrets/backblaze/id'
-    backblaze_key:
-        file: '/mnt/tank4/secrets/backblaze/key'
+    backblaze_credentials:
+        file: '/mnt/tank4/secrets/backrest/backblaze'
+    truenas_api_key:
+        file: '/mnt/tank4/secrets/backrest/truenas'

@@ -1,0 +1,189 @@
+{
+    "modno": 40,
+    "instance": "ZBNAS",
+    "repos": [
+        {
+            "id": "b2-critical",
+            "uri": "s3:s3.eu-central-003.backblazeb2.com/[redacted]/",
+            "password": "[redacted]",
+            "env": [
+                "AWS_DEFAULT_REGION=eu-central-003",
+                "AWS_SHARED_CREDENTIALS_FILE=/run/secrets/backblaze_credentials"
+            ],
+            "prunePolicy": {
+                "schedule": {
+                    "disabled": true,
+                    "clock": "CLOCK_LOCAL"
+                },
+                "maxUnusedPercent": 10
+            },
+            "hooks": [
+                {
+                    "conditions": [
+                        "CONDITION_ANY_ERROR"
+                    ],
+                    "onError": "ON_ERROR_RETRY_EXPONENTIAL_BACKOFF",
+                    "actionCommand": {
+                        "command": "curl -X POST \\\n    --header \"Authorization: Bearer $(cat '/run/secrets/truenas_api_key')\" \\\n    --header \"Content-Type: application/json\" \\\n    --data '{\"message\":{\"subject\":{{ printf \"Backrest [%v] on %s/%s\" .Event .Repo.Id .Plan.Id | .JsonMarshal }},\"text\":{{ .Summary | .JsonMarshal }}}}' \\\n    'https://nas.lan.zanbaldwin.com/api/v2.0/mail/send'"
+                    }
+                }
+            ],
+            "checkPolicy": {
+                "schedule": {
+                    "cron": "0 4 1 * *",
+                    "clock": "CLOCK_LOCAL"
+                },
+                "readDataSubsetPercent": 20
+            },
+            "commandPrefix": {},
+            "guid": "8f031a32b6b3b38b4977c7f0b72c875fc5bd0222464cdceb87caa13bda0f9dda",
+            "forgetPolicy": {
+                "schedule": {
+                    "maxFrequencyDays": 1,
+                    "clock": "CLOCK_LOCAL"
+                },
+                "retention": {
+                    "policyTimeBucketed": {
+                        "hourly": 24,
+                        "daily": 14,
+                        "weekly": 8,
+                        "monthly": 12,
+                        "yearly": 2
+                    }
+                }
+            }
+        },
+        {
+            "id": "b2-media",
+            "uri": "s3:s3.eu-central-003.backblazeb2.com/[redacted]/",
+            "password": "[redacted]",
+            "env": [
+                "AWS_DEFAULT_REGION=eu-central-003",
+                "AWS_SHARED_CREDENTIALS_FILE=/run/secrets/backblaze_credentials"
+            ],
+            "prunePolicy": {
+                "schedule": {
+                    "disabled": true,
+                    "clock": "CLOCK_LAST_RUN_TIME"
+                },
+                "maxUnusedPercent": 10
+            },
+            "hooks": [
+                {
+                    "conditions": [
+                        "CONDITION_ANY_ERROR"
+                    ],
+                    "onError": "ON_ERROR_RETRY_EXPONENTIAL_BACKOFF",
+                    "actionCommand": {
+                        "command": "curl -X POST \\\n    --header \"Authorization: Bearer $(cat '/run/secrets/truenas_api_key')\" \\\n    --header \"Content-Type: application/json\" \\\n    --data '{\"message\":{\"subject\":{{ printf \"Backrest [%v] on %s/%s\" .Event .Repo.Id .Plan.Id | .JsonMarshal }},\"text\":{{ .Summary | .JsonMarshal }}}}' \\\n    'https://nas.lan.zanbaldwin.com/api/v2.0/mail/send'"
+                    }
+                }
+            ],
+            "checkPolicy": {
+                "schedule": {
+                    "cron": "0 4 1 * *",
+                    "clock": "CLOCK_LOCAL"
+                },
+                "readDataSubsetPercent": 2
+            },
+            "commandPrefix": {},
+            "guid": "18ee4f24511eca9a91e72998719e4459af611918567ffb4c292ec8c024376424",
+            "forgetPolicy": {
+                "schedule": {
+                    "maxFrequencyDays": 1,
+                    "clock": "CLOCK_LAST_RUN_TIME"
+                },
+                "retention": {
+                    "policyTimeBucketed": {
+                        "hourly": 24,
+                        "daily": 7,
+                        "weekly": 4,
+                        "monthly": 6,
+                        "yearly": 1
+                    }
+                }
+            }
+        }
+    ],
+    "plans": [
+        {
+            "id": "b2-critical",
+            "repo": "b2-critical",
+            "paths": [
+                "/source/backups",
+                "/source/code",
+                "/source/secrets"
+            ],
+            "excludes": [
+                "**/cache",
+                "**/.cache",
+                "**/Cache",
+                "**/*.tmp",
+                "**/thumbs",
+                "**/node_modules",
+                "**/.DS_Store",
+                "**/.Spotlight-V100",
+                "**/.Trashes",
+                "**/.Trash-*"
+            ],
+            "retention": {
+                "policyTimeBucketed": {
+                    "hourly": 24,
+                    "daily": 30,
+                    "monthly": 12
+                }
+            },
+            "schedule": {
+                "cron": "0 3 * * *",
+                "clock": "CLOCK_LOCAL"
+            }
+        },
+        {
+            "id": "b2-media",
+            "repo": "b2-media",
+            "paths": [
+                "/source/books",
+                "/source/drive",
+                "/source/music",
+                "/source/photos"
+            ],
+            "excludes": [
+                "**/cache",
+                "**/.cache",
+                "**/Cache",
+                "**/*.tmp",
+                "**/thumbs",
+                "**/node_module",
+                "**/.DS_Store",
+                "**/.Spotlight-V100",
+                "**/.Trashes",
+                "**/.Trash-*"
+            ],
+            "retention": {
+                "policyTimeBucketed": {
+                    "hourly": 24,
+                    "daily": 30,
+                    "monthly": 12
+                }
+            },
+            "schedule": {
+                "cron": "30 2 * * *",
+                "clock": "CLOCK_LOCAL"
+            }
+        }
+    ],
+    "auth": {
+        "users": [
+            {
+                "name": "zanbaldwin",
+                "passwordBcrypt": "********"
+            }
+        ]
+    },
+    "version": 6,
+    "sync": {
+        "identity": {
+            "keyId": "ed25519.[redacted]"
+        }
+    }
+}

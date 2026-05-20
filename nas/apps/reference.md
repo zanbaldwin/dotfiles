@@ -18,14 +18,13 @@ TrueNAS
  │       ├─ tailscale
  │       └─ backrest
  └─ pool(tank4)
-     ├─ class1
-     │   ├─ secrets
-     │   │   └─ vault
-     │   ├─ books
-     │   └─ photos
-     └─ class2
-         ├─ music
-         └─ photos
+     ├─ backups
+     ├─ books
+     ├─ code
+     ├─ drive
+     ├─ music
+     ├─ photos
+     └─ secrets
 ```
 
 # Port Mappings
@@ -42,7 +41,7 @@ TrueNAS
 | Vaultwarden            | `2489` | `vault.lan.zanbaldwin.com`   |
 
 # Secrets
-> `/mnt/tank4/class1/secrets`
+> `/mnt/tank4/secrets`
 
 - `postgres/root`
 - `postgres/immich`

@@ -1,43 +1,177 @@
 name: 'notes'
 services:
-    # Database Setup
-    # ==============
-    #   CREATE USER memos WITH ENCRYPTED PASSWORD '<password>';
-    #   CREATE DATABASE memos;
-    #   \c memos
-    #   ALTER DATABASE memos OWNER TO memos;
-    #   ALTER SCHEMA public OWNER TO memos;
-    #   GRANT USAGE, CREATE ON SCHEMA public TO memos;
-    memos:
-        image: 'neosmemo/memos:0.25.3'
+    # Alternative:
+    # - KaraKeep, bookmarks manager.
+    # - AppFlowy, Notion-esque.
+    # - Tolaria, Obsidian-esque (desktop app, not self-hosted).
+
+    server:
+        image: 'standardnotes/server:latest'
         restart: 'unless-stopped'
         networks:
-            - 'database'
+            - 'aws'
+            - 'cache'
         environment:
             TZ: 'Europe/Amsterdam'
-            MEMOS_MODE: 'prod'
-            MEMOS_ADDR: '0.0.0.0'
-            MEMOS_PORT: '5230'
-            MEMOS_DATA: '/var/opt/memos'
-            MEMOS_DRIVER: 'postgres'
-            MEMOS_DSN_FILE: '/run/secrets/memodsn'
-            MEMOS_INSTANCE_URL: 'https://notes.lan.zanbaldwin.com'
+            # Host, port, username, password and database name are required and
+            # the container will fast-fail if they are not set (even though we
+            # don't use them).
+            DB_USERNAME: 'sqlite'
+            DB_PASSWORD: 'sqlite'
+            DB_DATABASE: 'sqlite'
+            # More annoyingly, the checks also validate/probe that the "host:port"
+            # combination is a reachable TCP endpoint (uses `nc -vz`). We already
+            # depend on Valkey, so just re-point it to that.
+            DB_HOST: 'valkey'
+            DB_PORT: '6379'
+            # Standard Notes only supports MySQL or SQLite, no Postgres :(
+            DB_TYPE: 'sqlite'
+            DB_SQLITE_DATABASE_PATH: '/opt/server/data/standardnotes.db'
+            REDIS_HOST: 'valkey'
+            REDIS_PORT: '6379'
+            CACHE_TYPE: 'redis'
+            AUTH_JWT_SECRET_FILE: '/run/secrets/jwt'
+            AUTH_SERVER_ENCRYPTION_SERVER_KEY_FILE: '/run/secrets/authserver'
+            VALET_TOKEN_SECRET_FILE: '/run/secrets/valet'
+            # Self-hosted domains (auth only needed on the API Gateway).
+            PUBLIC_FILES_SERVER_URL: 'https://notes-cdn.lan.zanbaldwin.com'
+            COOKIE_DOMAIN: 'notes-api.lan.zanbaldwin.com'
+            # SNS/SQS endpoints are left at the image defaults
+            # (http://localstack:4566). The 'goaws' service answers to that name
+            # and port via a network alias, so no per-service overrides are
+            # needed here.
         secrets:
-            - 'memodsn'
+            - 'jwt'
+            - 'authserver'
+            - 'valet'
         ports:
-            - target: 5230
-              published: 5230
+            # API Gateway
+            - target: 3000
+              published: 3102
+              protocol: 'tcp'
+            # Files Server
+            - target: 3104
+              published: 3104
               protocol: 'tcp'
         volumes:
             - type: 'bind'
-              source: '/mnt/fast/apps/memos'
-              target: '/var/opt/memos'
+              source: '/mnt/fast/apps/notes/logs'
+              target: '/var/lib/server/logs'
+              read_only: false
+            - type: 'bind'
+              source: '/mnt/tank4/notes/data'
+              target: '/opt/server/data'
+              read_only: false
+            - type: 'bind'
+              source: '/mnt/tank4/notes/uploads'
+              target: '/opt/server/packages/files/dist/uploads'
               read_only: false
 
+    web:
+        image: 'standardnotes/web:latest'
+        restart: 'unless-stopped'
+        environment:
+            TZ: 'Europe/Amsterdam'
+        ports:
+            # Web Client
+            - target: 80
+              published: 3105
+              protocol: 'tcp'
+
+    # SNS/SQS emulator for Standard Notes' inter-service domain events,
+    # replacing localstack (whose community image now requires a paid auth
+    # token). It is aliased as 'localstack' on the 'aws' network and listens on
+    # 4566 (set in the 'goaws' config below), so it transparently answers the
+    # image's built-in http://localstack:4566 defaults and 'server' needs no
+    # SNS/SQS overrides. Topics, queues and subscriptions are declared
+    # statically in the config. Not published to the host.
+    goaws:
+        image: 'admiralpiett/goaws:v0.5.4'
+        restart: 'unless-stopped'
+        command: ['-config', '/conf/goaws.yaml', '-loglevel', 'error']
+        networks:
+            aws:
+                aliases:
+                    - 'localstack'
+        environment:
+            TZ: 'Europe/Amsterdam'
+        expose: [4566]
+        configs:
+            - source: 'goaws'
+              target: '/conf/goaws.yaml'
+              mode: 0644
+
 networks:
-    database:
+    aws: {}
+    cache:
         external: true
 
 secrets:
-    memodsn:
-        file: '/mnt/tank4/secrets/postgres/memos_dsn'
+    jwt:
+        file: '/mnt/tank4/secrets/standardnotes/jwt'
+    authserver:
+        file: '/mnt/tank4/secrets/standardnotes/authserver'
+    valet:
+        file: '/mnt/tank4/secrets/standardnotes/valet'
+
+configs:
+    # Static SNS/SQS topology for GoAws: the same topics, queues and
+    # topic->queue subscriptions the old localstack bootstrap created at
+    # runtime. Port 4566 and Host 'localstack' mirror what the Standard Notes
+    # image expects by default. Raw is false everywhere so SNS messages arrive
+    # SQS-wrapped in the SNS envelope, matching the `--protocol sqs` (no raw
+    # delivery) subscriptions the bootstrap used.
+    goaws:
+        content: |
+            Local:
+              Host: localstack
+              Port: 4566
+              Region: us-east-1
+              AccountId: "000000000000"
+              LogToFile: false
+              Queues:
+                - Name: analytics-local-queue
+                - Name: auth-local-queue
+                - Name: files-local-queue
+                - Name: syncing-server-local-queue
+                - Name: revisions-server-local-queue
+                - Name: scheduler-local-queue
+              Topics:
+                - Name: payments-local-topic
+                  Subscriptions:
+                    - QueueName: analytics-local-queue
+                      Raw: false
+                    - QueueName: auth-local-queue
+                      Raw: false
+                - Name: auth-local-topic
+                  Subscriptions:
+                    - QueueName: auth-local-queue
+                      Raw: false
+                    - QueueName: files-local-queue
+                      Raw: false
+                    - QueueName: syncing-server-local-queue
+                      Raw: false
+                - Name: files-local-topic
+                  Subscriptions:
+                    - QueueName: auth-local-queue
+                      Raw: false
+                    - QueueName: syncing-server-local-queue
+                      Raw: false
+                - Name: revisions-server-local-topic
+                  Subscriptions:
+                    - QueueName: auth-local-queue
+                      Raw: false
+                    - QueueName: revisions-server-local-queue
+                      Raw: false
+                - Name: syncing-server-local-topic
+                  Subscriptions:
+                    - QueueName: files-local-queue
+                      Raw: false
+                    - QueueName: syncing-server-local-queue
+                      Raw: false
+                    - QueueName: auth-local-queue
+                      Raw: false
+                    - QueueName: revisions-server-local-queue
+                      Raw: false
+                - Name: analytics-local-topic
+                - Name: scheduler-local-topic

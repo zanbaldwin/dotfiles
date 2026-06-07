@@ -15,7 +15,8 @@ services:
                 limits:
                     memory: '1G'
         networks:
-            - 'database'
+            database:
+                aliases: ['database']
         environment:
             POSTGRES_PASSWORD_FILE: '/run/secrets/dbpass'
             POSTGRES_USER: 'main'
@@ -50,7 +51,8 @@ services:
                 limits:
                     memory: '256M'
         networks:
-            - 'cache'
+            cache:
+                aliases: ['cache']
         healthcheck:
             test: ['CMD', 'valkey-cli', '--raw', 'ping']
             interval: '30s'

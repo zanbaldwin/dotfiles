@@ -23,6 +23,10 @@ services:
         volumes:
             # Backrest application data
             - type: 'bind'
+              source: '/mnt/fast/apps/backrest/bin/websocat'
+              target: '/usr/local/bin/websocat'
+              read_only: true
+            - type: 'bind'
               source: '/mnt/fast/apps/backrest/data'
               target: '/data'
               read_only: false

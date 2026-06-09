@@ -36,7 +36,8 @@ function cd {
     else
         builtin cd "$@" || return;
     fi
-
+    # Skip repo banner when Claude Code is driving — saves context/tokens
+    [[ -n "$CLAUDECODE" ]] && return
     ## Git Repository Information on Directory Change
     if command -v "onefetch" >"/dev/null" 2>&1 && command -v "git" >"/dev/null" 2>&1; then
         if git rev-parse --show-toplevel >"/dev/null" 2>&1; then

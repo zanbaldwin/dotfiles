@@ -7,7 +7,7 @@ binds {
     Mod+Shift+Slash { show-hotkey-overlay; }
     // You can also toggle the overview with a 4-finger swipe on a touchpad.
     Mod+O repeat=false hotkey-overlay-title="Toogle <b>Overview</b>" { toggle-overview; }
-    Mod+Space hotkey-overlay-title="Run an <b>application</b>" { spawn "fuzzel"; }
+    Mod+Space hotkey-overlay-title="Run an <b>application</b>" { spawn "noctalia" "msg" "panel-toggle" "launcher"; }
     Mod+Return hotkey-overlay-title="Open a <b>Ghostty Terminal</b>" { spawn "ghostty"; }
 
     // Custom (without shift: focus, with shift: move).

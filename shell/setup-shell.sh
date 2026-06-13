@@ -22,11 +22,35 @@ EOF
 sudo udevadm control --reload-rules && sudo udevadm trigger
 systemctl --user enable 'kanata.service'
 
-# Quickshell
-sudo dnf install --setopt=install_weak_deps=False --assumeyes 'jemalloc'
-toolbox rm -f quickshell || true
-toolbox create quickshell
-toolbox run --container='quickshell' bash "${THIS_DIR}/toolbox.sh"
+# Noctalia runtime libraries: the toolbox build links against the -devel
+# counterparts, but the shell runs on the host, so the shared libraries must be
+# present here too (niri does not pull the GUI stack in on its own).
+sudo dnf install --setopt=install_weak_deps=False --assumeyes \
+    'cairo' \
+    'fontconfig' \
+    'freetype' \
+    'glib2' \
+    'harfbuzz' \
+    'jemalloc' \
+    'libcurl' \
+    'libglvnd-egl' \
+    'libglvnd-gles' \
+    'libqalculate' \
+    'librsvg2' \
+    'libwayland-client' \
+    'libwayland-egl' \
+    'libwebp' \
+    'libxkbcommon' \
+    'libxml2' \
+    'pango' \
+    'pipewire-libs' \
+    'polkit-libs' \
+    'sdbus-cpp'
+
+# Build Noctalia from source inside a toolbox (see toolbox.sh).
+toolbox rm -f 'noctalia' || true
+toolbox create 'noctalia'
+toolbox run --container='noctalia' bash "${THIS_DIR}/build-noctalia-in-toolbox.sh"
 
 # Utilities
 sudo dnf install --setopt=install_weak_deps=False --assumeyes \

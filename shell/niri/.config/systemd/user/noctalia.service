@@ -1,10 +1,13 @@
 [Unit]
-Description=Quickshell
+Description=Noctalia Wayland shell
+Documentation=https://noctalia.dev
+PartOf=graphical-session.target
 After=graphical-session.target
 ConditionEnvironment=XDG_CURRENT_DESKTOP=niri
 
 [Service]
-ExecStart=%h/.local/bin/qs --config='noctalia' --no-duplicate
+Type=simple
+ExecStart=%h/.local/bin/noctalia
 Restart=on-failure
 RestartSec=2
 

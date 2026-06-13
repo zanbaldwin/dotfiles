@@ -23,9 +23,6 @@ output "Samsung Electric Company LU28R55 H4ZT600868" {
     scale 1.0
     transform "normal"
     focus-at-startup
-    layout {
-        gaps 32
-    }
 }
 
 output "Samsung Electric Company LU28R55 BROKEN" {

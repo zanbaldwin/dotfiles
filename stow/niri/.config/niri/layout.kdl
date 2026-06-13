@@ -1,7 +1,7 @@
 // Example: enable rounded corners for all windows.
 // (This example rule is commented out with a "/-" in front.)
 window-rule {
-    geometry-corner-radius 20
+    geometry-corner-radius 10
     clip-to-geometry true
 }
 
@@ -10,7 +10,7 @@ window-rule {
 // https://niri-wm.github.io/niri/Configuration:-Layout
 layout {
     // A gap of 16px for the default screen (the internal laptop screen).
-    gaps 16
+    gaps 8
 
     // When to center a column when changing focus, options are:
     // - "never", default behavior, focusing an off-screen column will keep at the left
@@ -94,7 +94,7 @@ layout {
         // The settings are the same as for the focus ring.
         // If you enable the border, you probably want to disable the focus ring.
         on
-        width 3
+        width 2
         // active-color "#1fa15e"
         // inactive-color "#49567e"
 

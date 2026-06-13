@@ -12,3 +12,5 @@
 /yarn-error.log*
 /node_modules/
 /composer.phar
+
+**/.claude/settings.local.json

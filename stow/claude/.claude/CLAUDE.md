@@ -20,6 +20,7 @@ When fixing bugs, stay focused on the minimal fix. Do not refactor surrounding c
 - Suggestions → conversation. DO NOT implement without explicit approval
 - Work iteratively: complete one atomic task → STOP → report → ask permission for next
 - Code should be self-documenting. No unsolicited comments/PHPDoc
+- Use British English spelling wherever possible.
 
 ### Workflow
 - **Before:** State plan. "I will modify `Class::method()` to fix X" (confirm minimal scope)

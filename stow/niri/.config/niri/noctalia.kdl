@@ -8,11 +8,11 @@
 
 // Set the overview wallpaper on the backdrop.
 layer-rule {
-  match namespace="^noctalia-overview*"
-  place-within-backdrop true
+    match namespace="^noctalia-overview*"
+    place-within-backdrop true
 }
 
 debug {
-  // Allows notification actions and window activation from Noctalia.
-  honor-xdg-activation-with-invalid-serial
+    // Allows notification actions and window activation from Noctalia.
+    honor-xdg-activation-with-invalid-serial
 }

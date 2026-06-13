@@ -54,8 +54,4 @@ toolbox run --container='noctalia' bash "${THIS_DIR}/build-noctalia-in-toolbox.s
 
 # Utilities
 sudo dnf install --setopt=install_weak_deps=False --assumeyes \
-    'brightnessctl' \
-    'playerctl' \
-    'swayidle' \
-    'swaylock' \
     'wpctl'

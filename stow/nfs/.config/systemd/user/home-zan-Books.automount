@@ -1,9 +1,0 @@
-[Unit]
-Description=Automount NFS Books
-
-[Automount]
-Where=/home/zan/Books
-TimeoutIdleSec=10min
-
-[Install]
-WantedBy=multi-user.target

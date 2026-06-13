@@ -1,0 +1,51 @@
+#!/usr/bin/env bash
+
+# Privileged helper for `nfs-mount` -- invoked via pkexec, runs as root.
+# Not meant to be called directly.
+#
+# Mode (argument 1):
+#   mount    -> start the NFS mount units only
+#   connect  -> start the Tailscale container, wait until healthy, then mount
+#
+# Exit codes (consumed by nfs-mount for notify-send):
+#   0 success | 3 no Tailscale container | 4 container unhealthy | 5 mount/units error
+set -euo pipefail
+
+MODE="${1:-connect}"
+CONTAINER='network-tailscale-1'
+HEALTH_TIMEOUT='90' # seconds to wait for the container to report healthy
+
+mapfile -t UNITS < <(systemctl list-unit-files --no-legend 'home-zan-*.mount' | awk '{ print $1 }')
+if [ "${#UNITS[@]}" -eq 0 ]; then
+    echo 'nfs-mount-helper: no home-zan-*.mount units found' >&2
+    exit 5
+fi
+
+if [ "${MODE}" = 'connect' ]; then
+    if ! podman container exists "${CONTAINER}"; then
+        echo "nfs-mount-helper: container '${CONTAINER}' does not exist" >&2
+        exit 3
+    fi
+    podman start "${CONTAINER}" >'/dev/null' || {
+        echo "nfs-mount-helper: failed to start '${CONTAINER}'" >&2
+        exit 4
+    }
+
+    status=''
+    end=$((SECONDS + HEALTH_TIMEOUT))
+    while [ "${SECONDS}" -lt "${end}" ]; do
+        status="$(podman inspect --format '{{.State.Health.Status}}' "${CONTAINER}" 2>'/dev/null' || true)"
+        if [ "${status}" = 'healthy' ]; then
+            break
+        fi
+        # Force an immediate check rather than waiting on the 30s interval.
+        podman healthcheck run "${CONTAINER}" >'/dev/null' 2>&1 || true
+        sleep 2
+    done
+    if [ "${status}" != 'healthy' ]; then
+        echo "nfs-mount-helper: '${CONTAINER}' not healthy after ${HEALTH_TIMEOUT}s (status: ${status:-unknown})" >&2
+        exit 4
+    fi
+fi
+
+systemctl start "${UNITS[@]}" || exit 5

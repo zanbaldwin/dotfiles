@@ -1,9 +1,0 @@
-[Unit]
-Description=Automount NFS Music
-
-[Automount]
-Where=/home/zan/Music
-TimeoutIdleSec=10min
-
-[Install]
-WantedBy=multi-user.target

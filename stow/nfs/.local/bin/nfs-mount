@@ -1,0 +1,62 @@
+#!/usr/bin/env bash
+
+# Mount the home-network NFS shares on demand.
+#
+# Flow:
+#   - If the NFS server is reachable, just mount.
+#   - If not, bring up healthy Tailscale container, and then mount.
+#
+# All privileged work runs in a single pkexec call to nfs-mount-helper, so there
+# is exactly one polkit prompt and it works from a desktop launcher (no TTY,
+# where sudo could not prompt).
+set -euo pipefail
+
+THIS_DIR="$(dirname "$(readlink -f -- "$0")")"
+SERVER_HOST='nas.lan.zanbaldwin.com'
+SERVER_PORT='2049'
+CONTAINER='network-tailscale-1'
+HELPER="${THIS_DIR}/nfs-mount-helper"
+
+notify() {
+    # $1 = urgency (normal|critical), $2 = message
+    command -v notify-send >'/dev/null' 2>&1 && notify-send --urgency="$1" 'NFS Mounts' "$2" || true
+}
+
+# A 2s TCP probe to the NFS port. Off-network the .lan name only resolves once
+# Tailscale is up, so this fails fast and routes us through the Tailscale path.
+if timeout 2 bash -c "exec 3<>/dev/tcp/${SERVER_HOST}/${SERVER_PORT}" 2>'/dev/null'; then
+    MODE='mount'
+else
+    MODE='connect'
+fi
+
+rc=0
+pkexec "${HELPER}" "${MODE}" || rc=$?
+
+case "${rc}" in
+    0)
+        notify 'normal' 'NFS shares mounted.'
+        ;;
+    3)
+        msg="Tailscale container '${CONTAINER}' does not exist; cannot reach the NFS server."
+        echo "nfs-mount: ${msg}" >&2; notify 'critical' "${msg}"
+        ;;
+    4)
+        msg="Tailscale (${CONTAINER}) did not become healthy; shares not mounted."
+        echo "nfs-mount: ${msg}" >&2; notify 'critical' "${msg}"
+        ;;
+    5)
+        msg='Failed to mount one or more NFS shares.'
+        echo "nfs-mount: ${msg}" >&2; notify 'critical' "${msg}"
+        ;;
+    126|127)
+        msg='Authentication is required to mount the NFS shares.'
+        echo "nfs-mount: ${msg}" >&2; notify 'critical' "${msg}"
+        ;;
+    *)
+        msg="nfs-mount failed (exit ${rc})."
+        echo "nfs-mount: ${msg}" >&2; notify 'critical' "${msg}"
+        ;;
+esac
+
+exit "${rc}"

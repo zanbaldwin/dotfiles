@@ -1,9 +1,0 @@
-[Unit]
-Description=Automount NFS Drive
-
-[Automount]
-Where=/home/zan/Drive
-TimeoutIdleSec=10min
-
-[Install]
-WantedBy=multi-user.target

@@ -57,4 +57,3 @@ stow_packages() {
 
 TOOLBOX_SCRIPT_DIRECTORY="$(dirname "$(readlink -f -- "$0")")"
 stow_packages "${TOOLBOX_SCRIPT_DIRECTORY}/../stow" "${HOME}"
-stow_packages "${TOOLBOX_SCRIPT_DIRECTORY}/../shell" "${HOME}"

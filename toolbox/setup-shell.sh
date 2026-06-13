@@ -51,7 +51,9 @@ sudo dnf install --setopt=install_weak_deps=False --assumeyes \
 toolbox rm -f 'noctalia' || true
 toolbox create 'noctalia'
 toolbox run --container='noctalia' bash "${THIS_DIR}/build-noctalia-in-toolbox.sh"
+systemctl --user enable 'noctalia.service'
 
 # Utilities
 sudo dnf install --setopt=install_weak_deps=False --assumeyes \
+    'ddcutil' \
     'wpctl'

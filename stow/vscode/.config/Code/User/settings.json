@@ -20,6 +20,20 @@
     "[typst]": {
         "editor.wordSeparators": "`~!@#$%^&*()=+[{]}\\|;:'\",.<>/?"
     },
+    "[yaml]": {
+        "editor.tabSize": 2,
+        "editor.insertSpaces": true,
+        "editor.detectIndentation": false,
+        "editor.formatOnSave": true,
+        "editor.defaultFormatter": "redhat.vscode-yaml"
+    },
+    "[github-actions-workflow]": {
+        "editor.tabSize": 2,
+        "editor.insertSpaces": true,
+        "editor.detectIndentation": false,
+        "editor.formatOnSave": true,
+        "editor.defaultFormatter": "redhat.vscode-yaml"
+    },
     "chat.commandCenter.enabled": false,
     "chat.mcp.access": "none",
     "chat.mcp.autostart": "never",
@@ -175,4 +189,9 @@
     "workbench.tips.enabled": false,
     "terminal.integrated.lineHeight": 1.2,
     "editor.inlineSuggest.edits.showCollapsed": true,
+    "editor.quickSuggestions": {
+        "other": "offWhenInlineCompletions",
+        "comments": "off",
+        "strings": "off"
+    },
 }

@@ -1,15 +1,15 @@
-ARG VERSION="${VERSION:-40}"
+ARG VERSION_ID="${VERSION_ID:-44}"
 ARG VARIANT="${VARIANT:-silverblue}"
 # Fedora 39 is the first to officially ship as an OCI image; before then the
 # unofficial images could be found at "quay.io/fedora-ostree-desktops/${VARIANT}".
 # At some point, they should start hosting images on "registry.fedoraproject.org/fedora/fedora-${VARIANT}".
 ARG IMAGE="${IMAGE:-quay.io/fedora/fedora-${VARIANT}}"
 
-# ======================= RUST ======================= #
-# Rust is needed to build binaries for both Gnome and  #
-# Custom Linux kernel environments.                    #
-# ==================================================== #
-FROM "fedora:${VERSION}" AS rust
+# ================= #
+# Custom kernel RPM #
+# ================= #
+
+FROM "fedora:${VERSION_ID}" AS rust
 RUN dnf install --assumeyes \
         cmake \
         curl \
@@ -19,22 +19,7 @@ RUN dnf install --assumeyes \
  && curl --proto "=https" --tlsv1.2 -sSf "https://sh.rustup.rs" >"/tmp/rustup.sh" \
  && sh /tmp/rustup.sh -qy
 
-# === RUST === #
-FROM rust AS alacritty
-RUN dnf install --assumeyes fontconfig-devel
-# There's absolutely no way I'm settling for Gnome Terminal as my default console.
-# TODO: Migrate to Kitty for better rendering, such as ligatures.
-RUN source "${HOME}/.cargo/env" \
- && git clone "https://github.com/alacritty/alacritty.git" --branch "v0.13.0" "/tmp/alacritty" \
- && (cd "/tmp/alacritty"; cargo build --release --features "wayland") \
- && mkdir -p "/opt/alacritty/bin" "/opt/alacritty/etc/bash_completion.d" "/opt/alacritty/share/pixmaps" "/opt/alacritty/share/applications" \
- && cp "/tmp/alacritty/target/release/alacritty" "/opt/alacritty/bin/alacritty" \
- && cp "/tmp/alacritty/extra/logo/alacritty-term.svg" "/opt/alacritty/share/pixmaps/Alacritty.svg" \
- && cp "/tmp/alacritty/extra/linux/Alacritty.desktop" "/opt/alacritty/share/applications/alacritty.desktop" \
- && cp "/tmp/alacritty/extra/completions/alacritty.bash" "/opt/alacritty/etc/bash_completion.d/alacritty" \
- && rm -rf "/tmp/alacritty"
-
-FROM "fedora:${VERSION}" AS secure-boot
+FROM "fedora:${VERSION_ID}" AS secure-boot
 RUN dnf install --assumeyes openssl \
  && mkdir -p "/opt/secureboot" \
  && openssl req -new -x509 -newkey "rsa:4096" -nodes -days 36500 \
@@ -97,7 +82,7 @@ RUN source "${HOME}/.cargo/env" \
  && sed -i 's/^EXTRAVERSION.*/EXTRAVERSION = -zanbaldwin/g' "/tmp/linux/Makefile" \
  && git config user.name "Zan Baldwin (Container Build)" \
  && git config user.email "hello+build@zanbaldwin.com" \
- && git -C "/tmp/linux" am /tmp/patches/*.patch
+ && find '/tmp/patches' -type 'f' -name '*.patch' -exec git -C '/tmp/linux' am '{}' +
 # Build Kernel
 RUN source "${HOME}/.cargo/env" \
  && git -C "/tmp/linux" clean -d -f -x \
@@ -105,55 +90,60 @@ RUN source "${HOME}/.cargo/env" \
  && echo "Building Linux kernel version '$(make -C "/tmp/linux" --no-print-directory kernelversion)'." \
  && make -C "/tmp/linux" -j "$(nproc --all)" rpm-pkg
 
-# ===================== #
-#                       #
-#     Custom Kernel     #
-#    (extends GMOME)    #
-#                       #
-# ===================== #
-FROM gnome AS linux
-COPY --from="kernel" "/opt/kernel" "/opt/kernel"
-RUN rpm-ostree override replace /opt/kernel/*.rpm
-
-# ================ #
-#                  #
-#       GNOME      #
-#     (default)    #
-#                  #
-# ================ #
-FROM "${IMAGE}:${VERSION}" AS gnome
-COPY "./usr/" "/usr/"
-RUN rpm-ostree install --idempotent --allow-inactive --releasever="${VERSION}" \
+# =============================== #
+# Default Silverblue installation #
+# =============================== #
+FROM "${IMAGE}:${VERSION_ID}" AS os
+# Kernel Virtual Machines
+RUN rpm-ostree install --idempotent --allow-inactive --releasever="${VERSION_ID}" \
        bridge-utils edk2-ovmf guestfs-tools libvirt qemu-kvm virt-install virt-manager \
-       podman-docker podman-tui containernetworking-plugins aardvark-dns \
-       distrobox ffmpeg-free fzf make ncdu nss-tools tlp tlp-rdw \
  && systemctl enable "libvirtd" \
+ && rm -rf /tmp/* /var/*
+# Niri (+Kanshi/Kanata) + Noctalia Deps
+RUN rpm-ostree install --idempotent --allow-inactive --releasever="${VERSION_ID}" \
+       niri kanshi \
+       cairo fontconfig freetype glib2 harfbuzz jemalloc libcurl libglvnd-egl \
+       libglvnd-gles libqalculate librsvg2 libwayland-client libwayland-egl \
+       libwebp libxkbcommon libxml2 pango pipewire-libs polkit-libs sdbus-cpp \
+ && systemctl enable 'kanshi'
+ && echo 'KERNEL=="uinput", MODE="0660", GROUP="uinput", OPTIONS+="static_node=uinput"' >'/etc/udev/rules.d/99-uinput.rules' \
+ && echo 'uinput' >'/etc/modules-load.d/uinput.conf' \
+ && rm -rf /tmp/* /var/* \
+# Podman, DConf, and Flatpak services.
+COPY "./usr/" "/usr/"
+RUN rpm-ostree install --idempotent --allow-inactive --releasever="${VERSION_ID}" \
+       containernetworking-plugins aardvark-dns \
  && systemctl enable "podman.service" \
  && systemctl enable "podman.socket" \
  && systemctl enable "podman-restart.service" \
  && systemctl enable "flatpak-update.service" \
+ && rm -rf /tmp/* /var/* \
+# Official Docker Engine (TODO: Does this install Docker's GPG keys?)
+RUN rpm-ostree install 'https://download.docker.com/linux/fedora/docker-ce.repo' \
+ && rpm-ostree install --idempotent --allow-inactive --releasever="${VERSION_ID}" \
+        docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin \
+ && systemctl enable 'docker'
+ && rm -rf /tmp/* /var/*
+# Ghostty Deps
+RUN rpm-ostree install --idempotent --allow-inactive --releasever="${VERSION_ID}" \
+        gettext libadwaita libgtk4-layer-shell \
+ && rm -rf /tmp/* /var/*
+# Misc Services
+RUN rpm-ostree install --idempotent --allow-inactive --releasever="${VERSION_ID}" \
+       distrobox ffmpeg-free fzf make ncdu nss-tools tlp tlp-rdw \
  && (systemctl enable "tlp.service" || true) \
  && if grep "secure_path" "/etc/sudoers" >"/dev/null" 2>&1; then \
        cat "/etc/sudoers" | grep -v "secure_path" | tee "/etc/sudoers" >"/dev/null" 2>&1; \
     fi \
  && sed -i -E "s/^#HandleLidSwitchExternalPower=.*$/HandleLidSwitchExternalPower=ignore/g" "/usr/lib/systemd/logind.conf" \
- && rm -rf /tmp/* /var/* \
- && ostree container commit
-COPY --from="alacritty" "/opt/alacritty/" "/usr/"
+ && rm -rf /tmp/* /var/*
+RUN ostree container commit
 
-# ================ #
-#                  #
-#       GNOME      #
-# (nVidia Drivers) #
-#                  #
-# ================ #
-FROM gnome AS nvidia
-RUN rpm-ostree install "https://download1.rpmfusion.org/nonfree/fedora/rpmfusion-nonfree-release-$(rpm -E %fedora).noarch.rpm" \
- && rpm-ostree install --idempotent --allow-inactive --releasever="${VERSION}" \
-      akmod-nvidia \
-      xorg-x11-drv-nvidia \
-      xorg-x11-drv-nvidia-cuda \
- && rpm-ostree kargs \
-      --append=rd.driver.blacklist=nouveau \
-      --append=modprobe.blacklist=nouveau \
-      --append=nvidia-drm.modeset=1
+# ============================================================= #
+# Apply custom kernel to our default Silverblue OS installation #
+# Apply Bazzite's nVidia drivers.                               #
+# ============================================================= #
+FROM os AS linux
+COPY --from="kernel" "/opt/kernel" "/opt/kernel"
+RUN rpm-ostree override replace /opt/kernel/*.rpm
+## TODO: Figure out how Bazzite installs a decent nVidia driver.

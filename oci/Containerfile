@@ -1,159 +1,194 @@
-ARG VERSION="${VERSION:-40}"
-ARG VARIANT="${VARIANT:-silverblue}"
+ARG REGISTRY="localhost:5000"
+ARG OWNER="zanbaldwin"
+ARG FEDORA_VERSION="44"
+ARG VARIANT="silverblue"
 # Fedora 39 is the first to officially ship as an OCI image; before then the
 # unofficial images could be found at "quay.io/fedora-ostree-desktops/${VARIANT}".
-# At some point, they should start hosting images on "registry.fedoraproject.org/fedora/fedora-${VARIANT}".
-ARG IMAGE="${IMAGE:-quay.io/fedora/fedora-${VARIANT}}"
+ARG IMAGE="quay.io/fedora/fedora-${VARIANT}"
+ARG LINUX_VERSION="7.0.12"
 
-# ======================= RUST ======================= #
-# Rust is needed to build binaries for both Gnome and  #
-# Custom Linux kernel environments.                    #
-# ==================================================== #
-FROM "fedora:${VERSION}" AS rust
-RUN dnf install --assumeyes \
-        cmake \
-        curl \
-        gcc \
-        g++ \
-        git \
- && curl --proto "=https" --tlsv1.2 -sSf "https://sh.rustup.rs" >"/tmp/rustup.sh" \
- && sh /tmp/rustup.sh -qy
 
-# === RUST === #
-FROM rust AS alacritty
-RUN dnf install --assumeyes fontconfig-devel
-# There's absolutely no way I'm settling for Gnome Terminal as my default console.
-# TODO: Migrate to Kitty for better rendering, such as ligatures.
-RUN source "${HOME}/.cargo/env" \
- && git clone "https://github.com/alacritty/alacritty.git" --branch "v0.13.0" "/tmp/alacritty" \
- && (cd "/tmp/alacritty"; cargo build --release --features "wayland") \
- && mkdir -p "/opt/alacritty/bin" "/opt/alacritty/etc/bash_completion.d" "/opt/alacritty/share/pixmaps" "/opt/alacritty/share/applications" \
- && cp "/tmp/alacritty/target/release/alacritty" "/opt/alacritty/bin/alacritty" \
- && cp "/tmp/alacritty/extra/logo/alacritty-term.svg" "/opt/alacritty/share/pixmaps/Alacritty.svg" \
- && cp "/tmp/alacritty/extra/linux/Alacritty.desktop" "/opt/alacritty/share/applications/alacritty.desktop" \
- && cp "/tmp/alacritty/extra/completions/alacritty.bash" "/opt/alacritty/etc/bash_completion.d/alacritty" \
- && rm -rf "/tmp/alacritty"
-
-FROM "fedora:${VERSION}" AS secure-boot
+FROM "fedora:${FEDORA_VERSION}" AS "${REGISTRY}/${OWNER}/secureboot"
 RUN dnf install --assumeyes openssl \
- && mkdir -p "/opt/secureboot" \
- && openssl req -new -x509 -newkey "rsa:4096" -nodes -days 36500 \
-        -outform DER -out "/opt/secureboot/certificate.der" \
-        -keyout "/opt/secureboot/key.pem" \
-        -subj "/CN=${NAMESPACE}/" \
- && openssl pkcs12 -export -out "/opt/secureboot/key.p12" -inkey "/opt/secureboot/key.pem" -in "/opt/secureboot/cert.der"
+ && mkdir -p '/opt/secureboot' \
+ && openssl req -new -x509 -newkey 'rsa:4096' -nodes -days 36500 \
+        -outform DER -out '/opt/secureboot/cert.der' \
+        -keyout '/opt/secureboot/key.pem' \
+        -subj '/CN=${NAMESPACE}/' \
+ && openssl pkcs12 -export -out '/opt/secureboot/key.p12' -inkey '/opt/secureboot/key.pem' -in '/opt/secureboot/cert.der'
 
-FROM rust AS kernel
-# Dependencies
-RUN source "/etc/os-release" \
- && git clone --depth=1 --branch="f${VERSION_ID}" "https://src.fedoraproject.org/rpms/kernel.git" "/tmp/fedpkg" \
- && dnf install --assumeyes \
-        'dnf-command(builddep)' \
-        clang-devel \
-        fedpkg \
-        gcc-c++ \
-        git \
-        libXi-devel \
-        lld \
-        make \
-        ncurses-devel \
-        perl \
-        qt3-devel \
-        rsync \
- && dnf builddep --assumeyes "/tmp/fedpkg/kernel.spec"
+
+# ================= #
+# Custom kernel RPM #
+# ================= #
+FROM "fedora:${FEDORA_VERSION}" AS "${REGISTRY}/${OWNER}/kernel:${LINUX_VERSION:-latest}"
+ARG FEDORA_VERSION
+ARG LINUX_VERSION
+# Install Rust
+RUN dnf install --assumeyes cmake curl gcc g++ git \
+ && curl --proto '=https' --tlsv1.2 -sSf 'https://sh.rustup.rs' >'/tmp/rustup.sh' \
+ && sh '/tmp/rustup.sh' -qy
 # Sources
-# There doesn't seem to be a good way of applying Fedora-specific patches, on top of the Linux kernel Git repository.
-# The "approxpriate" command `fedpkg local` doesn't allow you to specify a custom directory to build from and uses
-# `fedpkg sources` to download a fresh copy of the Linux kernel seemingly a version behind the latest (and it takes
-# FUCKING AGES. Like 30 minutes to download ~135MiB ages).
+RUN git clone --depth=1 --branch="f${FEDORA_VERSION}" 'https://src.fedoraproject.org/rpms/kernel.git' '/tmp/fedpkg' \
+ && dnf install --assumeyes 'dnf-command(builddep)' clang-devel fedpkg gcc-c++ git libXi-devel lld make ncurses-devel perl qt3-devel rsync \
+ && dnf builddep --assumeyes '/tmp/fedpkg/kernel.spec'
 ARG LINUX_GIT_REPO="git://git.kernel.org/pub/scm/linux/kernel/git/stable/linux-stable.git"
-RUN export LINUX_LATEST_VERSION="$(git -c 'versionsort.suffix=-' ls-remote --tags --sort='v:refname' "${LINUX_GIT_REPO}" \
-       | \grep -v '\^' \
-       | \grep -P -e '\d+\.\d+' \
-       | \grep -P -v 'alpha|ALPHA|beta|BETA|rc|RC|-' \
-       | cut -d'/' -f3 \
-       | sort --version-sort \
-       | tail -n1)" \
- && echo "Latest stable version of Linux Kernel is ${LINUX_LATEST_VERSION}" \
- && git clone --depth=1 --branch="${LINUX_LATEST_VERSION}" "${LINUX_GIT_REPO}" "/tmp/linux"
-# Setup
+RUN if [ -n "${LINUX_VERSION}" ]; then \
+        LINUX_TARGET_VERSION="v${LINUX_VERSION}"; \
+    else \
+        LINUX_TARGET_VERSION="$(git -c 'versionsort.suffix=-' ls-remote --tags --sort='v:refname' "${LINUX_GIT_REPO}" \
+            | grep -v '\^' | grep -P -e '\d+\.\d+' | grep -P -v 'alpha|ALPHA|beta|BETA|rc|RC|-' \
+            | cut -d'/' -f3 | sort --version-sort | tail -n1)"; \
+    fi \
+ && echo "Targeting stable version of Linux Kernel: ${LINUX_TARGET_VERSION}" \
+ && git clone --depth=1 --branch="${LINUX_TARGET_VERSION}" "${LINUX_GIT_REPO}" '/tmp/linux'
+# Rust Build Tools
 RUN source "${HOME}/.cargo/env" \
- && export LINUX_RUST_VERSION="$("/tmp/linux/scripts/min-tool-version.sh" rustc)" \
+ && export LINUX_RUST_VERSION="$('/tmp/linux/scripts/min-tool-version.sh' rustc)" \
  && rustup toolchain add "${LINUX_RUST_VERSION}" \
- && rustup component add --toolchain="${LINUX_RUST_VERSION}" "rust-src" \
- && rustup override set --path="/tmp/linux" "${LINUX_RUST_VERSION}" \
- && cargo install --locked --version "$("/tmp/linux/scripts/min-tool-version.sh" bindgen)" "bindgen-cli"
- # Custom Kernel Configuration
-COPY "custom_kernel.config" "/tmp/custom_kernel.config"
-COPY "patches" "/tmp/patches"
+ && rustup component add --toolchain="${LINUX_RUST_VERSION}" 'rust-src' \
+ && rustup override set --path='/tmp/linux' "${LINUX_RUST_VERSION}" \
+ && cargo install --locked --version "$('/tmp/linux/scripts/min-tool-version.sh' bindgen)" 'bindgen-cli'
+# Custom Kernel Configuration
+COPY 'custom_kernel.config' '/tmp/custom_kernel.config'
+COPY 'patches' '/tmp/patches'
 # Configure Kernel
 RUN source "${HOME}/.cargo/env" \
- && cd "/tmp/linux" \
- && sed -i -E "s/^.*CONFIG_RUSTC_VERSION_TEXT.*$/CONFIG_RUSTC_VERSION_TEXT=\"$(rustc --version)\"/g" "/tmp/custom_kernel.config" \
- && sed -i -E "s/^.*CONFIG_BINDGEN_VERSION_TEXT.*$/CONFIG_BINDGEN_VERSION_TEXT=\"$(bindgen --version)\"/g" "/tmp/custom_kernel.config" \
- && KCONFIG_CONFIG="/tmp/kernel-custom-build.config" bash "/tmp/linux/scripts/kconfig/merge_config.sh" \
+ && cd '/tmp/linux' \
+ && sed -i -E "s/^.*CONFIG_RUSTC_VERSION_TEXT.*$/CONFIG_RUSTC_VERSION_TEXT=\"$(rustc --version)\"/g" '/tmp/custom_kernel.config' \
+ && sed -i -E "s/^.*CONFIG_BINDGEN_VERSION_TEXT.*$/CONFIG_BINDGEN_VERSION_TEXT=\"$(bindgen --version)\"/g" '/tmp/custom_kernel.config' \
+ && KCONFIG_CONFIG='/tmp/kernel-custom-build.config' bash '/tmp/linux/scripts/kconfig/merge_config.sh' \
         "/tmp/fedpkg/kernel-$(uname -m)-fedora.config" \
-        "/tmp/custom_kernel.config" \
- && sed -i 's/^EXTRAVERSION.*/EXTRAVERSION = -zanbaldwin/g' "/tmp/linux/Makefile" \
- && git config user.name "Zan Baldwin (Container Build)" \
- && git config user.email "hello+build@zanbaldwin.com" \
- && git -C "/tmp/linux" am /tmp/patches/*.patch
+        '/tmp/custom_kernel.config' \
+ && sed -i 's/^EXTRAVERSION.*/EXTRAVERSION = -zanbaldwin/g' '/tmp/linux/Makefile' \
+ && git config user.name 'Zan Baldwin (Container Build)' \
+ && git config user.email 'hello+build@zanbaldwin.com' \
+ && find '/tmp/patches' -type 'f' -name '*.patch' -exec git -C '/tmp/linux' am '{}' +
 # Build Kernel
 RUN source "${HOME}/.cargo/env" \
- && git -C "/tmp/linux" clean -d -f -x \
- && mv "/tmp/kernel-custom-build.config" "/tmp/linux/.config" \
+ && git -C '/tmp/linux' clean -d -f -x \
+ && mv '/tmp/kernel-custom-build.config' '/tmp/linux/.config' \
  && echo "Building Linux kernel version '$(make -C "/tmp/linux" --no-print-directory kernelversion)'." \
- && make -C "/tmp/linux" -j "$(nproc --all)" rpm-pkg
+ && make -C '/tmp/linux' -j "$(nproc --all)" rpm-pkg \
+ && mkdir -p '/opt/kernel' \
+ && find '/tmp/linux/rpmbuild/RPMS' -type 'f' -name '*.rpm' -exec cp --target-directory='/opt/kernel' '{}' +
 
-# ===================== #
-#                       #
-#     Custom Kernel     #
-#    (extends GMOME)    #
-#                       #
-# ===================== #
-FROM gnome AS linux
-COPY --from="kernel" "/opt/kernel" "/opt/kernel"
-RUN rpm-ostree override replace /opt/kernel/*.rpm
 
-# ================ #
-#                  #
-#       GNOME      #
-#     (default)    #
-#                  #
-# ================ #
-FROM "${IMAGE}:${VERSION}" AS gnome
-COPY "./usr/" "/usr/"
-RUN rpm-ostree install --idempotent --allow-inactive --releasever="${VERSION}" \
-       bridge-utils edk2-ovmf guestfs-tools libvirt qemu-kvm virt-install virt-manager \
-       podman-docker podman-tui containernetworking-plugins aardvark-dns \
-       distrobox ffmpeg-free fzf make ncdu nss-tools tlp tlp-rdw \
- && systemctl enable "libvirtd" \
- && systemctl enable "podman.service" \
- && systemctl enable "podman.socket" \
- && systemctl enable "podman-restart.service" \
- && systemctl enable "flatpak-update.service" \
- && (systemctl enable "tlp.service" || true) \
- && if grep "secure_path" "/etc/sudoers" >"/dev/null" 2>&1; then \
-       cat "/etc/sudoers" | grep -v "secure_path" | tee "/etc/sudoers" >"/dev/null" 2>&1; \
-    fi \
- && sed -i -E "s/^#HandleLidSwitchExternalPower=.*$/HandleLidSwitchExternalPower=ignore/g" "/usr/lib/systemd/logind.conf" \
- && rm -rf /tmp/* /var/* \
+# ========================================================= #
+# Build the NVIDIA kernel module against our custom kernel. #
+# ========================================================= #
+FROM "fedora:${FEDORA_VERSION}" AS "${REGISTRY}/${OWNER}/nvidia:${LINUX_VERSION:-latest}"
+ARG FEDORA_VERSION
+ARG LINUX_VERSION
+ARG REGISTRY
+ARG OWNER
+COPY --from="${REGISTRY}/${OWNER}/kernel:${LINUX_VERSION:-latest}" '/opt/kernel' '/opt/kernel'
+RUN dnf install --assumeyes \
+        "https://mirrors.rpmfusion.org/free/fedora/rpmfusion-free-release-${FEDORA_VERSION}.noarch.rpm" \
+        "https://mirrors.rpmfusion.org/nonfree/fedora/rpmfusion-nonfree-release-${FEDORA_VERSION}.noarch.rpm" \
+ && dnf install --assumeyes "/opt/kernel/kernel-devel-"*.rpm \
+ && KVER="$(rpm --query --queryformat '%{VERSION}-%{RELEASE}.%{ARCH}' 'kernel-devel')" \
+ && echo '%_with_kmod_nvidia_open 1' >'/etc/rpm/macros.nvidia-kmod' \
+ && dnf install --assumeyes akmod-nvidia \
+ && akmods --force --kernels "${KVER}" --kmod 'nvidia' \
+ && modinfo "/usr/lib/modules/${KVER}/extra/nvidia/nvidia.ko.xz" >'/dev/null' \
+ && mkdir -p '/opt/nvidia' \
+ && cp /var/cache/akmods/nvidia/kmod-nvidia-*.rpm '/opt/nvidia/' \
+ && dnf download --destdir='/opt/nvidia' \
+        xorg-x11-drv-nvidia xorg-x11-drv-nvidia-libs \
+        xorg-x11-drv-nvidia-cuda xorg-x11-drv-nvidia-cuda-libs \
+        xorg-x11-drv-nvidia-power nvidia-kmod-common \
+        nvidia-modprobe nvidia-settings nvidia-persistenced
+
+
+# ============================================================= #
+# Apply our custom kernel + NVIDIA driver to the OS image.      #
+# ============================================================= #
+FROM "${IMAGE}:${FEDORA_VERSION}" AS "${REGISTRY}/${OWNER}/ostree"
+ARG LINUX_VERSION
+ARG REGISTRY
+ARG OWNER
+COPY --from="${REGISTRY}/${OWNER}/kernel:${LINUX_VERSION:-latest}" '/opt/kernel' '/opt/kernel'
+COPY --from="${REGISTRY}/${OWNER}/nvidia:${LINUX_VERSION:-latest}" '/opt/nvidia' '/opt/nvidia'
+# Force the nVidia + AMD iGPU drivers into every regenerated initramfs (hybrid
+# GPU host), enable DRM KMS (required for Wayland/Niri), and blacklist nouveau.
+RUN mkdir -p '/usr/lib/bootc/kargs.d' \
+ && echo 'force_drivers+=" nvidia nvidia-modeset nvidia-drm nvidia-uvm amdgpu "' >'/usr/lib/dracut/dracut.conf.d/99-nvidia.conf' \
+ && echo 'options nvidia_drm modeset=1 fbdev=1' >'/usr/lib/modprobe.d/nvidia-modeset.conf' \
+ && printf '%s\n' 'kargs = ["rd.driver.blacklist=nouveau", "modprobe.blacklist=nouveau", "nvidia-drm.modeset=1"]' >'/usr/lib/bootc/kargs.d/00-nvidia.toml'
+# Fedora ships a SPLIT kernel (kernel-core/-modules/-modules-core); our upstream
+# `make rpm-pkg` build is a single MONOLITHIC `kernel` RPM, so a plain
+# `override replace` can't map them. Remove the split base packages and install
+# the monolithic kernel in the same transaction (one /usr/lib/modules tree), then
+# install the matching nVidia kmod + userspace from the staged local RPMs and
+# rebuild the initramfs for our kernel with the nVidia drivers baked in.
+RUN KERNEL_RPM="$(ls /opt/kernel/kernel-[0-9]*.rpm)" \
+ && rpm-ostree override remove kernel kernel-core kernel-modules kernel-modules-core --install "${KERNEL_RPM}" \
+ && rpm-ostree install /opt/nvidia/*.rpm \
+ && KVER="$(rpm --query --queryformat '%{VERSION}-%{RELEASE}.%{ARCH}' 'kernel')" \
+ && dracut --force --no-hostonly --reproducible --kver "${KVER}" \
+        "/usr/lib/modules/${KVER}/initramfs.img" \
+ && rm -rf /opt/kernel /opt/nvidia /tmp/* /var/* \
  && ostree container commit
-COPY --from="alacritty" "/opt/alacritty/" "/usr/"
 
-# ================ #
-#                  #
-#       GNOME      #
-# (nVidia Drivers) #
-#                  #
-# ================ #
-FROM gnome AS nvidia
-RUN rpm-ostree install "https://download1.rpmfusion.org/nonfree/fedora/rpmfusion-nonfree-release-$(rpm -E %fedora).noarch.rpm" \
- && rpm-ostree install --idempotent --allow-inactive --releasever="${VERSION}" \
-      akmod-nvidia \
-      xorg-x11-drv-nvidia \
-      xorg-x11-drv-nvidia-cuda \
- && rpm-ostree kargs \
-      --append=rd.driver.blacklist=nouveau \
-      --append=modprobe.blacklist=nouveau \
-      --append=nvidia-drm.modeset=1
+
+# =============================== #
+# Default Silverblue installation #
+# =============================== #
+FROM "${REGISTRY}/${OWNER}/ostree" AS "${REGISTRY}/${OWNER}/${VARIANT}"
+ARG FEDORA_VERSION
+ARG LINUX_VERSION
+LABEL org.opencontainers.image.version="${FEDORA_VERSION}+${LINUX_VERSION:-latest}" \
+      org.opencontainers.image.authors="Zan Baldwin" \
+      org.opencontainers.image.title="Silverblue" \
+      containers.bootc="1"
+
+# Kernel Virtual Machines
+RUN rpm-ostree install --idempotent --allow-inactive --releasever="${FEDORA_VERSION}" \
+       bridge-utils edk2-ovmf guestfs-tools libvirt qemu-kvm virt-install virt-manager \
+ && systemctl enable 'libvirtd' \
+ && rm -rf /tmp/* /var/*
+
+# Niri (+Kanshi/Kanata) + Noctalia Deps
+RUN rpm-ostree install --idempotent --allow-inactive --releasever="${FEDORA_VERSION}" \
+       niri kanshi \
+       cairo fontconfig freetype glib2 harfbuzz jemalloc libcurl libglvnd-egl \
+       libglvnd-gles libqalculate librsvg2 libwayland-client libwayland-egl \
+       libwebp libxkbcommon libxml2 pango pipewire-libs polkit-libs sdbus-cpp \
+ && systemctl --global enable 'kanshi.service' \
+ && mkdir -p '/etc/udev/rules.d' \
+ && echo 'KERNEL=="uinput", MODE="0660", GROUP="uinput", OPTIONS+="static_node=uinput"' >'/etc/udev/rules.d/99-uinput.rules' \
+ && echo 'uinput' >'/etc/modules-load.d/uinput.conf' \
+ && rm -rf /tmp/* /var/*
+
+# Podman, DConf, and Flatpak services.
+COPY './usr/' '/usr/'
+RUN rpm-ostree install --idempotent --allow-inactive --releasever="${FEDORA_VERSION}" \
+       containernetworking-plugins aardvark-dns \
+ && systemctl enable 'podman.service' \
+ && systemctl enable 'podman.socket' \
+ && systemctl enable 'podman-restart.service' \
+ && systemctl enable 'flatpak-update.service' \
+ && systemctl enable 'rpm-ostreed-automatic.timer' \
+ && rm -rf /tmp/* /var/*
+
+# Official Docker Engine
+RUN curl -fsSL -o '/etc/yum.repos.d/docker-ce.repo' 'https://download.docker.com/linux/fedora/docker-ce.repo' \
+ && rpm-ostree install --idempotent --allow-inactive --releasever="${FEDORA_VERSION}" docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin \
+ && systemctl enable 'docker' \
+ && rm -rf /tmp/* /var/*
+
+# Ghostty Deps
+RUN rpm-ostree install --idempotent --allow-inactive --releasever="${FEDORA_VERSION}" gettext libadwaita libgtk4-layer-shell \
+ && rm -rf /tmp/* /var/*
+
+# Misc Services
+RUN rpm-ostree install --idempotent --allow-inactive --releasever="${FEDORA_VERSION}" distrobox ffmpeg-free fzf make ncdu nss-tools tlp tlp-rdw \
+ && (systemctl enable 'tlp.service' || true) \
+ && if grep 'secure_path' '/etc/sudoers' >'/dev/null' 2>&1; then \
+       cat '/etc/sudoers' | grep -v 'secure_path' | tee '/etc/sudoers' >'/dev/null' 2>&1; \
+    fi \
+ && sed -i -E 's/^#HandleLidSwitchExternalPower=.*$/HandleLidSwitchExternalPower=ignore/g' '/usr/lib/systemd/logind.conf' \
+ && rm -rf /tmp/* /var/*
+
+RUN ostree container commit

@@ -4,7 +4,7 @@ set -eox pipefail
 LINUX_VERSION="${1:-7.0.12}"
 
 THIS_DIR="$(dirname "$(readlink -f -- "$0")")"
-mkdir -p '/etc/containers/registries.conf.d'
+sudo mkdir -p '/etc/containers/registries.conf.d'
 { \
     echo '[[registry]]'; \
     echo "location = 'localhost:5000'"; \

@@ -24,6 +24,7 @@ RUN dnf install --assumeyes openssl \
 FROM "fedora:${FEDORA_VERSION}" AS "${REGISTRY}/${OWNER}/kernel:${LINUX_VERSION:-latest}"
 ARG FEDORA_VERSION
 ARG LINUX_VERSION
+ARG OWNER
 # Install Rust
 RUN dnf install --assumeyes cmake curl gcc g++ git \
  && curl --proto '=https' --tlsv1.2 -sSf 'https://sh.rustup.rs' >'/tmp/rustup.sh' \
@@ -60,7 +61,7 @@ RUN source "${HOME}/.cargo/env" \
  && KCONFIG_CONFIG='/tmp/kernel-custom-build.config' bash '/tmp/linux/scripts/kconfig/merge_config.sh' \
         "/tmp/fedpkg/kernel-$(uname -m)-fedora.config" \
         '/tmp/custom_kernel.config' \
- && sed -i 's/^EXTRAVERSION.*/EXTRAVERSION = -zanbaldwin/g' '/tmp/linux/Makefile' \
+ && sed -i "s/^EXTRAVERSION.*/EXTRAVERSION = -${OWNER}/g" '/tmp/linux/Makefile' \
  && git config user.name 'Zan Baldwin (Container Build)' \
  && git config user.email 'hello+build@zanbaldwin.com' \
  && find '/tmp/patches' -type 'f' -name '*.patch' -exec git -C '/tmp/linux' am '{}' +
@@ -69,6 +70,7 @@ RUN source "${HOME}/.cargo/env" \
  && git -C '/tmp/linux' clean -d -f -x \
  && mv '/tmp/kernel-custom-build.config' '/tmp/linux/.config' \
  && echo "Building Linux kernel version '$(make -C "/tmp/linux" --no-print-directory kernelversion)'." \
+ && sed -i '/^Provides: kernel-%{KERNELRELEASE}$/a Provides: kernel-uname-r = %{KERNELRELEASE}' '/tmp/linux/scripts/package/kernel.spec' \
  && make -C '/tmp/linux' -j "$(nproc --all)" rpm-pkg \
  && mkdir -p '/opt/kernel' \
  && find '/tmp/linux/rpmbuild/RPMS' -type 'f' -name '*.rpm' -exec cp --target-directory='/opt/kernel' '{}' +
@@ -87,7 +89,7 @@ RUN dnf install --assumeyes \
         "https://mirrors.rpmfusion.org/free/fedora/rpmfusion-free-release-${FEDORA_VERSION}.noarch.rpm" \
         "https://mirrors.rpmfusion.org/nonfree/fedora/rpmfusion-nonfree-release-${FEDORA_VERSION}.noarch.rpm" \
  && dnf install --assumeyes "/opt/kernel/kernel-devel-"*.rpm \
- && KVER="$(rpm --query --queryformat '%{VERSION}-%{RELEASE}.%{ARCH}' 'kernel-devel')" \
+ && KVER="$(basename /usr/lib/modules/*-"${OWNER}"*)" \
  && echo '%_with_kmod_nvidia_open 1' >'/etc/rpm/macros.nvidia-kmod' \
  && dnf install --assumeyes akmod-nvidia \
  && akmods --force --kernels "${KVER}" --kmod 'nvidia' \
@@ -125,7 +127,7 @@ RUN mkdir -p '/usr/lib/bootc/kargs.d' \
 RUN KERNEL_RPM="$(ls /opt/kernel/kernel-[0-9]*.rpm)" \
  && rpm-ostree override remove kernel kernel-core kernel-modules kernel-modules-core --install "${KERNEL_RPM}" \
  && rpm-ostree install /opt/nvidia/*.rpm \
- && KVER="$(rpm --query --queryformat '%{VERSION}-%{RELEASE}.%{ARCH}' 'kernel')" \
+ && KVER="$(basename /usr/lib/modules/*-"${OWNER}"*)" \
  && dracut --force --no-hostonly --reproducible --kver "${KVER}" \
         "/usr/lib/modules/${KVER}/initramfs.img" \
  && rm -rf /opt/kernel /opt/nvidia /tmp/* /var/* \
@@ -151,11 +153,13 @@ RUN rpm-ostree install --idempotent --allow-inactive --releasever="${FEDORA_VERS
 
 # Niri (+Kanshi/Kanata) + Noctalia Deps
 RUN rpm-ostree install --idempotent --allow-inactive --releasever="${FEDORA_VERSION}" \
-       niri kanshi \
-       cairo fontconfig freetype glib2 harfbuzz jemalloc libcurl libglvnd-egl \
-       libglvnd-gles libqalculate librsvg2 libwayland-client libwayland-egl \
-       libwebp libxkbcommon libxml2 pango pipewire-libs polkit-libs sdbus-cpp \
+        niri kanshi \
+        cairo fontconfig freetype glib2 harfbuzz jemalloc libcurl libglvnd-egl \
+        libglvnd-gles libqalculate librsvg2 libwayland-client libwayland-egl \
+        libwebp libxkbcommon libxml2 pango pipewire-libs polkit-libs sdbus-cpp \
+        ddcutil wireplumber brightnessctl wl-clipboard wlsunset cava \
  && systemctl --global enable 'kanshi.service' \
+ && groupadd --force --system 'uinput' \
  && mkdir -p '/etc/udev/rules.d' \
  && echo 'KERNEL=="uinput", MODE="0660", GROUP="uinput", OPTIONS+="static_node=uinput"' >'/etc/udev/rules.d/99-uinput.rules' \
  && echo 'uinput' >'/etc/modules-load.d/uinput.conf' \
@@ -169,6 +173,7 @@ RUN rpm-ostree install --idempotent --allow-inactive --releasever="${FEDORA_VERS
  && systemctl enable 'podman.socket' \
  && systemctl enable 'podman-restart.service' \
  && systemctl enable 'flatpak-update.service' \
+ && systemctl enable 'flatpak-update.timer' \
  && systemctl enable 'rpm-ostreed-automatic.timer' \
  && rm -rf /tmp/* /var/*
 
@@ -185,10 +190,12 @@ RUN rpm-ostree install --idempotent --allow-inactive --releasever="${FEDORA_VERS
 # Misc Services
 RUN rpm-ostree install --idempotent --allow-inactive --releasever="${FEDORA_VERSION}" distrobox ffmpeg-free fzf make ncdu nss-tools tlp tlp-rdw \
  && (systemctl enable 'tlp.service' || true) \
- && if grep 'secure_path' '/etc/sudoers' >'/dev/null' 2>&1; then \
-       cat '/etc/sudoers' | grep -v 'secure_path' | tee '/etc/sudoers' >'/dev/null' 2>&1; \
-    fi \
- && sed -i -E 's/^#HandleLidSwitchExternalPower=.*$/HandleLidSwitchExternalPower=ignore/g' '/usr/lib/systemd/logind.conf' \
+ && mkdir -p '/usr/lib/systemd/logind.conf.d/' \
+ && { echo '[Login]'; echo 'HandleLidSwitchExternalPower=ignore'; } >'/usr/lib/systemd/logind.conf.d/10-lid.conf' \
  && rm -rf /tmp/* /var/*
+# Recommended to avoid doing the following; commenting out for preservation.
+#RUN if grep 'secure_path' '/etc/sudoers' >'/dev/null' 2>&1; then \
+#       cat '/etc/sudoers' | grep -v 'secure_path' | tee '/etc/sudoers' >'/dev/null' 2>&1; \
+#    fi
 
 RUN ostree container commit

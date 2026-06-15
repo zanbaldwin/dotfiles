@@ -16,6 +16,7 @@
     ],
     "defaultMode": "plan"
   },
+  "model": "opus[1m]",
   "hooks": {
     "PreToolUse": []
   },
@@ -51,7 +52,9 @@
   "effortLevel": "high",
   "autoUpdatesChannel": "latest",
   "skipWorkflowUsageWarning": true,
+  "theme": "dark",
   "verbose": true,
   "remoteControlAtStartup": false,
-  "skipAutoPermissionPrompt": true
+  "skipAutoPermissionPrompt": true,
+  "tui": "fullscreen"
 }

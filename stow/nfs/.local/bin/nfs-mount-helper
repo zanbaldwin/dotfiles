@@ -4,30 +4,55 @@
 # Not meant to be called directly.
 #
 # Mode (argument 1):
-#   mount    -> start the NFS mount units only
+#   mount    -> mount the NFS shares only
 #   connect  -> start the Tailscale container, wait until healthy, then mount
 #
+# Mountpoints live under the *invoking* user's home directory, resolved from
+# PKEXEC_UID and canonicalised (readlink -f). This handles both layouts without
+# hard-coding a path: Fedora Workstation (/home/zan) and Silverblue, where
+# /home is a symlink to /var/home (/var/home/zan).
+#
 # Exit codes (consumed by nfs-mount for notify-send):
-#   0 success | 3 no Tailscale container | 4 container unhealthy | 5 mount/units error
+#   0 success | 3 no Tailscale container | 4 container unhealthy | 5 mount error
 set -euo pipefail
 
 MODE="${1:-connect}"
 CONTAINER='network-tailscale-1'
-HEALTH_TIMEOUT='90' # seconds to wait for the container to report healthy
+# Number of seconds to wait for the container to report healthy:
+HEALTH_TIMEOUT='30'
+SERVER='nas.lan.zanbaldwin.com'
+MOUNT_OPTS='rw,vers=4.1,proto=tcp'
 
-mapfile -t UNITS < <(systemctl list-unit-files --no-legend 'home-zan-*.mount' | awk '{ print $1 }')
-if [ "${#UNITS[@]}" -eq 0 ]; then
-    echo 'nfs-mount-helper: no home-zan-*.mount units found' >&2
+# Share name (mountpoint under the user's home) -> NFS export on the server.
+declare -A SHARES=(
+    ['Drive']='/mnt/tank4/drive'
+    ['Music']='/mnt/tank4/music'
+    ['Books']='/mnt/tank4/books'
+)
+
+# Resolve the invoking user's home from pkexec's UID, then canonicalise it so
+# the mountpoint path contains no symlinks.
+UID="${PKEXEC_UID:-}"
+if [ -z "${UID}" ]; then
+    echo >&2 'nfs-mount-helper: PKEXEC_UID is unset; run via nfs-mount/pkexec'
     exit 5
 fi
+ENTRY="$(getent passwd "${UID}" || true)"
+GID="$(printf '%s' "${ENTRY}" | cut -d':' -f4)"
+HOME="$(printf '%s' "${ENTRY}" | cut -d':' -f6)"
+if [ -z "${HOME}" ] || [ ! -d "${HOME}" ]; then
+    echo >&2 "nfs-mount-helper: cannot resolve home for UID #${UID}"
+    exit 5
+fi
+BASE="$(readlink -f -- "${HOME}")"
 
 if [ "${MODE}" = 'connect' ]; then
     if ! podman container exists "${CONTAINER}"; then
-        echo "nfs-mount-helper: container '${CONTAINER}' does not exist" >&2
+        echo >&2 "nfs-mount-helper: container '${CONTAINER}' does not exist"
         exit 3
     fi
     podman start "${CONTAINER}" >'/dev/null' || {
-        echo "nfs-mount-helper: failed to start '${CONTAINER}'" >&2
+        echo >&2 "nfs-mount-helper: failed to start '${CONTAINER}'"
         exit 4
     }
 
@@ -43,9 +68,27 @@ if [ "${MODE}" = 'connect' ]; then
         sleep 2
     done
     if [ "${status}" != 'healthy' ]; then
-        echo "nfs-mount-helper: '${CONTAINER}' not healthy after ${HEALTH_TIMEOUT}s (status: ${status:-unknown})" >&2
+        echo >&2 "nfs-mount-helper: '${CONTAINER}' not healthy after ${HEALTH_TIMEOUT}s (status: ${status:-unknown})"
         exit 4
     fi
 fi
 
-systemctl start "${UNITS[@]}" || exit 5
+rc=0
+for NAME in "${!SHARES[@]}"; do
+    TARGET="${BASE}/${NAME}"
+    EXPORT="${SHARES[${NAME}]}"
+
+    if mountpoint -q -- "${TARGET}"; then
+        continue
+    fi
+    if [ ! -d "${TARGET}" ]; then
+        mkdir -p -- "${TARGET}"
+        chown "${UID}:${GID}" -- "${TARGET}"
+    fi
+    if ! mount -t nfs -o "${MOUNT_OPTS}" "${SERVER}:${EXPORT}" "${TARGET}"; then
+        echo >&2 "nfs-mount-helper: failed to mount ${SERVER}:${EXPORT} at ${TARGET}"
+        rc=5
+    fi
+done
+
+exit "${rc}"

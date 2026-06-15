@@ -191,8 +191,6 @@ RUN rpm-ostree install --idempotent --allow-inactive --releasever="${FEDORA_VERS
 
 # Misc Services
 RUN rpm-ostree install --idempotent --allow-inactive --releasever="${FEDORA_VERSION}" distrobox ffmpeg-free fzf make ncdu nss-tools \
- && rpm-ostree override remove tuned-ppd --install tlp --install tlp-rdw \
- && (systemctl enable 'tlp.service' || true) \
  && mkdir -p '/usr/lib/systemd/logind.conf.d/' \
  && { echo '[Login]'; echo 'HandleLidSwitchExternalPower=ignore'; } >'/usr/lib/systemd/logind.conf.d/10-lid.conf' \
  && rm -rf /tmp/* /var/*

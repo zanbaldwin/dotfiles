@@ -14,8 +14,9 @@ sudo mkdir -p '/etc/containers/registries.conf.d'
 [ -f '/etc/os-release' ] && source '/etc/os-release'
 IMAGE='localhost:5000/zanbaldwin/silverblue'
 podman build --pull='newer' --tag="${IMAGE}" \
-    --build-arg="FEDORA_VERSION=${VERSION_ID:-}" \
+    --build-arg="FEDORA_VERSION=${VERSION_ID:-44}" \
     --build-arg="LINUX_VERSION=${LINUX_VERSION}" \
+    --target="stock" \
     "${THIS_DIR}"
 podman start 'registry' || podman run -d --name='registry' --publish='5000:5000' 'docker.io/library/registry:2'
 podman push "${IMAGE}"

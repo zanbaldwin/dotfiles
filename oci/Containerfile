@@ -1,4 +1,3 @@
-ARG REGISTRY="localhost:5000"
 ARG OWNER="zanbaldwin"
 ARG FEDORA_VERSION="44"
 ARG VARIANT="silverblue"
@@ -8,7 +7,7 @@ ARG IMAGE="quay.io/fedora/fedora-${VARIANT}"
 ARG LINUX_VERSION="7.0.12"
 
 
-FROM "fedora:${FEDORA_VERSION}" AS "${REGISTRY}/${OWNER}/secureboot"
+FROM "fedora:${FEDORA_VERSION}" AS secureboot
 RUN dnf install --assumeyes openssl \
  && mkdir -p '/opt/secureboot' \
  && openssl req -new -x509 -newkey 'rsa:4096' -nodes -days 36500 \
@@ -21,7 +20,7 @@ RUN dnf install --assumeyes openssl \
 # ================= #
 # Custom kernel RPM #
 # ================= #
-FROM "fedora:${FEDORA_VERSION}" AS "${REGISTRY}/${OWNER}/kernel:${LINUX_VERSION:-latest}"
+FROM "fedora:${FEDORA_VERSION}" AS kernel
 ARG FEDORA_VERSION
 ARG LINUX_VERSION
 ARG OWNER
@@ -70,7 +69,8 @@ RUN source "${HOME}/.cargo/env" \
  && git -C '/tmp/linux' clean -d -f -x \
  && mv '/tmp/kernel-custom-build.config' '/tmp/linux/.config' \
  && echo "Building Linux kernel version '$(make -C "/tmp/linux" --no-print-directory kernelversion)'." \
- && sed -i '/^Provides: kernel-%{KERNELRELEASE}$/a Provides: kernel-uname-r = %{KERNELRELEASE}' '/tmp/linux/scripts/package/kernel.spec' \
+ && sed -i '/^Provides: kernel-%{KERNELRELEASE}/a Provides: kernel-uname-r = %{KERNELRELEASE}' '/tmp/linux/scripts/package/kernel.spec' \
+ && sed -i '/^%package devel/a Provides: kernel-devel-uname-r = %{KERNELRELEASE}' '/tmp/linux/scripts/package/kernel.spec' \
  && make -C '/tmp/linux' -j "$(nproc --all)" rpm-pkg \
  && mkdir -p '/opt/kernel' \
  && find '/tmp/linux/rpmbuild/RPMS' -type 'f' -name '*.rpm' -exec cp --target-directory='/opt/kernel' '{}' +
@@ -79,12 +79,11 @@ RUN source "${HOME}/.cargo/env" \
 # ========================================================= #
 # Build the NVIDIA kernel module against our custom kernel. #
 # ========================================================= #
-FROM "fedora:${FEDORA_VERSION}" AS "${REGISTRY}/${OWNER}/nvidia:${LINUX_VERSION:-latest}"
+FROM "fedora:${FEDORA_VERSION}" AS custom-nvidia
 ARG FEDORA_VERSION
 ARG LINUX_VERSION
-ARG REGISTRY
 ARG OWNER
-COPY --from="${REGISTRY}/${OWNER}/kernel:${LINUX_VERSION:-latest}" '/opt/kernel' '/opt/kernel'
+COPY --from='kernel' '/opt/kernel' '/opt/kernel'
 RUN dnf install --assumeyes \
         "https://mirrors.rpmfusion.org/free/fedora/rpmfusion-free-release-${FEDORA_VERSION}.noarch.rpm" \
         "https://mirrors.rpmfusion.org/nonfree/fedora/rpmfusion-nonfree-release-${FEDORA_VERSION}.noarch.rpm" \
@@ -92,8 +91,9 @@ RUN dnf install --assumeyes \
  && KVER="$(basename /usr/lib/modules/*-"${OWNER}"*)" \
  && echo '%_with_kmod_nvidia_open 1' >'/etc/rpm/macros.nvidia-kmod' \
  && dnf install --assumeyes akmod-nvidia \
- && akmods --force --kernels "${KVER}" --kmod 'nvidia' \
- && modinfo "/usr/lib/modules/${KVER}/extra/nvidia/nvidia.ko.xz" >'/dev/null' \
+ && { akmods --force --kernels "${KVER}" --kmod 'nvidia'; \
+      echo '=== akmods failed.log (if any) ==='; \
+      cat /var/cache/akmods/nvidia/*.failed.log 2>/dev/null || true; } \
  && mkdir -p '/opt/nvidia' \
  && cp /var/cache/akmods/nvidia/kmod-nvidia-*.rpm '/opt/nvidia/' \
  && dnf download --destdir='/opt/nvidia' \
@@ -103,41 +103,43 @@ RUN dnf install --assumeyes \
         nvidia-modprobe nvidia-settings nvidia-persistenced
 
 
-# ============================================================= #
-# Apply our custom kernel + NVIDIA driver to the OS image.      #
-# ============================================================= #
-FROM "${IMAGE}:${FEDORA_VERSION}" AS "${REGISTRY}/${OWNER}/ostree"
-ARG LINUX_VERSION
-ARG REGISTRY
-ARG OWNER
-COPY --from="${REGISTRY}/${OWNER}/kernel:${LINUX_VERSION:-latest}" '/opt/kernel' '/opt/kernel'
-COPY --from="${REGISTRY}/${OWNER}/nvidia:${LINUX_VERSION:-latest}" '/opt/nvidia' '/opt/nvidia'
-# Force the nVidia + AMD iGPU drivers into every regenerated initramfs (hybrid
-# GPU host), enable DRM KMS (required for Wayland/Niri), and blacklist nouveau.
-RUN mkdir -p '/usr/lib/bootc/kargs.d' \
- && echo 'force_drivers+=" nvidia nvidia-modeset nvidia-drm nvidia-uvm amdgpu "' >'/usr/lib/dracut/dracut.conf.d/99-nvidia.conf' \
- && echo 'options nvidia_drm modeset=1 fbdev=1' >'/usr/lib/modprobe.d/nvidia-modeset.conf' \
- && printf '%s\n' 'kargs = ["rd.driver.blacklist=nouveau", "modprobe.blacklist=nouveau", "nvidia-drm.modeset=1"]' >'/usr/lib/bootc/kargs.d/00-nvidia.toml'
-# Fedora ships a SPLIT kernel (kernel-core/-modules/-modules-core); our upstream
-# `make rpm-pkg` build is a single MONOLITHIC `kernel` RPM, so a plain
-# `override replace` can't map them. Remove the split base packages and install
-# the monolithic kernel in the same transaction (one /usr/lib/modules tree), then
-# install the matching nVidia kmod + userspace from the staged local RPMs and
-# rebuild the initramfs for our kernel with the nVidia drivers baked in.
-RUN KERNEL_RPM="$(ls /opt/kernel/kernel-[0-9]*.rpm)" \
- && rpm-ostree override remove kernel kernel-core kernel-modules kernel-modules-core --install "${KERNEL_RPM}" \
- && rpm-ostree install /opt/nvidia/*.rpm \
- && KVER="$(basename /usr/lib/modules/*-"${OWNER}"*)" \
- && dracut --force --no-hostonly --reproducible --kver "${KVER}" \
-        "/usr/lib/modules/${KVER}/initramfs.img" \
- && rm -rf /opt/kernel /opt/nvidia /tmp/* /var/* \
- && ostree container commit
+# ========================================================== #
+# Build the NVIDIA kernel module against the STOCK kernel.    #
+# ========================================================== #
+# Read the exact kernel version shipped in the base OS image so the kmod is built
+# against THAT kernel, not whatever is newest in the Fedora repos. Both this stage
+# and the `stock` stage derive from the same `${IMAGE}:${FEDORA_VERSION}`, so the
+# version is guaranteed to match.
+FROM "${IMAGE}:${FEDORA_VERSION}" AS stock-kernel
+RUN rpm --query --queryformat '%{VERSION}-%{RELEASE}.%{ARCH}\n' 'kernel-core' | tail -n1 >'/kver.txt'
+FROM "fedora:${FEDORA_VERSION}" AS stock-nvidia
+ARG FEDORA_VERSION
+COPY --from='stock-kernel' '/kver.txt' '/kver.txt'
+RUN echo "Installing nVidia drivers for kernel version: $(cat '/kver.txt')" \
+ && dnf install --assumeyes \
+        "https://mirrors.rpmfusion.org/free/fedora/rpmfusion-free-release-${FEDORA_VERSION}.noarch.rpm" \
+        "https://mirrors.rpmfusion.org/nonfree/fedora/rpmfusion-nonfree-release-${FEDORA_VERSION}.noarch.rpm" \
+ && KVER="$(cat /kver.txt)" \
+ && dnf install --assumeyes "kernel-core-${KVER}" "kernel-devel-${KVER}" \
+ && rpm --query "kernel-core-${KVER}" "kernel-devel-${KVER}" \
+ && echo '%_with_kmod_nvidia_open 1' >'/etc/rpm/macros.nvidia-kmod' \
+ && dnf install --assumeyes akmod-nvidia \
+ && { akmods --force --kernels "${KVER}" --kmod 'nvidia'; \
+      echo '=== akmods failed.log (if any) ==='; \
+      cat /var/cache/akmods/nvidia/*.failed.log 2>/dev/null || true; } \
+ && mkdir -p '/opt/nvidia' \
+ && cp /var/cache/akmods/nvidia/kmod-nvidia-*.rpm '/opt/nvidia/' \
+ && dnf download --arch='x86_64' --destdir='/opt/nvidia' \
+        xorg-x11-drv-nvidia xorg-x11-drv-nvidia-libs \
+        xorg-x11-drv-nvidia-cuda xorg-x11-drv-nvidia-cuda-libs \
+        xorg-x11-drv-nvidia-power \
+        nvidia-modprobe nvidia-settings nvidia-persistenced
 
 
 # =============================== #
 # Default Silverblue installation #
 # =============================== #
-FROM "${REGISTRY}/${OWNER}/ostree" AS "${REGISTRY}/${OWNER}/${VARIANT}"
+FROM "${IMAGE}:${FEDORA_VERSION}" AS ostree
 ARG FEDORA_VERSION
 ARG LINUX_VERSION
 LABEL org.opencontainers.image.version="${FEDORA_VERSION}+${LINUX_VERSION:-latest}" \
@@ -184,11 +186,12 @@ RUN curl -fsSL -o '/etc/yum.repos.d/docker-ce.repo' 'https://download.docker.com
  && rm -rf /tmp/* /var/*
 
 # Ghostty Deps
-RUN rpm-ostree install --idempotent --allow-inactive --releasever="${FEDORA_VERSION}" gettext libadwaita libgtk4-layer-shell \
+RUN rpm-ostree install --idempotent --allow-inactive --releasever="${FEDORA_VERSION}" gettext libadwaita gtk4-layer-shell \
  && rm -rf /tmp/* /var/*
 
 # Misc Services
-RUN rpm-ostree install --idempotent --allow-inactive --releasever="${FEDORA_VERSION}" distrobox ffmpeg-free fzf make ncdu nss-tools tlp tlp-rdw \
+RUN rpm-ostree install --idempotent --allow-inactive --releasever="${FEDORA_VERSION}" distrobox ffmpeg-free fzf make ncdu nss-tools \
+ && rpm-ostree override remove tuned-ppd --install tlp --install tlp-rdw \
  && (systemctl enable 'tlp.service' || true) \
  && mkdir -p '/usr/lib/systemd/logind.conf.d/' \
  && { echo '[Login]'; echo 'HandleLidSwitchExternalPower=ignore'; } >'/usr/lib/systemd/logind.conf.d/10-lid.conf' \
@@ -199,3 +202,56 @@ RUN rpm-ostree install --idempotent --allow-inactive --releasever="${FEDORA_VERS
 #    fi
 
 RUN ostree container commit
+
+
+# ======================================================== #
+# Apply our custom kernel + NVIDIA driver to the OS image. #
+# ======================================================== #
+FROM ostree AS custom
+ARG LINUX_VERSION
+ARG OWNER
+COPY --from='kernel' '/opt/kernel' '/opt/kernel'
+COPY --from='custom-nvidia' '/opt/nvidia' '/opt/nvidia'
+# Force the nVidia + AMD iGPU drivers into every regenerated initramfs (hybrid
+# GPU host), enable DRM KMS (required for Wayland/Niri), and blacklist nouveau.
+RUN mkdir -p '/usr/lib/bootc/kargs.d' \
+ && echo 'force_drivers+=" nvidia nvidia-modeset nvidia-drm nvidia-uvm amdgpu "' >'/usr/lib/dracut/dracut.conf.d/99-nvidia.conf' \
+ && echo 'options nvidia_drm modeset=1 fbdev=1' >'/usr/lib/modprobe.d/nvidia-modeset.conf' \
+ && printf '%s\n' 'kargs = ["rd.driver.blacklist=nouveau", "modprobe.blacklist=nouveau", "nvidia-drm.modeset=1"]' >'/usr/lib/bootc/kargs.d/00-nvidia.toml'
+# Fedora ships a SPLIT kernel (kernel-core/-modules/-modules-core); our upstream
+# `make rpm-pkg` build is a single MONOLITHIC `kernel` RPM, so a plain
+# `override replace` can't map them. Remove the split base packages and install
+# the monolithic kernel in the same transaction (one /usr/lib/modules tree), then
+# install the matching nVidia kmod + userspace from the staged local RPMs and
+# rebuild the initramfs for our kernel with the nVidia drivers baked in.
+RUN KERNEL_RPM="$(ls /opt/kernel/kernel-[0-9]*.rpm)" \
+ && rpm-ostree override remove kernel kernel-core kernel-modules kernel-modules-core kernel-modules-extra \
+ && rpm-ostree install "${KERNEL_RPM}" /opt/nvidia/*.rpm \
+ && KVER="$(basename /usr/lib/modules/*-"${OWNER}"*)" \
+ && dracut --force --no-hostonly --reproducible --kver "${KVER}" \
+        "/usr/lib/modules/${KVER}/initramfs.img" \
+ && rm -rf /opt/kernel /opt/nvidia /tmp/* /var/* \
+ && ostree container commit
+
+
+# ===================================================== #
+# Stock Fedora kernel + NVIDIA driver applied to image. #
+# ===================================================== #
+FROM ostree AS stock
+COPY --from='stock-nvidia' '/opt/nvidia' '/opt/nvidia'
+# Force the nVidia + AMD iGPU drivers into every regenerated initramfs (hybrid
+# GPU host), enable DRM KMS (required for Wayland/Niri), and blacklist nouveau.
+RUN mkdir -p '/usr/lib/bootc/kargs.d' \
+ && echo 'force_drivers+=" nvidia nvidia-modeset nvidia-drm nvidia-uvm amdgpu "' >'/usr/lib/dracut/dracut.conf.d/99-nvidia.conf' \
+ && echo 'options nvidia_drm modeset=1 fbdev=1' >'/usr/lib/modprobe.d/nvidia-modeset.conf' \
+ && printf '%s\n' 'kargs = ["rd.driver.blacklist=nouveau", "modprobe.blacklist=nouveau", "nvidia-drm.modeset=1"]' >'/usr/lib/bootc/kargs.d/00-nvidia.toml'
+# The stock split kernel already ships in the base image and provides
+# `kernel-uname-r`, so the staged nVidia kmod + userspace install cleanly (no
+# `override remove` needed); just rebuild the initramfs for the stock kernel with
+# the nVidia drivers baked in.
+RUN KVER="$(rpm --query --queryformat '%{VERSION}-%{RELEASE}.%{ARCH}\n' 'kernel-core' | tail -n1)" \
+ && rpm-ostree install /opt/nvidia/*.rpm \
+ && dracut --force --no-hostonly --reproducible --kver "${KVER}" \
+        "/usr/lib/modules/${KVER}/initramfs.img" \
+ && rm -rf /opt/nvidia /tmp/* /var/* \
+ && ostree container commit

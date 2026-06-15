@@ -1,0 +1,101 @@
+[bar.default]
+background_opacity = 0.8
+start = ["clock", "launcher", "workspaces", "network_rx"]
+center = ["media", "audio_visualizer"]
+end = [
+    "tray",
+    "notifications",
+    "clipboard",
+    "bluetooth",
+    "volume",
+    "brightness",
+    "control-center",
+    "session",
+]
+margin_edge = 0
+margin_ends = 0
+padding = 10
+radius = 0
+widget_spacing = 12
+
+[brightness]
+enable_ddcutil = true
+
+[desktop_widgets]
+enabled = false
+
+[idle.behavior.screen-off]
+action = "screen_off"
+enabled = true
+timeout = 900
+
+[location]
+address = "Apeldoorn, Netherlands"
+
+[lockscreen_widgets]
+enabled = false
+
+[notification]
+scale = 1.2
+
+[shell]
+polkit_agent = true
+[shell.panel]
+control_center_placement = "floating"
+session_placement = "floating"
+transparency_mode = "glass"
+wallpaper_placement = "floating"
+[shell.screen_corners]
+enabled = true
+size = 24
+[shell.screenshot]
+directory = "~/Pictures/Screenshots"
+
+[[shell.session.actions]]
+action = "shutdown"
+enabled = true
+shortcut = "1"
+variant = "destructive"
+
+[[shell.session.actions]]
+action = "reboot"
+enabled = true
+shortcut = "2"
+variant = "destructive"
+
+[[shell.session.actions]]
+action = "logout"
+enabled = true
+shortcut = "3"
+variant = "default"
+
+[[shell.session.actions]]
+action = "lock"
+enabled = true
+shortcut = "4"
+variant = "default"
+
+[[shell.session.actions]]
+action = "command"
+command = "bash '~/.local/bin/nfs-mount'"
+enabled = true
+glyph = "cloud-data-connection"
+label = "Mount NFS"
+shortcut = "5"
+variant = "ghost"
+
+[theme]
+builtin = "Dracula"
+community_palette = "Doomed"
+mode = "dark"
+source = "community"
+[theme.templates]
+enable_builtin_templates = false
+enable_community_templates = false
+
+[wallpaper]
+directory = "~/Pictures/Wallpapers"
+transition_on_startup = true
+[wallpaper.automation]
+enabled = true
+interval_seconds = 600

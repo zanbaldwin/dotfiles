@@ -188,6 +188,20 @@ RUN curl -fsSL -o '/etc/yum.repos.d/docker-ce.repo' 'https://download.docker.com
 RUN rpm-ostree install --idempotent --allow-inactive --releasever="${FEDORA_VERSION}" gettext libadwaita gtk4-layer-shell \
  && rm -rf /tmp/* /var/*
 
+# OpenH264 (non-free video codec from Cisco). The repo ships disabled in the base
+# image; `dnf config-manager --set-enabled` simply flips `enabled=0` to `enabled=1`
+# in the repo file, which we replicate with `sed` (DNF is unavailable on ostree).
+# The base image ships the `noopenh264` stub (it provides `openh264` without the
+# patent-encumbered codec); the real `openh264` obsoletes it, so we must drop the
+# stub and install the codec in one transaction — `rpm-ostree install` alone won't
+# replace a base-layer package.
+RUN sed -i '0,/^enabled=0/s//enabled=1/' '/etc/yum.repos.d/fedora-cisco-openh264.repo' \
+ && rpm-ostree override remove noopenh264 \
+       --install openh264 \
+       --install gstreamer1-plugin-openh264 \
+       --install mozilla-openh264 \
+ && rm -rf /tmp/* /var/*
+
 # Misc Services
 RUN rpm-ostree install --idempotent --allow-inactive --releasever="${FEDORA_VERSION}" distrobox ffmpeg-free fzf make ncdu nss-tools \
  && mkdir -p '/usr/lib/systemd/logind.conf.d/' \

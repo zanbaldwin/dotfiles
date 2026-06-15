@@ -32,16 +32,15 @@ declare -A SHARES=(
 
 # Resolve the invoking user's home from pkexec's UID, then canonicalise it so
 # the mountpoint path contains no symlinks.
-UID="${PKEXEC_UID:-}"
-if [ -z "${UID}" ]; then
+if [ -z "${PKEXEC_UID:-}" ]; then
     echo >&2 'nfs-mount-helper: PKEXEC_UID is unset; run via nfs-mount/pkexec'
     exit 5
 fi
-ENTRY="$(getent passwd "${UID}" || true)"
+ENTRY="$(getent passwd "${PKEXEC_UID}" || true)"
 GID="$(printf '%s' "${ENTRY}" | cut -d':' -f4)"
 HOME="$(printf '%s' "${ENTRY}" | cut -d':' -f6)"
 if [ -z "${HOME}" ] || [ ! -d "${HOME}" ]; then
-    echo >&2 "nfs-mount-helper: cannot resolve home for UID #${UID}"
+    echo >&2 "nfs-mount-helper: cannot resolve home for UID #${PKEXEC_UID}"
     exit 5
 fi
 BASE="$(readlink -f -- "${HOME}")"

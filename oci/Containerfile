@@ -226,7 +226,7 @@ RUN KERNEL_RPM="$(ls /opt/kernel/kernel-[0-9]*.rpm)" \
  && rpm-ostree override remove kernel kernel-core kernel-modules kernel-modules-core kernel-modules-extra \
  && rpm-ostree install "${KERNEL_RPM}" /opt/nvidia/*.rpm \
  && KVER="$(basename /usr/lib/modules/*-"${OWNER}"*)" \
- && dracut --force --no-hostonly --reproducible --kver "${KVER}" \
+ && dracut --force --no-hostonly --reproducible --add ostree --kver "${KVER}" \
         "/usr/lib/modules/${KVER}/initramfs.img" \
  && rm -rf /opt/kernel /opt/nvidia /tmp/* /var/* \
  && ostree container commit
@@ -249,7 +249,7 @@ RUN mkdir -p '/usr/lib/bootc/kargs.d' \
 # the nVidia drivers baked in.
 RUN KVER="$(rpm --query --queryformat '%{VERSION}-%{RELEASE}.%{ARCH}\n' 'kernel-core' | tail -n1)" \
  && rpm-ostree install /opt/nvidia/*.rpm \
- && dracut --force --no-hostonly --reproducible --kver "${KVER}" \
+ && dracut --force --no-hostonly --reproducible --add ostree --kver "${KVER}" \
         "/usr/lib/modules/${KVER}/initramfs.img" \
  && rm -rf /opt/nvidia /tmp/* /var/* \
  && ostree container commit

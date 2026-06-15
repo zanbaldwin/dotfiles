@@ -10,7 +10,7 @@ window-rule {
 // https://niri-wm.github.io/niri/Configuration:-Layout
 layout {
     // A gap of 16px for the default screen (the internal laptop screen).
-    gaps 8
+    gaps 24
 
     // When to center a column when changing focus, options are:
     // - "never", default behavior, focusing an off-screen column will keep at the left

@@ -161,7 +161,6 @@ RUN rpm-ostree install --idempotent --allow-inactive --releasever="${FEDORA_VERS
         libwebp libxkbcommon libxml2 pango pipewire-libs polkit-libs sdbus-cpp \
         ddcutil wireplumber brightnessctl wl-clipboard wlsunset cava \
  && systemctl --global enable 'kanshi.service' \
- && groupadd --force --system 'uinput' \
  && mkdir -p '/etc/udev/rules.d' \
  && echo 'KERNEL=="uinput", MODE="0660", GROUP="uinput", OPTIONS+="static_node=uinput"' >'/etc/udev/rules.d/99-uinput.rules' \
  && echo 'uinput' >'/etc/modules-load.d/uinput.conf' \

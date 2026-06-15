@@ -10,7 +10,7 @@ if [ -z "${LOCAL_BASH_COMPLETION_LOADED}" ]; then
     # Also I think this is automatically loaded by Ububtu 24.10 without having to specify it?
     #[ -f "/etc/bash_completion" ] && source "/etc/bash_completion"
 
-    if [ -d "${HOME}/.bash_competion.d" ]; then
+    if [ -d "${HOME}/.bash_completion.d" ]; then
         for COMPLETION_FILE in ~/.bash_completion.d/*.sh; do
             if [ -f "${COMPLETION_FILE}" ]; then
                 # shellcheck source="/dev/null"

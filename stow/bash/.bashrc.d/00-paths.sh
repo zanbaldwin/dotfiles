@@ -35,6 +35,6 @@ if [ -d "${HOME}/.local/state/nix/profile" ]; then
     export MY_NIX_PROFILE="${HOME}/.local/state/nix/profile";
     add_to_path "${MY_NIX_PROFILE}/bin";
 elif [ -d "${HOME}/.nix-profile" ]; then
-    EXPORT MY_NIX_PROFILE="${HOME}/.nix-profile";
+    export MY_NIX_PROFILE="${HOME}/.nix-profile";
     add_to_path "${MY_NIX_PROFILE}/bin";
 fi

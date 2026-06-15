@@ -1,4 +1,4 @@
 [D-BUS Service]
 Name=com.mitchellh.ghostty
 SystemdService=app-com.mitchellh.ghostty.service
-Exec=/home/zan/bin/ghostty --gtk-single-instance=true --initial-window=false
+Exec=/home/zan/.local/bin/ghostty --gtk-single-instance=true --initial-window=false

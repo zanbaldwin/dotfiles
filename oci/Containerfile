@@ -266,3 +266,9 @@ RUN KVER="$(rpm --query --queryformat '%{VERSION}-%{RELEASE}.%{ARCH}\n' 'kernel-
         "/usr/lib/modules/${KVER}/initramfs.img" \
  && rm -rf /opt/nvidia /tmp/* /var/* \
  && ostree container commit
+# Graphics passthru to containers.
+RUN curl -fsSL -o '/etc/yum.repos.d/nvidia-container-toolkit.repo' \
+       'https://nvidia.github.io/libnvidia-container/stable/rpm/nvidia-container-toolkit.repo' \
+ && rpm-ostree install --idempotent --allow-inactive nvidia-container-toolkit \
+ && rm -rf /tmp/* /var/*
+RUN ostree container commit

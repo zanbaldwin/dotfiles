@@ -4,14 +4,9 @@ services:
   machine-learning:
     image: 'ghcr.io/immich-app/immich-machine-learning:v2.3.1-cuda'
     restart: 'unless-stopped'
-    deploy:
-      resources:
-        reservations:
-          devices:
-            - driver: 'nvidia'
-              count: 1
-              capabilities:
-                - 'gpu'
+    devices:
+      - 'nvidia.com/gpu=all'
+    network_mode: 'host'
     environment:
       TZ: 'Europe/Amsterdam'
     healthcheck:

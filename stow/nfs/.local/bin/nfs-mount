@@ -6,16 +6,33 @@
 #   - If the NFS server is reachable, just mount.
 #   - If not, bring up healthy Tailscale container, and then mount.
 #
-# All privileged work runs in a single pkexec call to nfs-mount-helper, so there
+# All privileged work runs in a single pkexec call to nfs-pkexec, so there
 # is exactly one polkit prompt and it works from a desktop launcher (no TTY,
 # where sudo could not prompt).
 set -euo pipefail
 
-THIS_DIR="$(dirname "$(readlink -f -- "$0")")"
-SERVER_HOST='nas.lan.zanbaldwin.com'
-SERVER_PORT='2049'
-CONTAINER='network-tailscale-1'
-HELPER="${THIS_DIR}/nfs-mount-helper"
+SELF="$(readlink -f -- "$0")"
+THIS_DIR="$(dirname -- "${SELF}")"
+HELPER="${THIS_DIR}/nfs-pkexec"
+
+# Shared config (SERVER, SERVER_PORT, CONTAINER, ...). Read from the user's home;
+# the helper reads the same file under root via the invoking user's home.
+CONFIG="${HOME}/.config/nfs/config.sh"
+# shellcheck source=../../.config/nfs/config.sh disable=SC1091
+if [[ -r "${CONFIG}" ]]; then
+    source "${CONFIG}"
+else
+    echo "nfs-mount: config not found at ${CONFIG}" >&2
+    exit 1
+fi
+
+# Fail before the polkit prompt if the config is missing what we need.
+for var in SERVER SERVER_PORT CONTAINER; do
+    if [[ -z "${!var:-}" ]]; then
+        echo "nfs-mount: config error: ${var} is not set in ${CONFIG}" >&2
+        exit 1
+    fi
+done
 
 notify() {
     # $1 = urgency (normal|critical), $2 = message
@@ -24,7 +41,8 @@ notify() {
 
 # A 2s TCP probe to the NFS port. Off-network the .lan name only resolves once
 # Tailscale is up, so this fails fast and routes us through the Tailscale path.
-if timeout 2 bash -c "exec 3<>/dev/tcp/${SERVER_HOST}/${SERVER_PORT}" 2>'/dev/null'; then
+# @see https://mareksuppa.com/til/bash-dev-tcp-http-without-curl/
+if timeout 2 bash -c "exec 3<>/dev/tcp/${SERVER}/${SERVER_PORT}" 2>'/dev/null'; then
     MODE='mount'
 else
     MODE='connect'

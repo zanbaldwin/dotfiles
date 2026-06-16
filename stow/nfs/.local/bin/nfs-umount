@@ -1,0 +1,41 @@
+#!/usr/bin/env bash
+
+# Unmount the home-network NFS shares.
+#
+# Unmounting needs no network or Tailscale, so this is just a thin pkexec wrapper
+# around nfs-pkexec's `umount` mode -- one polkit prompt, works from a
+# desktop launcher (no TTY, where sudo could not prompt). The helper detaches
+# each share gracefully and falls back to a lazy detach if it is busy/unreachable.
+set -euo pipefail
+
+SELF="$(readlink -f -- "$0")"
+THIS_DIR="$(dirname -- "${SELF}")"
+HELPER="${THIS_DIR}/nfs-pkexec"
+
+notify() {
+    # $1 = urgency (normal|critical), $2 = message
+    command -v notify-send >'/dev/null' 2>&1 && notify-send --urgency="$1" 'NFS Mounts' "$2" || true
+}
+
+rc=0
+pkexec "${HELPER}" 'umount' || rc=$?
+
+case "${rc}" in
+    0)
+        notify 'normal' 'NFS shares unmounted.'
+        ;;
+    5)
+        msg='Failed to unmount one or more NFS shares.'
+        echo "nfs-umount: ${msg}" >&2; notify 'critical' "${msg}"
+        ;;
+    126|127)
+        msg='Authentication is required to unmount the NFS shares.'
+        echo "nfs-umount: ${msg}" >&2; notify 'critical' "${msg}"
+        ;;
+    *)
+        msg="nfs-umount failed (exit ${rc})."
+        echo "nfs-umount: ${msg}" >&2; notify 'critical' "${msg}"
+        ;;
+esac
+
+exit "${rc}"

@@ -1,0 +1,144 @@
+#!/usr/bin/env bash
+
+# Privileged helper for `nfs-mount` -- invoked via pkexec, runs as root.
+# Not meant to be called directly.
+#
+# Mode (argument 1):
+#   mount    -> mount the NFS shares only
+#   connect  -> start the Tailscale container, wait until healthy, then mount
+#   umount   -> unmount the NFS shares (graceful, with lazy-detach fallback)
+#
+# Configuration (server, shares, container...) is read from the invoking user's
+# ~/.config/nfs/config.sh -- the same file nfs-mount sources. See that file to edit.
+#
+# Mountpoints live under the *invoking* user's home directory, resolved from
+# PKEXEC_UID and canonicalised (readlink -f). This handles both layouts without
+# hard-coding a path: Fedora Workstation (/home/zan) and Silverblue (/var/home/zan).
+#
+# Exit codes (consumed by nfs-mount for notify-send):
+#   0 success | 3 no Tailscale container | 4 container unhealthy | 5 mount/unmount error
+set -euo pipefail
+
+# Emit a diagnostic to stderr *and* the journal (view: journalctl -t nfs-pkexec).
+# pkexec gives us no TTY, so stderr alone is lost when run from a desktop launcher.
+log() {
+    echo >&2 "nfs-pkexec: $*"
+    command -v logger >'/dev/null' 2>&1 && logger -t 'nfs-pkexec' -- "$*" || true
+}
+
+MODE="${1:-connect}"
+
+# Resolve the invoking user's home from pkexec's UID, then canonicalise it so
+# the mountpoint path contains no symlinks.
+if [[ -z "${PKEXEC_UID:-}" ]]; then
+    log 'PKEXEC_UID is unset; run via nfs-mount/pkexec'
+    exit 5
+fi
+ENTRY="$(getent passwd "${PKEXEC_UID}" || true)"
+GID="$(printf '%s' "${ENTRY}" | cut -d':' -f4)"
+USER_HOME="$(printf '%s' "${ENTRY}" | cut -d':' -f6)"
+if [[ -z "${USER_HOME}" || ! -d "${USER_HOME}" ]]; then
+    log "cannot resolve home for UID #${PKEXEC_UID}"
+    exit 5
+fi
+BASE="$(readlink -f -- "${USER_HOME}")"
+
+# Shared config (SERVER, MOUNT_OPTS, CONTAINER, HEALTH_TIMEOUT, SHARES) lives in
+# the invoking user's home -- the same file nfs-mount sources unprivileged.
+CONFIG="${BASE}/.config/nfs/config.sh"
+# shellcheck source=../../.config/nfs/config.sh disable=SC1091
+if [[ -r "${CONFIG}" ]]; then
+    source "${CONFIG}"
+else
+    log "config not found at ${CONFIG}"
+    exit 5
+fi
+
+# Fail loudly and early on an incomplete config, rather than dying cryptically
+# under `set -u` at the point of use.
+for var in SERVER MOUNT_OPTS CONTAINER HEALTH_TIMEOUT; do
+    if [[ -z "${!var:-}" ]]; then
+        log "config error: ${var} is not set in ${CONFIG}"
+        exit 5
+    fi
+done
+if ! declare -p SHARES >'/dev/null' 2>&1 || [[ "${#SHARES[@]}" -eq 0 ]]; then
+    log "config error: no SHARES defined in ${CONFIG}"
+    exit 5
+fi
+
+if [[ "${MODE}" = 'umount' ]]; then
+    rc=0
+    for NAME in "${!SHARES[@]}"; do
+        TARGET="${BASE}/${NAME}"
+        # findmnt reads /proc and never touches the (possibly hung) share, unlike
+        # mountpoint/stat which can block in D-state on a dead hard NFS mount.
+        if ! findmnt -rn --mountpoint "${TARGET}" >'/dev/null' 2>&1; then
+            continue
+        fi
+        # Bound the graceful attempt so an unreachable server cannot hang us before
+        # we reach the lazy fallback.
+        if timeout 5 umount -- "${TARGET}" 2>'/dev/null'; then
+            continue
+        fi
+        # Mount busy or the server is unreachable (common off-network); detach
+        # lazily so we never hang, and report that it was a lazy detach.
+        if umount -l -- "${TARGET}"; then
+            log "lazily detached ${TARGET} (was busy/unreachable)"
+        else
+            log "failed to unmount ${TARGET}"
+            rc=5
+        fi
+    done
+    exit "${rc}"
+fi
+
+if [[ "${MODE}" = 'connect' ]]; then
+    if ! podman container exists "${CONTAINER}"; then
+        log "container '${CONTAINER}' does not exist"
+        exit 3
+    fi
+    podman start "${CONTAINER}" >'/dev/null' || {
+        log "failed to start '${CONTAINER}'"
+        exit 4
+    }
+
+    status=''
+    end=$((SECONDS + HEALTH_TIMEOUT))
+    while [[ "${SECONDS}" -lt "${end}" ]]; do
+        status="$(podman inspect --format '{{.State.Health.Status}}' "${CONTAINER}" 2>'/dev/null' || true)"
+        if [[ "${status}" = 'healthy' ]]; then
+            break
+        fi
+        # Force an immediate check rather than waiting on the 30s interval.
+        podman healthcheck run "${CONTAINER}" >'/dev/null' 2>&1 || true
+        sleep 2
+    done
+    if [[ "${status}" != 'healthy' ]]; then
+        log "'${CONTAINER}' not healthy after ${HEALTH_TIMEOUT}s (status: ${status:-unknown})"
+        exit 4
+    fi
+fi
+
+rc=0
+for NAME in "${!SHARES[@]}"; do
+    TARGET="${BASE}/${NAME}"
+    EXPORT="${SHARES[${NAME}]}"
+
+    if mountpoint -q -- "${TARGET}"; then
+        continue
+    fi
+    if [[ ! -d "${TARGET}" ]]; then
+        mkdir -p -- "${TARGET}"
+        chown "${PKEXEC_UID}:${GID}" -- "${TARGET}"
+        # Make the freshly-created, empty mountpoint immutable: nothing can write
+        # into it locally while unmounted; mount(8) bypasses the flag once mounted.
+        chattr +i -- "${TARGET}" || log "warning: could not set immutable flag on ${TARGET}"
+    fi
+    if ! mount -t nfs -o "${MOUNT_OPTS}" "${SERVER}:${EXPORT}" "${TARGET}"; then
+        log "failed to mount ${SERVER}:${EXPORT} at ${TARGET}"
+        rc=5
+    fi
+done
+
+exit "${rc}"

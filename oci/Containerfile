@@ -207,6 +207,14 @@ RUN rpm-ostree install --idempotent --allow-inactive --releasever="${FEDORA_VERS
  && mkdir -p '/usr/lib/systemd/logind.conf.d/' \
  && { echo '[Login]'; echo 'HandleLidSwitchExternalPower=ignore'; } >'/usr/lib/systemd/logind.conf.d/10-lid.conf' \
  && rm -rf /tmp/* /var/*
+
+# Work-hosted VPN for remote working.
+# `/usr/etc` is copied to `/etc` at runtime, we need it now at build time.
+RUN cp '/usr/etc/yum.repos.d/pritunl.repo' '/etc/yum.repos.d/pritunl.repo' \
+ && rpm-ostree install --idempotent --allow-inactive --releasever="${FEDORA_VERSION}" pritunl-client-electron \
+ && systemctl enable 'pritunl-client.service' \
+ && rm -rf /tmp/* /var/*
+
 # Recommended to avoid doing the following; commenting out for preservation.
 #RUN if grep 'secure_path' '/etc/sudoers' >'/dev/null' 2>&1; then \
 #       cat '/etc/sudoers' | grep -v 'secure_path' | tee '/etc/sudoers' >'/dev/null' 2>&1; \

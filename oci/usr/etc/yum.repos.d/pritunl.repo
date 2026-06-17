@@ -1,0 +1,6 @@
+[pritunl]
+name=Pritunl Stable Repository
+baseurl=https://repo.pritunl.com/stable/yum/fedora/44/
+gpgcheck=1
+enabled=1
+gpgkey=https://raw.githubusercontent.com/pritunl/pgp/master/pritunl_repo_pub.asc

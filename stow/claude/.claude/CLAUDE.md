@@ -44,6 +44,14 @@ When I ask you to 'explore' a codebase, write findings to a markdown file (e.g.,
 **Measure success: minimal lines changed, single-purpose atomic commits, zero scope creep.**
 Small + correct > comprehensive + requires human fixes.
 
+## Usage & Delegation
+When using the workflows feature to organize subagents with tasks, be mindful of which model you assign to each one.
+Your scarce resource is your own token budget; spend it on ideation and analysis, and **delegate where needed.**
+- **Opus 4.8:** ideation, signal interpretation, cross-domain synthesis, deciding what's a live idea; heavyweight *non-generative* analysis if a judgement call genuinely needs it.
+- **Sonnet 4.6:** consolidation, dedup, drafting catalogue entries from your raw output, summarising scan results, formatting. Cap its reasoning budget — these are mechanical.
+- **Haiku 4.5:** fetching and lookups — "does this already exist well on crates.io / Packagist / GitHub," mechanical adjacency scans against the user's repos, link-gathering. Minimal reasoning.
+Be liberal with subagents and conservative about what deserves *you*.
+
 # Notes about this system:
 - On this host machine, the `grep` command has been aliased to `rg` (ripgrep) meaning standard `grep` commands WILL NOT WORK. **Always** use `rg` instead.
 - When running commands inside Docker containers, the original `grep` command will be available.

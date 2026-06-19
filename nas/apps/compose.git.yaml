@@ -12,6 +12,7 @@ services:
         image: 'codeberg.org/forgejo/forgejo:15.0.2'
         restart: 'unless-stopped'
         networks:
+            - 'default'
             - 'database'
         environment:
             TZ: 'Europe/Amstedam'
@@ -38,7 +39,7 @@ services:
               protocol: 'tcp'
         volumes:
             - type: 'bind'
-              source: '/mnt/fast/apps/forgejo'
+              source: '/mnt/fast/apps/forgejo/server'
               target: '/data'
               read_only: false
             - type: 'bind'
@@ -54,6 +55,79 @@ services:
               target: '/etc/timezone'
               read_only: true
 
+    # Forgejo Actions runner + rootful Docker-in-Docker builder.
+    #
+    # Builds run against the DinD daemon (which ships BuildKit), NOT the host
+    # Docker socket. Compromised workflows cannot reach host datasets or other
+    # app containers, but the trade-off is that DinD must run privileged.
+    #
+    # Deploys NEVER run `docker compose` over SSH. Built images are redeployed
+    # the TrueNAS-native way via the middleware API (app.pull_images) from the
+    # project's own Actions workflow. See ~/.claude/plans for the full plan.
+    #
+    # Register a runner at `<forgejo-url>/admin/actions/runners/new`:
+    # - Update `server.connections.forgejo.uuid` setting in the runner config below, and
+    # - Write the token to the filesystem as a secret.
+    runner:
+        image: 'code.forgejo.org/forgejo/runner:12'
+        restart: 'unless-stopped'
+        # The image already defaults to USER 1000:1000 (HOME=/data) and has no
+        # PUID/PGID env vars like the Forgejo server image; set it explicitly so
+        # ownership is unambiguous.
+        # - `chown -R 1000:1000 /mnt/fast/apps/forgejo/runner/data`
+        user: '1000:1000'
+        depends_on:
+            forgejo:
+                condition: 'service_started'
+            dind:
+                # Wait for the DinD daemon to accept connections so the runner
+                # doesn't crash-loop on "cannot ping the docker daemon" at boot.
+                condition: 'service_healthy'
+        environment:
+            DOCKER_HOST: 'tcp://dind:2375'
+        configs:
+            - source: 'runner'
+              target: '/etc/forgejo/runner.yaml'
+              mode: 0644
+        secrets:
+            - 'runner'
+        volumes:
+            - type: 'bind'
+              source: '/mnt/fast/apps/forgejo/runner/data'
+              target: '/data'
+              read_only: false
+            - type: 'bind'
+              source: '/etc/localtime'
+              target: '/etc/localtime'
+              read_only: true
+            - type: 'bind'
+              source: '/etc/timezone'
+              target: '/etc/timezone'
+              read_only: true
+        command:
+            - 'forgejo-runner'
+            - 'daemon'
+            - '--config'
+            - '/etc/forgejo/runner.yaml'
+
+    dind:
+        image: 'docker:27-dind'
+        restart: 'unless-stopped'
+        privileged: true
+        environment:
+            DOCKER_TLS_CERTDIR: ''
+        command: ['dockerd', '--host', 'tcp://0.0.0.0:2375', '--tls=false']
+        healthcheck:
+            test: ['CMD', 'docker', '-H', 'tcp://localhost:2375', 'info']
+            interval: '5s'
+            timeout: '3s'
+            retries: 20
+        volumes:
+            - type: 'bind'
+              source: '/mnt/fast/apps/forgejo/runner/docker'
+              target: '/var/lib/docker'
+              read_only: false
+
 networks:
     database:
         external: true
@@ -61,7 +135,41 @@ networks:
 secrets:
     dbpass:
         file: '/mnt/tank4/secrets/postgres/forgejo'
+    runner:
+        file: '/mnt/tank4/secrets/forgejo/runner'
 
 configs:
     forgejo:
         content: ''
+    runner:
+        content: |
+            log:
+                level: 'info'
+            runner:
+                capacity: 1
+                labels:
+                    - 'ubuntu:docker://git.lan.zanbaldwin.com/actions/runner-images:ubuntu'
+                    - 'rust:docker://git.lan.zanbaldwin.com/actions/runner-images:rust'
+                # Injected into every job container. `container.docker_host` (below)
+                # only tells the runner where to CREATE job containers; it does NOT
+                # set DOCKER_HOST inside them, so docker/buildx steps fall back to the
+                # (absent) local socket. This line is what lets builds reach the DinD
+                # daemon; the hostname is resolved by `--add-host` below.
+                envs:
+                    DOCKER_HOST: 'tcp://dind_container.docker.internal:2375'
+            container:
+                docker_host: 'tcp://dind:2375'
+                # Job containers run INSIDE the DinD daemon, so the outer-compose
+                # service name `dind` does not resolve from within them. Map a stable
+                # hostname to the DinD daemon's gateway, where dockerd listens on :2375.
+                options: '--add-host=dind_container.docker.internal:host-gateway'
+                force_pull: true
+            cache:
+                enabled: true
+                dir: '/data/cache'
+            server:
+                connections:
+                    forgejo:
+                        url: 'https://git.lan.zanbaldwin.com/'
+                        uuid: '08497b80-a37f-40a4-b548-494b7d33b0b7'
+                        token_url: 'file:/run/secrets/runner'

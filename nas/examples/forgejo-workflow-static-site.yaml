@@ -1,0 +1,62 @@
+# Example Forgejo Actions workflow for a STATIC / SSG site built on the NAS.
+# Copy into the project repo as `.forgejo/workflows/deploy.yaml`.
+#
+# Flow:  build the site (actions/mdbook)  ->  publish (actions/deploy-static):
+# rsync into a staging dir on the NAS, then an atomic symlink swap.  This writes
+# FILES only (no container, no compose project), so it does NOT violate the
+# "no docker compose over SSH" rule. The existing compose.sites.yaml nginx then
+# serves it at {project}.lan.zanbaldwin.com with no reload (autoindex reads the
+# filesystem per request).
+#
+# Prerequisites (see ~/.claude/plans):
+#   - The runner is deployed and registered with the `ubuntu-26.04` label.
+#   - A restricted `deploy-sites` user on TrueNAS with an NFSv4 ACL granting
+#     Modify (+ File/Dir inherit) on the tank4/sites dataset, and its
+#     authorized_keys locked to a ForceCommand wrapper that permits BOTH the
+#     `rsync --server` call AND the deploy-static swap command:
+#       ln -sfn '<root>/<project>-staging' '<root>/<project>-next' && mv -fT '<root>/<project>-next' '<root>/<project>'
+#   - compose.sites.yaml bind-mounts the PARENT /mnt/tank4/sites (not a per-site
+#     symlink) so the atomic swap is visible without restarting nginx.
+#   - Forgejo Actions secret:  DEPLOY_SSH_KEY  private key for deploy-sites
+#   - Forgejo Actions variable: DEPLOY_HOST    nas.lan.zanbaldwin.com (or Tailscale IP)
+#
+# For a non-mdBook generator, swap the "Build book" step and point the publish
+# step's `source` at its output directory. Pin third-party (github.com) `uses:`
+# to a commit SHA in real use; the internal actions are tracked at @main.
+
+name: 'Build and publish'
+
+on:
+  push:
+    branches: ['main']
+
+env:
+  PROJECT: 'example-site'           # subdirectory under /mnt/tank4/sites
+  SITES_ROOT: '/mnt/tank4/sites'
+
+jobs:
+  build-and-publish:
+    runs-on: 'ubuntu-26.04'
+    steps:
+      - name: 'Checkout'
+        uses: 'https://github.com/actions/checkout@v4'
+
+      # Installs mdBook and builds the book; exposes the output directory as
+      # steps.mdbook.outputs.path. Pin `version:` here to override the default.
+      - name: 'Build book'
+        id: 'mdbook'
+        uses: 'https://git.lan.zanbaldwin.com/actions/mdbook@main'
+        with:
+          directory: '.'           # the directory containing book.toml
+
+      # rsync to a staging dir + atomic symlink swap, handled by the action.
+      # method (rsync-ssh), user (deploy-sites) and atomic-publish (true) all use
+      # the action's defaults, so only the paths + credentials are supplied here.
+      - name: 'Publish to the NAS'
+        uses: 'https://git.lan.zanbaldwin.com/actions/deploy-static@main'
+        with:
+          source: '${{ steps.mdbook.outputs.path }}'
+          host: '${{ vars.DEPLOY_HOST }}'
+          ssh-key: '${{ secrets.DEPLOY_SSH_KEY }}'
+          remote-path: '${{ env.SITES_ROOT }}/${{ env.PROJECT }}-staging'
+          live-path: '${{ env.SITES_ROOT }}/${{ env.PROJECT }}'

@@ -1,0 +1,95 @@
+# Example Forgejo Actions workflow for a DYNAMIC app (a process + port) built on
+# the NAS. Copy into the project repo as `.forgejo/workflows/deploy.yaml`.
+#
+# Flow:  build an OCI image  ->  push to the Forgejo registry  ->  redeploy via
+# the TrueNAS middleware API.  Deploys go through the middleware, NEVER via
+# `docker compose` over SSH (that would create an unmanaged parallel project).
+#
+# Prerequisites (see ~/.claude/plans + the compose.ci.yaml runner):
+#   - The runner is deployed and registered with the `ubuntu-22.04` label.
+#   - The app is already deployed once as a TrueNAS custom app named ${APP_NAME}
+#     (its own compose.<name>.yaml) whose image is ${IMAGE}:latest.
+#   - TrueNAS is signed in to the git.lan.zanbaldwin.com registry
+#     (Apps > Configuration > Sign-in to Docker registry) so the middleware can
+#     pull the private image during redeploy.
+#   - Forgejo Actions secrets:
+#       REGISTRY_TOKEN   bot-user PAT with write:package scope
+#       TRUENAS_API_KEY  TrueNAS API key with the APPS_WRITE role
+#   - Forgejo Actions variable:
+#       TRUENAS_HOST     e.g. nas.lan.zanbaldwin.com  (must be HTTPS/WSS-reachable)
+#
+# Pin every `uses:` to a full commit SHA in real use (supply-chain hygiene). The
+# https://github.com/... form is used so resolution does not depend on the
+# instance's DEFAULT_ACTIONS_URL; the docker/* actions are also mirrored at
+# https://code.forgejo.org/docker/... if you prefer to avoid internet egress.
+
+name: 'Build and deploy'
+
+on:
+  push:
+    branches: ['main']
+
+env:
+  REGISTRY: 'git.lan.zanbaldwin.com'
+  IMAGE: 'git.lan.zanbaldwin.com/zan/example-app'   # <registry>/<owner>/<image>
+  APP_NAME: 'example-app'                           # TrueNAS custom-app name
+
+jobs:
+  build-and-deploy:
+    runs-on: 'ubuntu-22.04'
+    steps:
+      - name: 'Checkout'
+        uses: 'https://github.com/actions/checkout@v4'
+
+      # docker-container driver (not the default 'docker' driver) is required for
+      # --cache-to type=registry to work; it spins up buildkit inside the DinD daemon.
+      - name: 'Set up Buildx'
+        uses: 'https://github.com/docker/setup-buildx-action@v3'
+        with:
+          driver: 'docker-container'
+
+      - name: 'Log in to the Forgejo registry'
+        uses: 'https://github.com/docker/login-action@v3'
+        with:
+          registry: '${{ env.REGISTRY }}'
+          username: 'ci-bot'                          # the bot user that owns REGISTRY_TOKEN
+          password: '${{ secrets.REGISTRY_TOKEN }}'
+
+      - name: 'Build and push'
+        uses: 'https://github.com/docker/build-push-action@v6'
+        with:
+          context: '.'
+          push: true
+          tags: |
+            ${{ env.IMAGE }}:latest
+            ${{ env.IMAGE }}:${{ github.sha }}
+          # Registry-backed layer cache in a separate :buildcache image so a
+          # Forgejo cleanup rule can keep it ("keep versions matching buildcache").
+          cache-from: 'type=registry,ref=${{ env.IMAGE }}-cache:buildcache'
+          cache-to: 'type=registry,ref=${{ env.IMAGE }}-cache:buildcache,mode=max,image-manifest=true,oci-mediatypes=true'
+
+      # Redeploy through the TrueNAS middleware. app.pull_images runs
+      # `docker compose pull` (re-pulls the moved :latest tag) then redeploys.
+      # NOTE: app.redeploy ALONE does not re-pull — pull_images is required.
+      - name: 'Redeploy on TrueNAS'
+        run: |
+          pip install --quiet 'git+https://github.com/truenas/api_client.git@TS-25.10.x'
+          python - <<'PY'
+          import os
+          from truenas_api_client import Client
+          with Client(uri=f"wss://{os.environ['TRUENAS_HOST']}/api/current") as c:
+              # Verify the exact auth signature against the installed api_client;
+              # auth.login_with_api_key takes the single API-key string.
+              c.call('auth.login_with_api_key', os.environ['TRUENAS_API_KEY'])
+              c.call('app.pull_images', os.environ['APP_NAME'], {'redeploy': True}, job=True)
+          print(f"Redeployed {os.environ['APP_NAME']}")
+          PY
+        env:
+          TRUENAS_HOST: '${{ vars.TRUENAS_HOST }}'
+          TRUENAS_API_KEY: '${{ secrets.TRUENAS_API_KEY }}'
+          APP_NAME: '${{ env.APP_NAME }}'
+
+      # Alternative to the step above if the runner can't reach the TrueNAS WSS
+      # endpoint but can SSH to the host (midclt talks to the local middleware):
+      #   ssh deploy@${{ vars.TRUENAS_HOST }} \
+      #     "midclt call app.pull_images ${{ env.APP_NAME }} '{\"redeploy\": true}'"

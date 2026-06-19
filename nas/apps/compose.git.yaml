@@ -9,7 +9,7 @@ services:
     #   ALTER SCHEMA public OWNER TO forgejo;
     #   GRANT USAGE, CREATE ON SCHEMA public TO forgejo;
     forgejo:
-        image: 'codeberg.org/forgejo/forgejo:15.0.2'
+        image: 'codeberg.org/forgejo/forgejo:15.0.3'
         restart: 'unless-stopped'
         networks:
             - 'default'
@@ -18,11 +18,19 @@ services:
             TZ: 'Europe/Amstedam'
             USER_UID: '${PUID:-1000}'
             USER_GID: '${PGID:-1000}'
+            # Instance posture. FORGEJO__<section>__<KEY> env vars are written into
+            # app.ini on startup (environment-to-ini), so single keys are overridden
+            # without templating the whole config.
             FORGEJO__database__DB_TYPE: 'postgres'
             FORGEJO__database__HOST: 'postgres:5432'
             FORGEJO__database__NAME: 'forgejo'
             FORGEJO__database__USER: 'forgejo'
             FORGEJO__database__PASSWD__FILE: '/run/secrets/dbpass'
+            # Allow anonymous clients to reach the instance so the container registry
+            # can issue anonymous pull tokens for PUBLIC packages.
+            FORGEJO__service__REQUIRE_SIGNIN_VIEW: 'false'
+            FORGEJO__service__DEFAULT_ORG_VISIBILITY: 'limited'
+            FORGEJO__service__DEFAULT_USER_VISIBILITY: 'limited'
         configs:
             # Config is actually loaded from `/data/gitea/conf/app.ini`,
             # but it's good to keep a reference of what should be.

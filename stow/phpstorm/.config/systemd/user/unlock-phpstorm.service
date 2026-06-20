@@ -4,7 +4,7 @@ After=graphical-session.target
 
 [Service]
 Type=oneshot
-ExecStart=%h/bin/unlock-phpstorm.sh
+ExecStart=%h/.local/bin/unlock-phpstorm.sh
 Environment=DISPLAY=:0
 RemainAfterExit=true
 

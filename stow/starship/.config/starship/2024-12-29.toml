@@ -112,7 +112,7 @@ symbol = '󰟆 '
 [docker_context]
 disabled = true
 [custom.podman]
-command = "~/bin/starship-podman.sh"
+command = "~/.local/bin/starship-podman.sh"
 description = "Podman"
 symbol = '󰡨'
 detect_files = [

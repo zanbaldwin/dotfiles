@@ -1,7 +1,7 @@
 [Desktop Entry]
 Name=Unlock PHPStorm
 Type=Application
-Exec=bash "${HOME}/bin/unlock-phpstorm.sh"
+Exec=bash "${HOME}/.local/bin/unlock-phpstorm.sh"
 Terminal=false
 NoDisplay=true
 Category=Utility;ConsoleOnly

@@ -157,7 +157,7 @@ RUN rpm-ostree install --idempotent --allow-inactive --releasever="${FEDORA_VERS
 RUN rpm-ostree install --idempotent --allow-inactive --releasever="${FEDORA_VERSION}" \
         niri kanshi \
         cairo fontconfig freetype glib2 harfbuzz jemalloc libcurl libglvnd-egl \
-        libglvnd-gles libqalculate librsvg2 libwayland-client libwayland-egl \
+        libglvnd-gles libqalculate librsvg2 libwayland-client libwayland-egl wtype \
         libwebp libxkbcommon libxml2 pango pipewire-libs polkit-libs sdbus-cpp \
         ddcutil wireplumber brightnessctl wl-clipboard wlsunset cava \
  && systemctl --global enable 'kanshi.service' \

@@ -71,6 +71,8 @@ binds {
     XF86AudioNext        allow-when-locked=true { spawn "noctalia" "msg" "media" "next"; }
     XF86MonBrightnessUp allow-when-locked=true { spawn "noctalia" "msg" "brightness-up"; }
     XF86MonBrightnessDown allow-when-locked=true { spawn "noctalia" "msg" "brightness-down"; }
+    // Show the clipboard if Wayland is being fucky about copypasta.
+    Mod+C { spawn "noctalia" "msg" "panel-toggle" "clipboard"; }
 
     Mod+Q repeat=false hotkey-overlay-title="<b>Close</b> focused window" { close-window; }
     Super+L hotkey-overlay-title="<b>Lock</b> the Screen" { spawn "noctalia" "msg" "session" "lock"; }
@@ -188,7 +190,7 @@ binds {
     // Makes the column "fill the rest of the space".
     Mod+Ctrl+F { expand-column-to-available-width; }
 
-    Mod+C { center-column; }
+    // Old (pre-clipboard): Mod+C { center-column; }
 
     // Center all fully visible columns on screen.
     Mod+Ctrl+C { center-visible-columns; }

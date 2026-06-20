@@ -15,8 +15,42 @@ services:
         volumes:
             - type: 'bind'
               source: '/mnt/tank4/sites'
-              target: '/host'
+              target: '/var/www/html'
               read_only: true
+
+    deploy:
+        image: 'linuxserver/openssh-server:amd64-latest'
+        restart: 'unless-stopped'
+        environment:
+            DOCKER_MODS: 'linuxserver/mods:universal-package-install'
+            INSTALL_PACKAGES: 'rsync'
+            PUID: '1000'
+            PGID: '1000'
+            TZ: 'Europe/Amsterdam'
+            USER_NAME: 'deploy'
+            PUBLIC_KEY_FILE: '/run/secrets/authorized'
+            LOG_STDOUT: 'true'
+        secrets:
+            - 'authorized'
+        ports:
+            - target: 2222
+              published: 7483
+              protocol: 'tcp'
+        volumes:
+            - type: 'bind'
+              source: '/mnt/tank4/sites'
+              target: '/var/www/html'
+              read_only: false
+        security_opt: ['no-new-privileges:true']
+        cap_drop: ['ALL']
+        cap_add: ['CHOWN', 'DAC_OVERRIDE', 'FOWNER', 'SETUID', 'SETGID', 'KILL', 'SYS_CHROOT', 'AUDIT_WRITE']
+        pids_limit: 200
+        mem_limit: '256m'
+        cpus: 1.0
+
+secrets:
+    authorized:
+        file: '/mnt/tank4/secrets/sites/public'
 
 configs:
     nginx:
@@ -24,7 +58,7 @@ configs:
             server {
                 listen 80 default_server;
                 server_name _;
-                root /host;
+                root /var/www/html;
                 server_tokens off;
                 charset utf-8;
                 location / {

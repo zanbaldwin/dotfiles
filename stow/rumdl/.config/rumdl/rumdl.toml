@@ -1,0 +1,22 @@
+[global]
+flavor = "gfm"
+line-length = 120
+respect-gitignore = true
+
+[MD013]
+reflow = true
+[MD022]
+lines-below = 0
+[MD004]
+style = "dash"
+[MD029]
+style = "ordered"
+[MD030]
+ol-align-column = 3
+[MD032]
+allow-lazy-continuation = false
+[MD033]
+# `<pre>` is required for native-mdbook Mermaid diagrams.
+allowed-elements = ["pre", "details", "summary"]
+[MD076]
+style = "tight"

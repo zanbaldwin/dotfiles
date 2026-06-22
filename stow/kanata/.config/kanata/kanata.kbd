@@ -3,13 +3,27 @@
 )
 
 (defsrc
-  caps
+  caps t spc
 )
 
 (deflayer default
-  @cap
+  @cap @dbt @dbspc
 )
 
 (defalias
-  cap (tap-hold-press 300 300 caps lmet)
+  cap   (tap-hold-press 300 300 caps lmet)
+
+  ;; Drop a re-press of t that arrives within 20ms of the previous t output.
+  ;; recency 1 = previous OUTPUT key (current press not yet in history).
+  ;;
+  ;; This is my lame attempt to get my keyboard from "double tapping" instead
+  ;; of spending the money to actually fix the hardware switch :(
+  dbt   (switch
+          ((and (key-history t   1) (key-timing 1 less-than 20))) XX break
+          () t   break
+        )
+  dbspc (switch
+          ((and (key-history spc 1) (key-timing 1 less-than 20))) XX break
+          () spc break
+        )
 )

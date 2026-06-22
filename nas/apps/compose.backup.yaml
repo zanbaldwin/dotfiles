@@ -15,6 +15,7 @@ services:
             BACKREST_PORT: '9898'
         secrets:
             - 'backblaze_credentials'
+            - 'tigris_credentials'
             - 'truenas_api_key'
         ports:
             - target: 9898
@@ -47,5 +48,7 @@ services:
 secrets:
     backblaze_credentials:
         file: '/mnt/tank4/secrets/backrest/backblaze'
+    tigris_credentials:
+        file: '/mnt/tank4/secrets/backrest/tigris'
     truenas_api_key:
         file: '/mnt/tank4/secrets/backrest/truenas'

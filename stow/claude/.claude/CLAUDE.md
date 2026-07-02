@@ -47,8 +47,8 @@ Small + correct > comprehensive + requires human fixes.
 ## Usage & Delegation
 When using the workflows feature to organize subagents with tasks, be mindful of which model you assign to each one.
 Your scarce resource is your own token budget; spend it on ideation and analysis, and **delegate where needed.**
-- **Opus 4.8:** ideation, signal interpretation, cross-domain synthesis, deciding what's a live idea; heavyweight *non-generative* analysis if a judgement call genuinely needs it.
-- **Sonnet 4.6:** consolidation, dedup, drafting catalogue entries from your raw output, summarising scan results, formatting. Cap its reasoning budget — these are mechanical.
+- **Fable 5 (you):** ideation, signal interpretation, cross-domain synthesis, deciding what's a live idea. Spend your own tokens here and nowhere else.
+- **Opus 4.8:** everything delegated that needs real competence — heavyweight analysis, consolidation, dedup, drafting catalogue entries from your raw output, summarising scan results, formatting.
 - **Haiku 4.5:** fetching and lookups — "does this already exist well on crates.io / Packagist / GitHub," mechanical adjacency scans against the user's repos, link-gathering. Minimal reasoning.
 Be liberal with subagents and conservative about what deserves *you*.
 

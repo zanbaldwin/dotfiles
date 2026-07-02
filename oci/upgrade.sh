@@ -23,7 +23,7 @@ podman start 'registry' || podman run -d --name='registry' --publish='5000:5000'
 podman push "${IMAGE}"
 # Reclaim disk by dropping the untagged intermediate build-stage images (each can
 # be several GB). The tagged "${IMAGE}" and pulled base images are kept.
-podman image prune --force
+podman image prune --force || true
 rpm-ostree rebase "ostree-unverified-registry:${IMAGE}" || rpm-ostree upgrade
 
 echo "Reboot your machine to start using the new image."

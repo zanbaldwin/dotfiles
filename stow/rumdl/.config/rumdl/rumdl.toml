@@ -2,6 +2,7 @@
 flavor = "gfm"
 line-length = 120
 respect-gitignore = true
+cache = false
 
 [MD013]
 reflow = true
@@ -18,5 +19,9 @@ allow-lazy-continuation = false
 [MD033]
 # `<pre>` is required for native-mdbook Mermaid diagrams.
 allowed-elements = ["pre", "details", "summary"]
+[MD049]
+style = "underscore"
+[MD050]
+style = "asterisk"
 [MD076]
 style = "tight"

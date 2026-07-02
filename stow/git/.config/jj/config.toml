@@ -51,6 +51,8 @@ diff-formatter = ":git"
 tree-level-conflicts = true
 
 [aliases]
+# jj all the way down
+jj = ["util", "exec", "--", "jj"]
 co = ["checkout"]
 ls = ["log", "-r", "@ | trunk()", "-T", "log_oneline"]
 # Polishing stacks

@@ -55,3 +55,4 @@ Be liberal with subagents and conservative about what deserves *you*.
 # Notes about this system:
 - On this host machine, the `grep` command has been aliased to `rg` (ripgrep) meaning standard `grep` commands WILL NOT WORK. **Always** use `rg` instead.
 - When running commands inside Docker containers, the original `grep` command will be available.
+- The primary system user is Zan; their pronouns are they/them.

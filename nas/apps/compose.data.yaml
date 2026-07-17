@@ -66,6 +66,72 @@ services:
         ports: []
         command: ['valkey-server', '/etc/valkey/valkey.conf']
 
+    garage:
+        image: 'dxflrs/garage:v2.0.0'
+        restart: 'unless-stopped'
+        networks:
+            s3:
+                aliases: ['s3', 'garage']
+        secrets:
+            - 'garage_rpc_secret'
+            - 'garage_admin_token'
+            - 'garage_metrics_token'
+        configs:
+            - source: 's3config'
+              target: '/etc/garage.toml'
+        volumes:
+            - type: 'bind'
+              source: '/mnt/fast/apps/garage'
+              target: '/var/lib/garage/meta'
+              read_only: false
+            - type: 'bind'
+              source: '/mnt/tank4/buckets'
+              target: '/var/lib/garage/data'
+              read_only: false
+        ports:
+            - target: 3900
+              published: 3900
+              protocol: 'tcp'
+        deploy:
+            resources:
+                limits:
+                    # Generous ceiling; a single-node build-cache workload will
+                    # realistically sit in the tens of MB. This is a blast-radius
+                    # cap, not a sizing recommendation.
+                    memory: '512M'
+                reservations:
+                    memory: '64M'
+        healthcheck:
+            test: ['CMD', '/garage', 'status']
+            interval: '30s'
+            timeout: '5s'
+            retries: 3
+            start_period: '10s'
+    webui:
+        image: 'noooste/garage-ui:v0.10.0'
+        restart: 'unless-stopped'
+        depends_on:
+            garage:
+                condition: 'service_healthy'
+        networks: ['s3']
+        environment:
+            GARAGE_UI_GARAGE_ENDPOINT: 'http://garage:3900'
+            GARAGE_UI_GARAGE_ADMIN_ENDPOINT: 'http://garage:3903'
+            GARAGE_UI_GARAGE_ADMIN_TOKEN_FILE: '/run/secrets/garage_admin_token'
+            GARAGE_UI_AUTH_ADMIN_USERNAME: 'zan'
+            GARAGE_UI_AUTH_ADMIN_PASSWORD_FILE: '/run/secrets/garage_ui_password'
+        secrets:
+            - 'garage_admin_token'
+            - 'garage_ui_password'
+        ports:
+            - target: 8080
+              published: 3909
+              protocol: 'tcp'
+        deploy:
+            resources:
+                limits:
+                    memory: '128M'
+
 networks:
     cache:
         name: 'cache'
@@ -75,10 +141,22 @@ networks:
         name: 'database'
         driver: 'bridge'
         attachable: true
+    s3:
+        name: 's3'
+        driver: 'bridge'
+        attachable: true
 
 secrets:
     dbpass:
         file: '/mnt/tank4/secrets/postgres/main'
+    garage_rpc_secret:
+        file: '/mnt/tank4/secrets/garage/rpc_secret'
+    garage_admin_token:
+        file: '/mnt/tank4/secrets/garage/admin_token'
+    garage_metrics_token:
+        file: '/mnt/tank4/secrets/garage/metrics_token'
+    garage_ui_password:
+        file: '/mnt/tank4/secrets/garage/ui_password'
 
 configs:
     initdb:
@@ -151,3 +229,34 @@ configs:
             save 60 100
             maxmemory 180mb
             maxmemory-policy allkeys-lru
+    s3config:
+        content: |
+            # Single-node Garage config.
+            # Generate the three secrets below with: openssl rand -hex 32
+            metadata_dir = "/var/lib/garage/meta"
+            data_dir = "/var/lib/garage/data"
+            db_engine = "sqlite"
+            # Periodic snapshot of the metadata DB alongside the data.
+            # Cheap insurance that makes restic/Backrest snapshots of the meta
+            # dir consistent without stopping the container.
+            metadata_auto_snapshot_interval = "6h"
+            # Single node: one copy of everything. This is a supported config,
+            # not a degraded cluster.
+            replication_factor = 1
+            # zstd level for data at rest. 2 is near-free CPU-wise.
+            compression_level = 2
+            rpc_bind_addr = "[::]:3901"
+            # Compose service name; only ever resolved inside the compose network.
+            rpc_public_addr = "garage:3901"
+            rpc_secret_file = "/run/secrets/garage_rpc_secret"
+            [s3_api]
+            s3_region = "garage"
+            api_bind_addr = "[::]:3900"
+            # Suffix for vhost-style bucket addressing. Path-style
+            # (http://host:3900/bucket/key) works regardless, which is what
+            # kache/sccache use, so this rarely matters in practice.
+            root_domain = ".s3.lan.zanbaldwin.com"
+            [admin]
+            api_bind_addr = "[::]:3903"
+            admin_token_file = "/run/secrets/garage_admin_token"
+            metrics_token_file = "/run/secrets/garage_metrics_token"

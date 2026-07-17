@@ -1,7 +1,7 @@
 name: 'backup'
 services:
     backrest:
-        image: 'garethgeorge/backrest:v1.13.0-alpine'
+        image: 'garethgeorge/backrest:v1.14.1-alpine'
         restart: 'unless-stopped'
         deploy:
             resources:

@@ -1,7 +1,7 @@
 name: 'proxy'
 services:
     manager:
-        image: 'jc21/nginx-proxy-manager:2.14.0'
+        image: 'jc21/nginx-proxy-manager:2.15.1'
         restart: 'unless-stopped'
         # Don't bother with extra_hosts, Nginx does not use it. Use host network instead.
         network_mode: 'host'

@@ -1,0 +1,10 @@
+[cache]
+local_max_size = "100"
+clean_incremental = true
+
+[cache.remote]
+type = "s3"
+bucket = "kache"
+endpoint = "https://s3.lan.zanbaldwin.com"
+region = "garage"
+profile = "kache"

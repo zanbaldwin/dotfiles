@@ -1,10 +1,8 @@
 [net]
 git-fetch-with-cli = true
-
 [http]
 ssl-version = "tlsv1.3"
 multiplexing = true
-
 [registries.crates-io]
 protocol = "sparse"
 
@@ -12,6 +10,7 @@ protocol = "sparse"
 # Compile for more modern CPU architecture. Work laptop doesn't support v4, though.
 rustflags = ["-C", "target-cpu=x86-64-v3"]
 
+# Needs: `apt install musl-tools` or `dnf install musl-gcc`.
 [target.x86_64-unknown-linux-musl]
 rustflags = [
     "-C",
@@ -19,3 +18,19 @@ rustflags = [
     "-C",
     "link-self-contained=yes",
 ]
+
+[build]
+rustc-wrapper = "kache"
+[env]
+CC_x86_64_unknown_linux_musl = "musl-gcc"
+[alias]
+deploy = "build --profile deploy --target x86_64-unknown-linux-musl"
+[profile.deploy]
+inherits = "release"
+opt-level = "s"
+debug = "none"
+strip = true
+debug-assertions = false
+overflow-checks = false
+lto = "fat"
+codegen-units = 1

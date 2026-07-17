@@ -1,0 +1,13 @@
+[Unit]
+Description=kache build cache daemon
+After=default.target
+
+[Service]
+Type=simple
+ExecStart=/home/zan/.cargo/bin/kache daemon run
+Restart=on-failure
+RestartSec=5s
+Environment=KACHE_LOG=kache=info
+
+[Install]
+WantedBy=default.target

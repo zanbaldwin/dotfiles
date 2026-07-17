@@ -62,6 +62,8 @@ command -v 'zellij' >'/dev/null' 2>&1               || cargo install 'zellij' --
 command -v 'atuin' >'/dev/null' 2>&1                || cargo install 'atuin' --locked     # Better Bash History
 command -v 'rg' >'/dev/null' 2>&1                   || cargo install 'ripgrep' --locked   # It's just fast
 command -v 'fnm' >'/dev/null' 2>&1                  || cargo install 'fnm' --locked       # Fast Node Manager
+command -v 'kanata' >'/dev/null' 2>&1               || cargo install 'kanata' --locked    # Keyboard modifier
+command -v 'rg' >'/dev/null' 2>&1                   || cargo install 'ripgrep' --locked   # Grep oxide
 
 # Other tools that I want to try to start using more
 # Useful Rust binaries that I want on my machine, or tools I want to try to
@@ -73,15 +75,23 @@ command -v 'oha' >'/dev/null' 2>&1                  || cargo install 'oha' --loc
 command -v 'jj' >'/dev/null' 2>&1                   || cargo install 'jj-cli' --locked    # Jujutsu DVCS layered on top of Git
 command -v 'sd' >'/dev/null' 2>&1                   || cargo install 'sd' --locked        # Replacement for `sed`
 command -v 'hexyl' >'/dev/null' 2>&1                || cargo install 'hexyl' --locked     # Binary file viewer
+command -v 'fd' >'/dev/null' 2>&1                   || cargo install 'fd-find' --locked   # Rust-based `find`
+command -v 'mdbook' >'/dev/null' 2>&1               || cargo install 'mdbook' --locked    # Markdown Book
+command -v 'mdterm' >'/dev/null' 2>&1               || cargo install 'mdterm' --locked    # Markdown Terminal-viewer
+command -v 'hexyl' >'/dev/null' 2>&1                || cargo install 'hexyl' --locked     # Binary file viewer
+command -v 'just' >'/dev/null' 2>&1                 || cargo install 'just' --locked      # Worse version of Make that some projects use
+command -v 'rumdl' >'/dev/null' 2>&1                || cargo install 'rumdl' --locked     # Rust Markdown Linter + Formatter
+command -v 'sqlx' >'/dev/null' 2>&1                 || cargo install 'sqlx-cli' --locked  # SQLx CLI, and...
+command -v 'tokei' >'/dev/null' 2>&1                 || cargo install 'tokei' --locked    # Count your code
 
 # Specifically for Rust development instead of general tools
 command -v 'bacon' >'/dev/null' 2>&1                || cargo install 'bacon' --locked         # Background Rust Code Checker (alternative watch TUI)
+command -v 'kache' >'/dev/null' 2>&1                || cargo install 'kache' --locked         # Build artifact cache, with S3 storage on NAS
 command -v 'cargo-expand' >'/dev/null' 2>&1         || cargo install 'cargo-expand' --locked  # Macro Source Code Expansion
 command -v 'cargo-info' >'/dev/null' 2>&1           || cargo install 'cargo-info' --locked    # crates.io in the terminal
 command -v 'tokio-console' >'/dev/null' 2>&1        || cargo install 'tokio-console' --locked # Tokio Tracing Console
 command -v 'cargo-install-update' >'/dev/null' 2>&1 || cargo install 'cargo-update' --locked  # Update all installed binaries
 command -v 'tree-sitter' >'/dev/null' 2>&1          || cargo install 'tree-sitter-cli' --locked
-
 command -v 'typst' >'/dev/null' 2>&1                || cargo install 'typst-cli' --locked     # Typst
 command -v 'typstyle' >'/dev/null' 2>&1             || cargo install 'typstyle' --locked      # Typst Linter/Formatter
 

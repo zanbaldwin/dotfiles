@@ -2,9 +2,11 @@
 // installed (Flatpak, RPM, etc). You may have to manually copy the file contents
 // over, remembering to copy them back when you make changes.
 {
+    "rumdl.configPath": "/home/zan/.config/rumdl/rumdl.toml",
     "[markdown]": {
         "diffEditor.ignoreTrimWhitespace": false,
-        "editor.formatOnSave": false,
+        "editor.formatOnSave": true,
+        "editor.defaultFormatter": "rvben.rumdl",
         "editor.quickSuggestions": {
             "comments": "off",
             "other": "off",
@@ -18,7 +20,29 @@
         "editor.wordSeparators": "`~!@#$%^&*()=+[{]}\\|;:'\",.<>/?"
     },
     "[typst]": {
-        "editor.wordSeparators": "`~!@#$%^&*()=+[{]}\\|;:'\",.<>/?"
+        "editor.wordSeparators": "`~!@#$%^&*()=+[{]}\\|;:'\",.<>/?",
+        "editor.formatOnSave": true,
+        "editor.defaultFormatter": "myriad-dreamin.tinymist"
+    },
+    "[rust]": {
+        "editor.formatOnSave": true,
+        "editor.defaultFormatter": "rust-lang.rust-analyzer"
+    },
+    "[typescript]": {
+        "editor.formatOnSave": true
+    },
+    "[typescriptreact]": {
+        "editor.formatOnSave": true
+    },
+    "[toml]": {
+        "editor.formatOnSave": true,
+        "editor.defaultFormatter": "tamasfe.even-better-toml"
+    },
+    "[json]": {
+        "editor.formatOnSave": true
+    },
+    "[jsonc]": {
+        "editor.formatOnSave": true
     },
     "[yaml]": {
         "editor.tabSize": 2,
@@ -52,7 +76,7 @@
     "editor.fontFamily": "'JetBrainsMono Nerd Font', 'JetBrains Mono', 'FiraCode Nerd Font', 'Fira Code', 'UbuntuMono Nerd Font', 'Ubuntu Mono', Menlo, Monaco, monospace",
     "editor.fontLigatures": true,
     "editor.fontSize": 14.5,
-    "editor.formatOnSave": true,
+    "editor.formatOnSave": false,
     "editor.guides.bracketPairs": "active",
     "editor.inlineSuggest.enabled": true,
     "editor.inlineSuggest.fontFamily": "'Monaspace Krypton NF', 'Monaspace Krypton', 'JetBrainsMono Nerd Font', 'FiraCode Nerd Font', 'Fira Code', 'UbuntuMono Nerd Font', 'Ubuntu Mono', Menlo, Monaco, monospace",
@@ -111,7 +135,6 @@
     "git.autofetch": "all",
     "git.autoStash": true,
     "git.openRepositoryInParentFolders": "never",
-    "github.copilot.advanced": {},
     "github.copilot.enable": {
         "*": true,
         "markdown": true,
@@ -194,4 +217,8 @@
         "comments": "off",
         "strings": "off"
     },
+    "workbench.productIconTheme": "developer-icons",
+    "workbench.colorTheme": "Ayu Dark Bordered",
+    "sqltools.formatLanguages": [],
+    "sqltools.highlightQuery": false,
 }

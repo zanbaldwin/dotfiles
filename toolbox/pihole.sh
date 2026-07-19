@@ -23,6 +23,36 @@ DEBIAN_FRONTEND='noninteractive' apt-get install -y \
     'ufw' \
     'unbound'
 
+# Raspberry Pi OS already provides zstd zram swap via its rpi-swap framework
+# (systemd zram-generator). By default it picks the "zram+file" mechanism, which
+# periodically writes idle zram pages back to a swap file on the SD card. Force
+# pure zram (no file, no writeback) so nothing ever swaps to the card. This takes
+# effect on the next boot, when the rpi-swap-generator reruns.
+mkdir -p '/etc/rpi/swap.conf.d'
+cat >'/etc/rpi/swap.conf.d/99-zram-only.conf' <<'EOF'
+[Main]
+Mechanism=zram
+EOF
+# Remove the leftover writeback swap file the default mechanism left behind.
+rm -f '/var/swap'
+
+# zram swap is fast, so bias towards it; one page per swap for lowest latency.
+cat >'/etc/sysctl.d/99-zram.conf' <<'EOF'
+vm.swappiness = 150
+vm.page-cluster = 0
+EOF
+sysctl --system
+
+# Keep the journal in RAM (/run); nothing written to the SD card. Capped so it
+# cannot exhaust RAM on the 512M device. Logs do not survive a reboot.
+mkdir -p '/etc/systemd/journald.conf.d'
+cat >'/etc/systemd/journald.conf.d/volatile.conf' <<'EOF'
+[Journal]
+Storage=volatile
+RuntimeMaxUse=32M
+EOF
+systemctl restart 'systemd-journald'
+
 curl -fsSL 'https://install.pi-hole.net' -o '/tmp/pihole.sh'
 export INSTALLER_CHECKSUM="84d278d104a30186f6924889c420d6f5c2bcc74ac525481bc65f454d202ebc84"
 echo "${INSTALLER_CHECKSUM} /tmp/pihole.sh" | tee '/tmp/pihole.sig'
@@ -31,15 +61,21 @@ if ! sha256sum --check '/tmp/pihole.sig' --strict --status; then
     exit 1
 fi
 
+# Keep the ban database in RAM. Trade-off: active bans are lost on restart.
+cat >'/etc/fail2ban/fail2ban.local' <<'EOF'
+[Definition]
+dbfile = :memory:
+EOF
 systemctl enable --now 'fail2ban'
 
-mkdir -p '/var/log/unbound'
-chown -R 'unbound:unbound' '/var/log/unbound'
 cat >'/etc/unbound/unbound.conf.d/pihole.conf' <<EOF
 server:
-    # If no logfile is specified, syslog is used
-    logfile: '/var/log/unbound/unbound.log'
-    verbosity: 1
+    # Log minimally to syslog (RAM-backed journald), not a dedicated SD file.
+    # Raise verbosity to 1 temporarily when debugging resolution.
+    verbosity: 0
+    use-syslog: yes
+    log-queries: no
+    log-replies: no
     interface: 127.0.0.1
     port: 5335
     do-ip4: yes
@@ -91,22 +127,6 @@ forward-zone:
     name: 'ts.net.'
     forward-addr: '100.100.100.100'
 EOF
-cat >'/etc/logrotate.d/unbound' <<EOF
-/var/log/unbound/unbound.log {
-    weekly
-    size 100M
-    rotate 12
-    missingok
-    notifempty
-    compress
-    delaycompress
-    sharedscripts
-    create 0644 unbound unbound
-    postrotate
-        /usr/sbin/unbound-control log_reopen >/dev/null 2>&1 || true
-    endscript
-}
-EOF
 systemctl disable --now 'unbound-resolvconf.service'
 systemctl restart 'unbound'
 systemctl enable 'logrotate.timer'
@@ -132,6 +152,12 @@ systemctl enable 'logrotate.timer'
 # EOF
 bash '/tmp/pihole.sh'
 
+# The FTL long-term database (pihole-FTL.db) is the main ongoing SD write source.
+# Batch query-log writes to every 10 min instead of 60s, and cap history at 30
+# days. Trade-off: up to ~10 min of query history lost on an unclean power-off.
+pihole-FTL --config database.DBinterval 600
+pihole-FTL --config database.maxDBdays 30
+
 # The following command is interactive...
 tailscale up --accept-dns=false
 
@@ -145,3 +171,14 @@ ufw allow from '100.64.0.0/10' to any port 53
 ufw allow from '100.64.0.0/10' to any port 22
 systemctl enable --now 'ufw'
 ufw enable
+
+# Reduce metadata/journal writes on the SD card. Find the real PARTUUIDs with:
+#   lsblk -o NAME,PARTUUID,FSTYPE,MOUNTPOINT
+# then edit '/etc/fstab' so the mounts read (do NOT put ext4 opts on vfat):
+#   PARTUUID=xxxxxxxx-02  /               ext4  defaults,noatime,commit=120  0 1
+#   PARTUUID=xxxxxxxx-01  /boot/firmware  vfat  defaults,noatime,flush       0 2
+# noatime is free and high-value; commit=120 batches ext4 flushes (default 5s),
+# risking up to ~2 min of unflushed data on a crash. Apply with: mount -o remount /
+
+# Debian Trixie already mounts /tmp as tmpfs via the tmp.mount unit; verify with
+# 'findmnt /tmp' (only run "systemctl enable --now tmp.mount" if it is inactive).

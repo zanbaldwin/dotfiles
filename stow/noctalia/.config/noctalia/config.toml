@@ -32,6 +32,8 @@ timeout = 900
 [location]
 address = "Apeldoorn, Netherlands"
 
+[lockscreen]
+fingerprint = false
 [lockscreen_widgets]
 enabled = false
 

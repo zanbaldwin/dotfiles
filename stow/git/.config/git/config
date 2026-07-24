@@ -120,6 +120,8 @@
     autocorrect = "prompt"
 [core]
     excludesFile = "~/.config/git/global-ignore"
+    # Empty directory: prevents repository-local hooks (.git/hooks) from ever running.
+    hooksPath = "~/.config/git/hooks"
     editor = "nano -AES --tabsize=4"
     pager = "delta"
     attributesfile = "~/.config/git/attributes"

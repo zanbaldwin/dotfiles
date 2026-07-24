@@ -1,0 +1,17 @@
+name: 'ai'
+services:
+    openwebui:
+        image: 'ghcr.io/open-webui/open-webui:v0.10.2'
+        restart: 'unless-stopped'
+        environment:
+            OLLAMA_BASE_URL: 'http://desktop.lan.zanbaldwin.com:11434'
+        ports:
+            - target: 8080
+              published: 6984
+              protocol: 'tcp'
+              mode: 'host'
+        volumes:
+            - type: 'bind'
+              source: '/mnt/fast/apps/openwebui'
+              target: '/app/backend/data'
+              read_only: false

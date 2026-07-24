@@ -4,8 +4,14 @@ services:
   machine-learning:
     image: 'ghcr.io/immich-app/immich-machine-learning:v2.3.1-cuda'
     restart: 'unless-stopped'
-    devices:
-      - 'nvidia.com/gpu=all'
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: 'nvidia'
+              count: 'all'
+              capabilities:
+                - 'gpu'
     network_mode: 'host'
     environment:
       TZ: 'Europe/Amsterdam'
@@ -22,8 +28,6 @@ services:
         source: 'models'
         target: '/cache'
         read_only: false
-    healthcheck:
-      disable: false
 
   notifier:
     image: 'curlimages/curl:8.17.0'

@@ -4,14 +4,14 @@ services:
   # Should be equivalent to:
   # docker run -d --gpus=all -v ollama:/root/.ollama -p 11434:11434 --name ollama ollama/ollama
   ollama:
-    image: 'ollama/ollama:0.13.1'
+    image: 'ollama/ollama:0.32.2'
     restart: 'unless-stopped'
     deploy:
       resources:
         reservations:
           devices:
             - driver: 'nvidia'
-              count: 1
+              count: 'all'
               capabilities:
                 - 'gpu'
     environment:
@@ -31,7 +31,7 @@ services:
         read_only: false
 
   openwebui:
-    image: 'ghcr.io/open-webui/open-webui:v0.6.43'
+    image: 'ghcr.io/open-webui/open-webui:v0.10.2'
     restart: 'unless-stopped'
     environment:
       OLLAMA_BASE_URL: 'http://ollama:11434'
@@ -42,7 +42,7 @@ services:
         condition: 'service_healthy'
     ports:
       - target: 8080
-        published: 6698
+        published: 6984
         protocol: 'tcp'
         mode: 'host'
     volumes:

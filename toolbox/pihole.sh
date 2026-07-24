@@ -113,6 +113,9 @@ server:
     private-address: 203.0.113.0/24
     private-address: 255.255.255.255/32
     private-address: 2001:db8::/32
+    # This publicly-hosted zone intentionally resolves to private IPs; exempt it
+    # from the rebind protection above (stripping breaks DNSSEC validation).
+    private-domain: "lan.zanbaldwin.com"
     # Increase TCP connection limits (default 10 is too low for Pi-hole FTL)
     incoming-num-tcp: 50
     outgoing-num-tcp: 20

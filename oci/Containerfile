@@ -157,9 +157,10 @@ RUN rpm-ostree install --idempotent --allow-inactive --releasever="${FEDORA_VERS
 RUN rpm-ostree install --idempotent --allow-inactive --releasever="${FEDORA_VERSION}" \
         niri kanshi \
         cairo fontconfig freetype glib2 harfbuzz jemalloc libcurl libglvnd-egl \
-        libglvnd-gles libqalculate librsvg2 libwayland-client libwayland-egl wtype \
-        libwebp libxkbcommon libxml2 pango pipewire-libs polkit-libs sdbus-cpp \
-        ddcutil wireplumber brightnessctl wl-clipboard wlsunset cava \
+        libglvnd-gles libqalculate librsvg2 libsecret libsodium libwayland-client \
+        libwayland-egl wtype libwebp libxkbcommon libxml2 pango pipewire-libs \
+        polkit-libs sdbus-cpp ddcutil wireplumber brightnessctl wl-clipboard wlsunset \
+        cava md4c libical libjxl libsndfile tomlplusplus \
  && systemctl --global enable 'kanshi.service' \
  && mkdir -p '/etc/udev/rules.d' \
  && echo 'KERNEL=="uinput", MODE="0660", GROUP="uinput", OPTIONS+="static_node=uinput"' >'/etc/udev/rules.d/99-uinput.rules' \

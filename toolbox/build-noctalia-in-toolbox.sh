@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 
+NOCTALIA_VERSION_TAG='v5.0.0-beta.7'
+
 if [ ! -f '/run/.toolboxenv' ]; then
     echo 'error: not inside a toolbox; refusing to modify system packages outside a toolbox.' >&2
     exit 1
@@ -22,12 +24,19 @@ sudo dnf install --setopt=install_weak_deps=False --assumeyes \
   'git' \
   'glib2-devel' \
   'jemalloc-devel' \
+  'json-devel' \
   'libcurl-devel' \
   'libEGL-devel' \
+  'libical-devel' \
+  'libjxl-devel' \
   'libqalculate-devel' \
   'librsvg2-devel' \
+  'libsecret-devel' \
+  'libsndfile-devel' \
+  'libsodium-devel' \
   'libwebp-devel' \
   'libxkbcommon-devel' \
+  'md4c-devel' \
   'mesa-libGLES-devel' \
   'meson' \
   'ninja-build' \
@@ -36,22 +45,27 @@ sudo dnf install --setopt=install_weak_deps=False --assumeyes \
   'pipewire-devel' \
   'polkit-devel' \
   'sdbus-cpp-devel' \
+  'stb_image_resize2-devel' \
+  'stb_image_write-devel' \
+  'tomlplusplus-devel' \
   'wayland-devel' \
-  'wayland-protocols-devel'
+  'wayland-protocols-devel' \
+  'wireplumber-devel'
 
 # `just` is installed via Cargo to match the rest of my Rust-based tooling.
 command -v just >'/dev/null' 2>&1 || cargo install --locked 'just'
 
-# Noctalia v5 is in alpha; the packaged form is `noctalia-git`, so build from
-# the default branch rather than pinning a stable tag.
-[ -d '/tmp/noctalia' ] || git clone --depth=1 'https://github.com/noctalia-dev/noctalia.git' '/tmp/noctalia'
-git -C '/tmp/noctalia' pull --ff-only
+[ -d '/tmp/noctalia' ] || git clone --depth=1 --branch="${NOCTALIA_VERSION_TAG}" \
+    'https://github.com/noctalia-dev/noctalia.git' \
+    '/tmp/noctalia'
+git -C '/tmp/noctalia' fetch --all
+git -C '/tmp/noctalia' switch --detach "${NOCTALIA_VERSION_TAG}"
 
 # Meson reads these on first `meson setup`; the justfile shells out to meson, so
 # exporting here is enough (no justfile patching needed).
 # Raise the microarchitecture baseline to x86-64-v3 (AVX2/BMI/FMA-era CPUs).
-export CFLAGS="${CFLAGS:-} -march=x86-64-v3"
-export CXXFLAGS="${CXXFLAGS:-} -march=x86-64-v3"
+export CFLAGS="${CFLAGS:-} -march=x86-64-v4"
+export CXXFLAGS="${CXXFLAGS:-} -march=x86-64-v4"
 # gcc is upstream's documented Fedora toolchain. To experiment with clang,
 # run with CC=clang CXX=clang++ (the `clang` package is installed above).
 export CC="${CC:-gcc}"

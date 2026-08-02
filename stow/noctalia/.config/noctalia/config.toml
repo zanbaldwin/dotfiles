@@ -42,6 +42,8 @@ scale = 1.2
 
 [shell]
 polkit_agent = true
+[shell.launcher]
+auto_paste = "ctrl_v"
 [shell.panel]
 control_center_placement = "floating"
 session_placement = "floating"

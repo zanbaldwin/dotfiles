@@ -73,6 +73,8 @@ binds {
     XF86MonBrightnessDown allow-when-locked=true { spawn "noctalia" "msg" "brightness-down"; }
     // Show the clipboard if Wayland is being fucky about copypasta.
     Mod+C { spawn "noctalia" "msg" "panel-toggle" "clipboard"; }
+    // Searchable emoji picker. For raw code points, Ctrl+Shift+U (GTK hex entry) still works.
+    Ctrl+Shift+E hotkey-overlay-title="Pick an <b>emoji</b>" { spawn "noctalia" "msg" "panel-toggle" "launcher" "/emo"; }
 
     Mod+Q repeat=false hotkey-overlay-title="<b>Close</b> focused window" { close-window; }
     Super+L hotkey-overlay-title="<b>Lock</b> the Screen" { spawn "noctalia" "msg" "session" "lock"; }

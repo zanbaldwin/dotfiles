@@ -64,8 +64,8 @@ git -C '/tmp/noctalia' switch --detach "${NOCTALIA_VERSION_TAG}"
 # Meson reads these on first `meson setup`; the justfile shells out to meson, so
 # exporting here is enough (no justfile patching needed).
 # Raise the microarchitecture baseline to x86-64-v3 (AVX2/BMI/FMA-era CPUs).
-export CFLAGS="${CFLAGS:-} -march=x86-64-v4"
-export CXXFLAGS="${CXXFLAGS:-} -march=x86-64-v4"
+export CFLAGS="${CFLAGS:-} -march=x86-64-v3"
+export CXXFLAGS="${CXXFLAGS:-} -march=x86-64-v3"
 # gcc is upstream's documented Fedora toolchain. To experiment with clang,
 # run with CC=clang CXX=clang++ (the `clang` package is installed above).
 export CC="${CC:-gcc}"

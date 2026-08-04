@@ -1,7 +1,21 @@
 name: 'data'
 services:
     postgres:
-        image: 'tensorchord/vchord-postgres:pg18-v0.5.3'
+        # VectorChord base image plus PostGIS (for Dawarich). The base image is
+        # the official Debian Postgres image, so the PGDG apt repository that
+        # provides the PostGIS packages is already configured.
+        build:
+            context: '.'
+            dockerfile_inline: |
+                FROM tensorchord/vchord-postgres:pg18-v1.1.1
+                RUN apt-get update && \
+                    apt-get install -y --no-install-recommends \
+                        postgresql-18-postgis-3 \
+                        postgresql-18-postgis-3-scripts && \
+                    rm -rf /var/lib/apt/lists/*
+        # Local tag for the built image; bump alongside the FROM line above,
+        # otherwise Compose will keep using the stale previously-built image.
+        image: 'vchord-postgis:pg18-v1.1.1'
         restart: 'unless-stopped'
         healthcheck:
             test: ['CMD', 'bash', '/usr/local/bin/healthcheck.sh']
@@ -44,7 +58,7 @@ services:
         command: ['postgres', '-c', 'config_file=/etc/postgresql/postgresql.conf']
 
     valkey:
-        image: 'valkey/valkey:9.1.0-alpine'
+        image: 'valkey/valkey:9.1.1-alpine'
         restart: 'unless-stopped'
         deploy:
             resources:
@@ -67,7 +81,7 @@ services:
         command: ['valkey-server', '/etc/valkey/valkey.conf']
 
     garage:
-        image: 'dxflrs/garage:v2.0.0'
+        image: 'dxflrs/garage:v2.3.0'
         restart: 'unless-stopped'
         networks:
             s3:
@@ -108,7 +122,7 @@ services:
             retries: 3
             start_period: '10s'
     webui:
-        image: 'noooste/garage-ui:v0.10.0'
+        image: 'noooste/garage-ui:v0.11.3'
         restart: 'unless-stopped'
         depends_on:
             garage:
@@ -162,6 +176,7 @@ configs:
     initdb:
         content: |
             CREATE EXTENSION IF NOT EXISTS vchord CASCADE;
+            CREATE EXTENSION IF NOT EXISTS postgis CASCADE;
     dbconfig:
         content: |
             listen_addresses = '*'

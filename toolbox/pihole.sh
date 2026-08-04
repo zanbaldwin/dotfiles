@@ -136,7 +136,7 @@ systemctl enable 'logrotate.timer'
 
 # cat >'/etc/pihole/setupVars.conf' <<EOF
 # WEBPASSWORD=<some_double_sha256_hash>
-# IPV4_ADDRESS=192.168.1.76/24
+# IPV4_ADDRESS=192.168.1.74/24
 # QUERY_LOGGING=true
 # INSTALL_WEB_INTERFACE=true
 # LIGHTTPD_ENABLED=true

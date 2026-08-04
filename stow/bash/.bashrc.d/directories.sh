@@ -1,9 +1,9 @@
 #!/usr/bin/env bash
 
 if command -v "eza" >"/dev/null" 2>&1; then
-    alias ll='eza -labUh --git --group-directories-first --icons';
+    alias ll='eza -labUh --git --group-directories-first --icons=auto';
 elif command -v "exa" >"/dev/null" 2>&1; then
-    alias ll="exa -labUh --git --group-directories-first --icons";
+    alias ll="exa -labUh --git --group-directories-first --icons=auto";
 else
     # Some systems have a version of "ls" that does not have the
     # "--group-directories-first" or "-G" command-line flags,

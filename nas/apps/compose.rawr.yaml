@@ -1,0 +1,32 @@
+name: 'rawr'
+services:
+  web:
+    image: 'alpine:3.24'
+    restart: 'unless-stopped'
+    user: '1000:1000'
+    command:
+      - '/opt/rawr/rawr-web'
+      - '--bind'
+      - '0.0.0.0:7297'
+    environment:
+      RAWR_CONFIG: '/library/rawr.toml'
+      RAWR__LIBRARY__CACHE: '/opt/rawr/cache.db'
+      # Override the path configured for Desktop use.
+      RAWR__TARGETS__NFS__DIRECTORY: '/library'
+    volumes:
+      - type: 'bind'
+        source: '/mnt/fast/apps/rawr'
+        target: '/opt/rawr'
+        read_only: false
+      - type: 'bind'
+        source: '/mnt/tank4/books/AO3'
+        target: '/library'
+        read_only: false
+    ports:
+      - target: 7297
+        published: 7297
+        protocol: 'tcp'
+    healthcheck:
+      test: ['CMD', 'wget', '-qO-', 'http://127.0.0.1:7297/api/v1/health']
+      interval: '60s'
+      start_period: '10s'

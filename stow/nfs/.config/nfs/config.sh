@@ -12,7 +12,7 @@ HEALTH_TIMEOUT='30'                 # seconds to wait for it to report healthy
 
 # Share name (mountpoint under the user's home) -> NFS export on the server.
 declare -A SHARES=(
-    ['Drive']='/mnt/tank4/drive'
+    ['Drive']='/mnt/tank4/drive/users/zan'
     ['Music']='/mnt/tank4/music'
     ['Books']='/mnt/tank4/books'
 )

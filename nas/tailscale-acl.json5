@@ -48,6 +48,20 @@
                 "udp:2049"
             ]
         },
+        // Devices allowed to mount SMB shares (iPadOS Files, laptops).
+        // Port 139 (NetBIOS) is deliberately omitted; SMB2/3 clients use 445 only.
+        {
+            "src": [
+                "tag:smb"
+            ],
+            "dst": [
+                "tag:nas",
+                "192.168.1.0/24"
+            ],
+            "ip": [
+                "tcp:445"
+            ]
+        },
         // Remote clients can push+pull from Git server using SSH.
         {
             "src": [
@@ -135,6 +149,10 @@
         // Allow devices remote-access to NFS shares
         "tag:nfs": [
             "hello@zanbaldwin.com"
+        ],
+        // Allow devices remote-access to SMB shares
+        "tag:smb": [
+            "hello@zanbaldwin.com"
         ]
     },
     "autoApprovers": {
@@ -155,6 +173,19 @@
                 "tag:dns:53",
                 "tag:nas:443",
                 "tag:nas:80"
+            ]
+        },
+        // Only SMB-tagged devices reach the file server; plain clients must not.
+        {
+            "src": "tag:smb",
+            "accept": [
+                "tag:nas:445"
+            ]
+        },
+        {
+            "src": "tag:client",
+            "deny": [
+                "tag:nas:445"
             ]
         }
     ]

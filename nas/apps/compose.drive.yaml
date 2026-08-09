@@ -1,0 +1,153 @@
+name: 'drive'
+services:
+
+  opencloud:
+    image: 'opencloudeu/opencloud-rolling:7.4.0'
+    restart: 'unless-stopped'
+    user: '1000:1000'
+    deploy:
+      resources:
+        limits:
+          memory: '2G'
+    configs:
+      - source: 'opencloud-entrypoint'
+        target: '/opencloud-entrypoint.sh'
+        mode: 0555
+      - source: 'csp'
+        target: '/etc/opencloud/csp.yaml'
+    entrypoint: ['/opencloud-entrypoint.sh']
+    command: []
+    environment:
+      TZ: 'Europe/Amsterdam'
+      IDM_ADMIN_PASSWORD: 'initial'
+      OC_URL: 'https://drive.lan.zanbaldwin.com'
+      OC_INSECURE: 'false'
+      OC_LOG_LEVEL: 'info'
+      PROXY_TLS: 'false'
+      PROXY_ENABLE_BASIC_AUTH: 'false'
+      PROXY_CSP_CONFIG_FILE_LOCATION: '/etc/opencloud/csp.yaml'
+      IDM_CREATE_DEMO_USERS: 'false'
+      STORAGE_USERS_DRIVER: 'posix'
+      STORAGE_USERS_POSIX_ROOT: '/var/lib/opencloud/posix'
+      STORAGE_USERS_POSIX_PERSONAL_SPACE_PATH_TEMPLATE: 'users/{{.User.Username | lower}}'
+      STORAGE_USERS_POSIX_GENERAL_SPACE_PATH_TEMPLATE: 'spaces/{{ regexReplaceAll "[^a-z0-9-]+" (lower .SpaceName) "-" | trimAll "-" | default .SpaceId }}'
+      STORAGE_USERS_POSIX_WATCH_FS: 'true'
+      AUTH_APP_JSONCS3_PASSWORD_GENERATOR: 'random'
+      AUTH_APP_JSONCS3_RANDOM_PASSWORD_LENGTH: '21'
+      # auth-app + app auth enables App Tokens (Personal settings -> App Tokens):
+      # stateless Basic-auth credentials for scripted WebDAV clients such as
+      # rclone. Note that OpenCloud offers a Bearer challenge before Basic, which
+      # CFNetwork clients cannot negotiate - those use the webdav service below.
+      OC_ADD_RUN_SERVICES: 'auth-app'
+      PROXY_ENABLE_APP_AUTH: 'true'
+    ports:
+      - target: 9200
+        published: 9200
+        protocol: 'tcp'
+    volumes:
+      - type: 'bind'
+        source: '/mnt/fast/apps/opencloud/config'
+        target: '/etc/opencloud'
+        read_only: false
+      - type: 'bind'
+        source: '/mnt/fast/apps/opencloud/data'
+        target: '/var/lib/opencloud'
+        read_only: false
+      - type: 'bind'
+        source: '/mnt/tank4/drive/users'
+        target: '/var/lib/opencloud/posix/users'
+        read_only: false
+      - type: 'bind'
+        source: '/mnt/tank4/drive/spaces'
+        target: '/var/lib/opencloud/posix/spaces'
+        read_only: false
+      - type: 'bind'
+        source: '/etc/localtime'
+        target: '/etc/localtime'
+        read_only: true
+
+  # Minimal Basic-auth-only WebDAV for iPad note apps. OpenCloud advertises a
+  # Bearer challenge before Basic, which CFNetwork clients (Noteshelf 3) cannot
+  # negotiate - they give up without ever sending credentials, so they can never
+  # authenticate against the opencloud service above.
+  webdav:
+    image: 'ghcr.io/hacdias/webdav:v5.14.2'
+    restart: 'unless-stopped'
+    # Must match OpenCloud's uid so its posix driver can assimilate new files.
+    user: '1000:1000'
+    deploy:
+      resources:
+        limits:
+          memory: '128M'
+    # No healthcheck: the image is a single static binary with no shell, so a
+    # CMD healthcheck cannot run.
+    command: ['-c', '/config.yaml']
+    environment:
+      TZ: 'Europe/Amsterdam'
+    volumes:
+      # Holds the user list and their bcrypt passwords. Must exist before first
+      # start or the container exits immediately.
+      - type: 'bind'
+        source: '/mnt/tank4/secrets/webdav/config.yaml'
+        target: '/config.yaml'
+        read_only: true
+      # The whole personal drive, so new users can be added without editing this
+      # file. Each user is re-rooted to their own directory in config.yaml - that
+      # scoping is the only thing keeping a leaked app credential off the rest of
+      # the drive.
+      - type: 'bind'
+        source: '/mnt/tank4/drive/users/zan'
+        target: '/data'
+        read_only: false
+    ports:
+      - target: 6065
+        published: 6065
+        protocol: 'tcp'
+
+configs:
+  opencloud-entrypoint:
+    content: |
+      #!/bin/sh
+      set -eu
+      opencloud init || true
+      exec opencloud server
+  csp:
+    content: |
+      directives:
+        child-src:
+          - '''self'''
+        connect-src:
+          - '''self'''
+          - 'blob:'
+          - 'https://raw.githubusercontent.com/opencloud-eu/awesome-apps/'
+          - 'https://update.opencloud.eu/'
+        default-src:
+          - '''none'''
+        font-src:
+          - '''self'''
+        frame-ancestors:
+          - '''self'''
+        frame-src:
+          - '''self'''
+          - 'blob:'
+        img-src:
+          - '''self'''
+          - 'data:'
+          - 'blob:'
+          - 'https://raw.githubusercontent.com/opencloud-eu/awesome-apps/'
+        manifest-src:
+          - '''self'''
+        media-src:
+          - '''self'''
+        object-src:
+          - '''self'''
+          - 'blob:'
+        script-src:
+          - '''self'''
+          - '''unsafe-inline'''
+        style-src:
+          - '''self'''
+          - '''unsafe-inline'''
+        worker-src:
+          - '''self'''
+          - 'blob:'

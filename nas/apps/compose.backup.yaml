@@ -1,54 +1,54 @@
 name: 'backup'
 services:
-    backrest:
-        image: 'garethgeorge/backrest:v1.14.1-alpine'
-        restart: 'unless-stopped'
-        deploy:
-            resources:
-                limits:
-                    memory: '512M'
-        environment:
-            TZ: 'Europe/Amsterdam'
-            BACKREST_DATA: '/data'
-            BACKREST_CONFIG: '/config/config.json'
-            XDG_CACHE_HOME: '/cache'
-            BACKREST_PORT: '9898'
-        secrets:
-            - 'backblaze_credentials'
-            - 'tigris_credentials'
-            - 'truenas_api_key'
-        ports:
-            - target: 9898
-              published: 9898
-              protocol: 'tcp'
-        volumes:
-            # Backrest application data
-            - type: 'bind'
-              source: '/mnt/fast/apps/backrest/bin/websocat'
-              target: '/usr/local/bin/websocat'
-              read_only: true
-            - type: 'bind'
-              source: '/mnt/fast/apps/backrest/data'
-              target: '/data'
-              read_only: false
-            - type: 'bind'
-              source: '/mnt/fast/apps/backrest/config'
-              target: '/config'
-              read_only: false
-            - type: 'bind'
-              source: '/mnt/fast/apps/backrest/cache'
-              target: '/cache'
-              read_only: false
-            # Backup sources (read-only)
-            - type: 'bind'
-              source: '/mnt/tank4'
-              target: '/source'
-              read_only: true
+  backrest:
+    image: 'garethgeorge/backrest:v1.14.1-alpine'
+    restart: 'unless-stopped'
+    deploy:
+      resources:
+        limits:
+          memory: '512M'
+    environment:
+      TZ: 'Europe/Amsterdam'
+      BACKREST_DATA: '/data'
+      BACKREST_CONFIG: '/config/config.json'
+      XDG_CACHE_HOME: '/cache'
+      BACKREST_PORT: '9898'
+    secrets:
+      - 'backblaze_credentials'
+      - 'tigris_credentials'
+      - 'truenas_api_key'
+    ports:
+      - target: 9898
+        published: 9898
+        protocol: 'tcp'
+    volumes:
+      # Backrest application data
+      - type: 'bind'
+        source: '/mnt/fast/apps/backrest/bin/websocat'
+        target: '/usr/local/bin/websocat'
+        read_only: true
+      - type: 'bind'
+        source: '/mnt/fast/apps/backrest/data'
+        target: '/data'
+        read_only: false
+      - type: 'bind'
+        source: '/mnt/fast/apps/backrest/config'
+        target: '/config'
+        read_only: false
+      - type: 'bind'
+        source: '/mnt/fast/apps/backrest/cache'
+        target: '/cache'
+        read_only: false
+      # Backup sources (read-only)
+      - type: 'bind'
+        source: '/mnt/tank4'
+        target: '/source'
+        read_only: true
 
 secrets:
-    backblaze_credentials:
-        file: '/mnt/tank4/secrets/backrest/backblaze'
-    tigris_credentials:
-        file: '/mnt/tank4/secrets/backrest/tigris'
-    truenas_api_key:
-        file: '/mnt/tank4/secrets/backrest/truenas'
+  backblaze_credentials:
+    file: '/mnt/tank4/secrets/backrest/backblaze'
+  tigris_credentials:
+    file: '/mnt/tank4/secrets/backrest/tigris'
+  truenas_api_key:
+    file: '/mnt/tank4/secrets/backrest/truenas'

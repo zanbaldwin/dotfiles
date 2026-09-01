@@ -1,0 +1,31 @@
+name: 'zotify'
+services:
+    zotify:
+        build:
+            context: '/mnt/tank4/music/Zotify'
+            dockerfile_inline: |
+                FROM python:3.12-slim
+                RUN apt-get update \
+                    && apt-get install -y --no-install-recommends ffmpeg git \
+                    && rm -rf /var/lib/apt/lists/*
+                RUN pip install --no-cache-dir 'git+https://github.com/Googolplexed0/zotify.git'
+                WORKDIR "/zotify"
+                CMD ["/zotify/download.sh"]
+        # One-shot: walks every list in /zotify/lists, then exits. Rerun to
+        # resume; completed work is skipped via /zotify/state.
+        restart: 'no'
+        user: '1000:1000'
+        deploy:
+            resources:
+                limits:
+                    memory: '512M'
+        environment:
+            TZ: 'Europe/Amsterdam'
+            # Zotify writes config.json to $HOME, which must be writable
+            # when running as a non-root user.
+            HOME: '/tmp'
+        volumes:
+            - type: 'bind'
+              source: '/mnt/tank4/music/Zotify'
+              target: '/zotify'
+              read_only: false

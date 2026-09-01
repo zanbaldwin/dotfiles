@@ -16,6 +16,7 @@
     fa          = fetch --all
     ft          = fetch --tags
     ad          = add
+    rb          = rebase
     force       = push --force-with-lease --force-if-includes
 
     stash       = stash --include-untracked

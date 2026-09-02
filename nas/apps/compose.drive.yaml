@@ -54,12 +54,8 @@ services:
         target: '/var/lib/opencloud'
         read_only: false
       - type: 'bind'
-        source: '/mnt/tank4/drive/users'
-        target: '/var/lib/opencloud/posix/users'
-        read_only: false
-      - type: 'bind'
-        source: '/mnt/tank4/drive/spaces'
-        target: '/var/lib/opencloud/posix/spaces'
+        source: '/mnt/tank4/drive'
+        target: '/var/lib/opencloud/posix/users/zan'
         read_only: false
       - type: 'bind'
         source: '/etc/localtime'
@@ -91,12 +87,8 @@ services:
         source: '/mnt/tank4/secrets/webdav/config.yaml'
         target: '/config.yaml'
         read_only: true
-      # The whole personal drive, so new users can be added without editing this
-      # file. Each user is re-rooted to their own directory in config.yaml - that
-      # scoping is the only thing keeping a leaked app credential off the rest of
-      # the drive.
       - type: 'bind'
-        source: '/mnt/tank4/drive/users/zan'
+        source: '/mnt/tank4/drive'
         target: '/data'
         read_only: false
     ports:
@@ -104,7 +96,71 @@ services:
         published: 6065
         protocol: 'tcp'
 
+  # Web file manager, replacing the old read-only Next Explorer - it reuses that
+  # service's port and domain. The '-stable-slim' tag drops ffmpeg (25MB vs
+  # 83MB) at the cost of video and office thumbnails.
+  # The image ships its own HEALTHCHECK against /health, so none is declared.
+  files:
+    image: 'gtstef/filebrowser:1.5.1-stable'
+    restart: 'unless-stopped'
+    # The image's own user is already uid 1000, matching OpenCloud, so files
+    # created from the web UI get ownership the posix driver expects.
+    user: '1000:1000'
+    deploy:
+      resources:
+        limits:
+          memory: '512M'
+    configs:
+      - source: 'filebrowser'
+        target: '/config.yaml'
+    environment:
+      TZ: 'Europe/Amsterdam'
+      # Defaults to /home/filebrowser/data/config.yaml, i.e. inside the state
+      # directory. Point it at the inlined config instead, so the state
+      # directory holds only the sqlite index.
+      FILEBROWSER_CONFIG: '/config.yaml'
+    volumes:
+      # Sqlite search index and app state.
+      - type: 'bind'
+        source: '/mnt/fast/apps/filebrowser'
+        target: '/home/filebrowser/data'
+        read_only: false
+      - type: 'bind'
+        source: '/mnt/tank4/drive'
+        target: '/drive'
+        read_only: false
+    ports:
+      - target: 80
+        published: 3453
+        protocol: 'tcp'
+
 configs:
+  # No credentials here: the initial admin is created by the binary on first
+  # run, not declared in config, so this is safe to keep in git.
+  filebrowser:
+    content: |
+      server:
+        port: 80
+        baseURL: '/'
+        logging:
+          - levels: 'info'
+        sources:
+          - path: '/drive'
+            name: 'Drive'
+            config:
+              rules:
+                # OpenCloud's posix driver keeps ~2,750 metadata files under
+                # .oc-nodes and upload staging in .oc-tmp, both at the space
+                # root. Without this they get indexed and pollute search.
+                - folderStartsWith: '.oc-'
+                - folderStartsWith: '.Trash'
+      auth:
+        methods:
+          password:
+            enabled: true
+            signup: false
+          passkey:
+            enabled: false
   opencloud-entrypoint:
     content: |
       #!/bin/sh

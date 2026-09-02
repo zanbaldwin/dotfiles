@@ -1,8 +1,10 @@
-// GTK 4.20+ stopped handling Compose/dead keys on Wayland.
+// Fcitx5 handles Korean input AND Compose/dead keys, replacing the previous
+// GTK_IM_MODULE=simple workaround for GTK 4.20+ dropping Compose on Wayland.
 // https://github.com/niri-wm/niri/wiki/Application-Issues
 environment {
-    GTK_IM_MODULE "simple"
-    XMODIFIERS "@im=none"
+    GTK_IM_MODULE "fcitx"
+    QT_IM_MODULE "fcitx"
+    XMODIFIERS "@im=fcitx"
 }
 
 // Input device configuration.

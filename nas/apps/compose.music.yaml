@@ -22,6 +22,10 @@ services:
               source: '/mnt/tank4/music'
               target: '/music'
               read_only: true
+            - type: 'bind'
+              source: '/mnt/tank4/books/Audible'
+              target: '/books'
+              read_only: true
         command: ['--configfile', '/data/navidrome.toml']
 
 configs:

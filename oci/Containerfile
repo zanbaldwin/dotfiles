@@ -160,7 +160,7 @@ RUN rpm-ostree install --idempotent --allow-inactive --releasever="${FEDORA_VERS
         libglvnd-gles libqalculate librsvg2 libsecret libsodium libwayland-client \
         libwayland-egl wtype libwebp libxkbcommon libxml2 pango pipewire-libs \
         polkit-libs sdbus-cpp ddcutil wireplumber brightnessctl wl-clipboard wlsunset \
-        cava md4c libical libjxl libsndfile tomlplusplus \
+        cava md4c libical libjxl libsndfile tomlplusplus uxplay \
  && systemctl --global enable 'kanshi.service' \
  && mkdir -p '/etc/udev/rules.d' \
  && echo 'KERNEL=="uinput", MODE="0660", GROUP="uinput", OPTIONS+="static_node=uinput"' >'/etc/udev/rules.d/99-uinput.rules' \
@@ -214,6 +214,11 @@ RUN rpm-ostree install --idempotent --allow-inactive --releasever="${FEDORA_VERS
 RUN cp '/usr/etc/yum.repos.d/pritunl.repo' '/etc/yum.repos.d/pritunl.repo' \
  && rpm-ostree install --idempotent --allow-inactive --releasever="${FEDORA_VERSION}" pritunl-client-electron \
  && systemctl enable 'pritunl-client.service' \
+ && rm -rf /tmp/* /var/*
+
+# Korean input method (Fcitx5 + Hangul) with GTK/Qt IM modules.
+RUN rpm-ostree install --idempotent --allow-inactive --releasever="${FEDORA_VERSION}" \
+        fcitx5 fcitx5-hangul fcitx5-configtool fcitx5-gtk3 fcitx5-gtk4 fcitx5-qt5 fcitx5-qt6 \
  && rm -rf /tmp/* /var/*
 
 # Recommended to avoid doing the following; commenting out for preservation.

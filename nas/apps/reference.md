@@ -17,6 +17,7 @@ TrueNAS
  │       ├─ tailscale
  │       └─ backrest
  └─ pool(tank4)
+     ├─ anki            (sync server state: collections + media)
      ├─ backups
      ├─ books
      ├─ code
@@ -30,6 +31,7 @@ TrueNAS
 
 | Service                | Port   | Proxy Domain                 |
 |------------------------|--------|------------------------------|
+| Anki Sync Server       | `8770` | `anki.lan.zanbaldwin.com`    |
 | Backrest               | `9898` | `backup.lan.zanbaldwin.com`  |
 | Calibre Web            | `8083` | `books.lan.zanbaldwin.com`   |
 | Container Updates      | `8321` | `cup.nas.lan.zanbaldwin.com` |
@@ -43,6 +45,7 @@ TrueNAS
 # Secrets
 > `/mnt/tank4/secrets`
 
+- `anki/sync_user` (sync server credentials, `username:password`)
 - `postgres/root`
 - `postgres/immich`
 - `cloudflare` (DNS Zone API Key)

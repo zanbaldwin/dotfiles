@@ -58,7 +58,7 @@ services:
         command: ['postgres', '-c', 'config_file=/etc/postgresql/postgresql.conf']
 
     valkey:
-        image: 'valkey/valkey:9.1.1-alpine'
+        image: 'valkey/valkey:9.1.2-alpine'
         restart: 'unless-stopped'
         deploy:
             resources:
@@ -81,7 +81,7 @@ services:
         command: ['valkey-server', '/etc/valkey/valkey.conf']
 
     garage:
-        image: 'dxflrs/garage:v2.3.0'
+        image: 'dxflrs/garage:v2.4.1'
         restart: 'unless-stopped'
         networks:
             s3:

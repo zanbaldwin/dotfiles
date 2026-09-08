@@ -1,7 +1,7 @@
 name: 'books'
 services:
     web:
-        image: 'linuxserver/calibre-web:0.6.26'
+        image: 'linuxserver/calibre-web:0.6.27'
         restart: 'unless-stopped'
         environment:
             TZ: 'Europe/Amsterdam'

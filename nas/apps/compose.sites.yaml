@@ -18,6 +18,24 @@ services:
               target: '/var/www/html'
               read_only: true
 
+    public:
+        image: 'nginx:1.31.5-alpine'
+        restart: 'unless-stopped'
+        environment:
+            TZ: 'Europe/Amsterdam'
+        ports:
+            - target: 80
+              published: 7487
+              protocol: 'tcp'
+        configs:
+            - source: 'nginx'
+              target: '/etc/nginx/conf.d/default.conf'
+        volumes:
+            - type: 'bind'
+              source: '/mnt/tank4/drive/Public'
+              target: '/var/www/html'
+              read_only: true
+
     deploy:
         image: 'linuxserver/openssh-server:amd64-latest'
         restart: 'unless-stopped'

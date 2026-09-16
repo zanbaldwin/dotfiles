@@ -40,3 +40,6 @@ configs:
             BaseUrl = 'https://music.lan.zanbaldwin.com'
             Port = 4533
             EnableInsightsCollector = false
+            Tags.Artist.Split = [' / ', ' feat. ', ' feat ', ' ft. ', ' ft ', '; ', ', ']
+            Tags.AlbumArtist.Split = [' / ', ' feat. ', ' feat ', ' ft. ', ' ft ', '; ', ', ']
+            Scanner.ArtistSplitExceptions = ['ABBA (Björn, Benny, Agnetha & Frida)', 'Blood, Sweat & Tears', 'Woe, Is Me', 'The Chapel Choir of Pembroke College, Cambridge', 'Mr. Garrison, The 3rd Grade Teacher']

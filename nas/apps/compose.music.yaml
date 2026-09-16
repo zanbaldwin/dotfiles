@@ -6,13 +6,21 @@ services:
         user: '1000:1000'
         environment:
             TZ: 'Europe/Amsterdam'
+            ND_LASTFM_APIKEY: 'cdd6ee6c6fb2d399252e19e0e6f23980'
         configs:
             - source: 'navidrome'
               target: '/data/navidrome.toml'
+            - source: 'secretsexec'
+              target: '/secrets-exec.sh'
+              mode: 0555
+        entrypoint: ['/bin/sh', '/secrets-exec.sh', 'navidrome']
         ports:
             - target: 4533
               published: 4533
               protocol: 'tcp'
+        secrets:
+            - source: 'lastfm'
+              target: 'ND_LASTFM_SECRET'
         volumes:
             - type: 'bind'
               source: '/mnt/fast/apps/navidrome'
@@ -28,7 +36,22 @@ services:
               read_only: true
         command: ['--configfile', '/data/navidrome.toml']
 
+secrets:
+    lastfm:
+        file: '/mnt/tank4/secrets/lastfm/api_secret'
+
 configs:
+    secretsexec:
+        # Exports every mounted secret as an env var named after its file (the
+        # service-level `target:` name), then hands off to the real entrypoint.
+        content: |
+            #!/bin/sh
+            set -eu
+            for file in /run/secrets/*; do
+                [ -f "$${file}" ] || continue
+                export "$$(basename "$${file}")=$$(cat "$${file}")"
+            done
+            exec "$$@"
     navidrome:
         content: |
             LogLevel = 'WARNING'
@@ -43,3 +66,4 @@ configs:
             Tags.Artist.Split = [' / ', ' feat. ', ' feat ', ' ft. ', ' ft ', '; ', ', ']
             Tags.AlbumArtist.Split = [' / ', ' feat. ', ' feat ', ' ft. ', ' ft ', '; ', ', ']
             Scanner.ArtistSplitExceptions = ['ABBA (Björn, Benny, Agnetha & Frida)', 'Blood, Sweat & Tears', 'Woe, Is Me', 'The Chapel Choir of Pembroke College, Cambridge', 'Mr. Garrison, The 3rd Grade Teacher']
+            Agents = 'lastfm'

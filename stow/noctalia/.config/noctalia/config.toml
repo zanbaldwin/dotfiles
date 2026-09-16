@@ -1,3 +1,6 @@
+[backdrop]
+enabled = true
+
 [bar.default]
 background_opacity = 0.8
 start = ["clock", "launcher", "workspaces", "network_rx"]
@@ -28,6 +31,7 @@ enabled = false
 action = "screen_off"
 enabled = true
 timeout = 900
+locked_timeout = 60
 
 [location]
 address = "Apeldoorn, Netherlands"
@@ -42,8 +46,12 @@ scale = 1.2
 
 [shell]
 polkit_agent = true
+launch_apps_as_systemd_services = true
+niri_overview_type_to_launch_enabled = true
 [shell.launcher]
 auto_paste = "ctrl_v"
+[shell.window_switcher]
+mru = true
 [shell.panel]
 control_center_placement = "floating"
 session_placement = "floating"
@@ -52,20 +60,27 @@ wallpaper_placement = "floating"
 [shell.screen_corners]
 enabled = true
 size = 24
+
 [shell.screenshot]
 directory = "~/Pictures/Screenshots"
+annotate = true              # open the 5.1.0 editor after every capture
+remember_last_region = true  # beta.7
+show_cursor = false          # beta.4
+close_on_copy = true
 
 [[shell.session.actions]]
 action = "shutdown"
 enabled = true
 shortcut = "1"
 variant = "destructive"
+countdown_seconds = 5
 
 [[shell.session.actions]]
 action = "reboot"
 enabled = true
 shortcut = "2"
 variant = "destructive"
+countdown_seconds = 5
 
 [[shell.session.actions]]
 action = "logout"
@@ -74,9 +89,15 @@ shortcut = "3"
 variant = "default"
 
 [[shell.session.actions]]
-action = "lock"
+action = "lock_and_suspend"
 enabled = true
 shortcut = "4"
+variant = "default"
+
+[[shell.session.actions]]
+action = "lock"
+enabled = true
+shortcut = "5"
 variant = "default"
 
 [[shell.session.actions]]
@@ -85,7 +106,7 @@ command = "bash \"${HOME}/.local/bin/nfs-mount\""
 enabled = true
 glyph = "cloud-data-connection"
 label = "Mount NFS"
-shortcut = "5"
+shortcut = "6"
 variant = "ghost"
 
 [theme]

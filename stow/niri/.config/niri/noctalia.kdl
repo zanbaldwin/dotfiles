@@ -1,15 +1,28 @@
-// Add lines like this to spawn processes at startup.
-// Note that running niri as a session supports xdg-desktop-autostart,
-// which may be more convenient to use.
-// See the binds section below for more spawn examples.
+// Noctalia is started by the noctalia.service user unit, not from here.
+// Reference: https://docs.noctalia.dev/noctalia/compositor-settings/niri/
 
-// Quickshell is started using SystemD instead.
-// spawn-sh-at-startup "qs -c 'noctalia' --no-duplicate"
-
-// Set the overview wallpaper on the backdrop.
+// Show Noctalia's blurred, tinted wallpaper copy behind the overview.
+// Needs `[backdrop] enabled = true` in the Noctalia config.
 layer-rule {
-    match namespace="^noctalia-overview*"
+    match namespace="^noctalia-backdrop"
     place-within-backdrop true
+}
+
+// Noctalia publishes blur regions for its surfaces automatically. Without
+// `xray false` the blur samples the wallpaper instead of the windows behind.
+layer-rule {
+    match namespace="^noctalia-"
+    background-effect {
+        xray false
+    }
+}
+
+// Float the Noctalia settings window.
+window-rule {
+    match app-id="dev.noctalia.Noctalia"
+    open-floating true
+    default-column-width { fixed 1080; }
+    default-window-height { fixed 920; }
 }
 
 debug {

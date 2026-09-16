@@ -8,6 +8,7 @@ binds {
     // You can also toggle the overview with a 4-finger swipe on a touchpad.
     Mod+O repeat=false hotkey-overlay-title="Toogle <b>Overview</b>" { toggle-overview; }
     Mod+Space hotkey-overlay-title="Run an <b>application</b>" { spawn "noctalia" "msg" "panel-toggle" "launcher"; }
+    Alt+Tab repeat=false hotkey-overlay-title="<b>Switch</b> windows (most recently used)" { spawn "noctalia" "msg" "window-switcher"; }
     Mod+Return hotkey-overlay-title="Open a <b>Ghostty Terminal</b>" { spawn "ghostty"; }
 
     // Custom (without shift: focus, with shift: move).
@@ -61,10 +62,10 @@ binds {
     Mod+Shift+End  { move-window-to-monitor-next; }
 
     // Media controls
-    XF86AudioRaiseVolume allow-when-locked=true { spawn-sh "wpctl set-volume @DEFAULT_AUDIO_SINK@ 0.1+ -l 1.0"; }
-    XF86AudioLowerVolume allow-when-locked=true { spawn-sh "wpctl set-volume @DEFAULT_AUDIO_SINK@ 0.1-"; }
-    XF86AudioMute        allow-when-locked=true { spawn-sh "wpctl set-mute @DEFAULT_AUDIO_SINK@ toggle"; }
-    XF86AudioMicMute     allow-when-locked=true { spawn-sh "wpctl set-mute @DEFAULT_AUDIO_SOURCE@ toggle"; }
+    XF86AudioRaiseVolume allow-when-locked=true { spawn "noctalia" "msg" "volume-up" "10"; }
+    XF86AudioLowerVolume allow-when-locked=true { spawn "noctalia" "msg" "volume-down" "10"; }
+    XF86AudioMute        allow-when-locked=true { spawn "noctalia" "msg" "volume-mute"; }
+    XF86AudioMicMute     allow-when-locked=true { spawn "noctalia" "msg" "mic-mute"; }
     XF86AudioPlay        allow-when-locked=true { spawn "noctalia" "msg" "media" "toggle"; }
     XF86AudioStop        allow-when-locked=true { spawn "noctalia" "msg" "media" "stop"; }
     XF86AudioPrev        allow-when-locked=true { spawn "noctalia" "msg" "media" "previous"; }
@@ -220,9 +221,10 @@ binds {
     // Mod+Space       { switch-layout "next"; }
     // Mod+Shift+Space { switch-layout "prev"; }
 
-    Print { screenshot; }
-    Ctrl+Print { screenshot-screen; }
-    Alt+Print { screenshot-window; }
+    Print       { spawn "noctalia" "msg" "screenshot-region"; }
+    Ctrl+Print  { spawn "noctalia" "msg" "screenshot-fullscreen" "pick"; }
+    Shift+Print { spawn "noctalia" "msg" "screenshot-annotate"; }
+    Alt+Print   { screenshot-window; }   // keep: Noctalia has no per-window capture
 
     // Applications such as remote-desktop clients and software KVM switches may
     // request that niri stops processing the keyboard shortcuts defined here

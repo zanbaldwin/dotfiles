@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-NOCTALIA_VERSION_TAG='v5.0.0-beta.7'
+NOCTALIA_VERSION_TAG='v5.1.0'
 
 if [ ! -f '/run/.toolboxenv' ]; then
     echo 'error: not inside a toolbox; refusing to modify system packages outside a toolbox.' >&2
@@ -77,8 +77,8 @@ cd '/tmp/noctalia' || exit 1
 # full recompile and ensures the CC/CXX/CFLAGS changes above actually take effect
 # (meson bakes them in at first setup and ignores them on a reused build dir).
 rm -rf 'build-release'
-rm -f "${HOME}/.local/bin/noctalia"
-
 just configure release "${HOME}/.local"
 just build release
+
+rm -f "${HOME}/.local/bin/noctalia"
 just install release

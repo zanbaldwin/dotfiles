@@ -12,6 +12,7 @@ services:
             TS_EXTRA_ARGS: '--accept-routes'
             TS_USERSPACE: 'false'
             TS_ACCEPT_DNS: 'true'
+            TS_NO_LOGS_NO_SUPPORT: 'true'
         healthcheck:
             test: ['CMD-SHELL', 'wget --spider -q "http://127.0.0.1:8575/healthz"']
             interval: '30s'

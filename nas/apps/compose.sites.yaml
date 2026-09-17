@@ -33,6 +33,16 @@ services:
               target: '/var/www/html'
               read_only: true
 
+    tunnel:
+        image: 'cloudflare/cloudflared:2026.9.1'
+        restart: 'unless-stopped'
+        depends_on: ['public']
+        environment:
+            TZ: 'Europe/Amsterdam'
+            TUNNEL_TOKEN_FILE: '/run/secrets/tunnel'
+        secrets: ['tunnel']
+        command: ['tunnel', '--no-autoupdate', 'run']
+
     deploy:
         image: 'linuxserver/openssh-server:amd64-latest'
         restart: 'unless-stopped'
@@ -76,6 +86,8 @@ networks:
 secrets:
     authorized:
         file: '/mnt/tank4/secrets/sites/public'
+    tunnel:
+        file: '/mnt/tank4/secrets/sites/public-tunnel-token'
 
 configs:
     nginx:

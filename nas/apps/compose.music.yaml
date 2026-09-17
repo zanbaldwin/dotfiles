@@ -59,7 +59,7 @@ configs:
             Scanner.Schedule = '@every 24h'
             MusicFolder = '/music'
             DataFolder = '/data'
-            CacheFolder = '/tmp'
+            CacheFolder = '/data/cache'
             Address = '0.0.0.0'
             BaseUrl = 'https://music.lan.zanbaldwin.com'
             Port = 4533

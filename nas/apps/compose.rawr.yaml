@@ -25,6 +25,7 @@ services:
     ports:
       - target: 7297
         published: 7297
+        host_ip: '127.0.0.1'
         protocol: 'tcp'
     healthcheck:
       test: ['CMD', 'wget', '-qO-', 'http://127.0.0.1:7297/api/v1/health']

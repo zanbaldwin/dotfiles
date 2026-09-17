@@ -48,10 +48,12 @@ services:
             # API Gateway
             - target: 3000
               published: 3102
+              host_ip: '127.0.0.1'
               protocol: 'tcp'
             # Files Server
             - target: 3104
               published: 3104
+              host_ip: '127.0.0.1'
               protocol: 'tcp'
         volumes:
             - type: 'bind'
@@ -76,6 +78,7 @@ services:
             # Web Client
             - target: 80
               published: 3105
+              host_ip: '127.0.0.1'
               protocol: 'tcp'
 
     # SNS/SQS emulator for Standard Notes' inter-service domain events,

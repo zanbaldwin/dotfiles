@@ -43,6 +43,7 @@ services:
     ports:
       - target: 9200
         published: 9200
+        host_ip: '127.0.0.1'
         protocol: 'tcp'
     volumes:
       - type: 'bind'
@@ -94,6 +95,7 @@ services:
     ports:
       - target: 6065
         published: 6065
+        host_ip: '127.0.0.1'
         protocol: 'tcp'
 
   # Web file manager, replacing the old read-only Next Explorer - it reuses that
@@ -132,6 +134,7 @@ services:
     ports:
       - target: 80
         published: 3453
+        host_ip: '127.0.0.1'
         protocol: 'tcp'
 
 configs:

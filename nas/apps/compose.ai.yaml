@@ -8,6 +8,7 @@ services:
         ports:
             - target: 8080
               published: 6984
+              host_ip: '127.0.0.1'
               protocol: 'tcp'
               mode: 'host'
         volumes:

@@ -41,6 +41,7 @@ services:
         ports:
             - target: 3000
               published: 3645
+              host_ip: '127.0.0.1'
               protocol: 'tcp'
             - target: 22
               published: 484

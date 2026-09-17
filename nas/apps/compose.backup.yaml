@@ -20,6 +20,7 @@ services:
     ports:
       - target: 9898
         published: 9898
+        host_ip: '127.0.0.1'
         protocol: 'tcp'
     volumes:
       # Backrest application data

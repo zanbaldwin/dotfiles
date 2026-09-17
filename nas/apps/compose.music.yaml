@@ -17,6 +17,7 @@ services:
         ports:
             - target: 4533
               published: 4533
+              host_ip: '127.0.0.1'
               protocol: 'tcp'
         secrets:
             - source: 'lastfm'

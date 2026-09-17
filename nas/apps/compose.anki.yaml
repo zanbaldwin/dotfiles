@@ -34,6 +34,7 @@ services:
         ports:
             - target: 8080
               published: 8770
+              host_ip: '127.0.0.1'
               protocol: 'tcp'
         volumes:
             - type: 'bind'

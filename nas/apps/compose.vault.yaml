@@ -7,7 +7,7 @@ services:
     #   \c immich
     #   ALTER DATABASE immich OWNER TO immich;
     server:
-        image: 'vaultwarden/server:1.36.0'
+        image: 'vaultwarden/server:1.37.3-alpine'
         restart: 'unless-stopped'
         networks:
             - 'database'

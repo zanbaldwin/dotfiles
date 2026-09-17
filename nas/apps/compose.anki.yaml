@@ -9,9 +9,9 @@ services:
     sync:
         build:
             dockerfile_inline: |
-                FROM python:3.12-slim-bookworm
-                RUN pip install --no-cache-dir 'anki==26.8.1'
-        image: 'local/anki-sync-server:26.8.1'
+                FROM python:3.14-slim-trixie
+                RUN pip install --no-cache-dir 'anki==26.9.2'
+        image: 'local/anki-sync-server:26.9.2'
         restart: 'unless-stopped'
         user: '1000:1000'
         deploy:

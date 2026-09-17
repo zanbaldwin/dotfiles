@@ -68,7 +68,7 @@ services:
   # negotiate - they give up without ever sending credentials, so they can never
   # authenticate against the opencloud service above.
   webdav:
-    image: 'ghcr.io/hacdias/webdav:v5.14.2'
+    image: 'ghcr.io/hacdias/webdav:v5.15.1'
     restart: 'unless-stopped'
     # Must match OpenCloud's uid so its posix driver can assimilate new files.
     user: '1000:1000'
@@ -103,7 +103,7 @@ services:
   # 83MB) at the cost of video and office thumbnails.
   # The image ships its own HEALTHCHECK against /health, so none is declared.
   files:
-    image: 'gtstef/filebrowser:1.5.1-stable'
+    image: 'gtstef/filebrowser:1.5.6-stable'
     restart: 'unless-stopped'
     # The image's own user is already uid 1000, matching OpenCloud, so files
     # created from the web UI get ownership the posix driver expects.

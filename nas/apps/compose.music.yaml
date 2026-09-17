@@ -13,7 +13,7 @@ services:
             - source: 'secretsexec'
               target: '/secrets-exec.sh'
               mode: 0555
-        entrypoint: ['/bin/sh', '/secrets-exec.sh', 'navidrome']
+        entrypoint: ['/bin/sh', '/secrets-exec.sh']
         ports:
             - target: 4533
               published: 4533
@@ -35,7 +35,7 @@ services:
               source: '/mnt/tank4/books/Audible'
               target: '/books'
               read_only: true
-        command: ['--configfile', '/data/navidrome.toml']
+        command: ['navidrome', '--configfile', '/data/navidrome.toml']
 
 secrets:
     lastfm:

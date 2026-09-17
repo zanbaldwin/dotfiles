@@ -92,6 +92,9 @@ services:
                 # Wait for the DinD daemon to accept connections so the runner
                 # doesn't crash-loop on "cannot ping the docker daemon" at boot.
                 condition: 'service_healthy'
+        networks:
+            - 'default'
+            - 'runner'
         environment:
             DOCKER_HOST: 'tcp://dind:2375'
         configs:
@@ -140,6 +143,10 @@ services:
 networks:
     database:
         external: true
+    runner:
+        name: 'runner'
+        driver: 'bridge'
+        attachable: true
 
 secrets:
     dbpass:

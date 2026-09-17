@@ -36,6 +36,11 @@ services:
     deploy:
         image: 'linuxserver/openssh-server:amd64-latest'
         restart: 'unless-stopped'
+        networks:
+            default: {}
+            runner:
+                aliases:
+                    - 'sites-deployer'
         environment:
             DOCKER_MODS: 'linuxserver/mods:universal-package-install'
             INSTALL_PACKAGES: 'rsync'
@@ -63,6 +68,10 @@ services:
         pids_limit: 200
         mem_limit: '256m'
         cpus: 1.0
+
+networks:
+    runner:
+        external: true
 
 secrets:
     authorized:

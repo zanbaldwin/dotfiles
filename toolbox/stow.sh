@@ -7,6 +7,7 @@ mkdir -p \
     "${HOME}/code" \
     "${HOME}/.config/autostart" \
     "${HOME}/.config/flakes" \
+    "${HOME}/.config/smb" \
     "${HOME}/.config/systemd/user/default.target.wants" \
     "${HOME}/.local/share/applications" \
     "${HOME}/.local/share/icons/hicolor/scalable/apps" \

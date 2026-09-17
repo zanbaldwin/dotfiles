@@ -47,6 +47,9 @@
                 "tcp:2049",
                 "udp:2049",
             ],
+            "srcPosture": [
+                "posture:upToDate",
+            ],
         },
         // Devices allowed to mount SMB shares (iPadOS Files, laptops).
         // Port 139 (NetBIOS) is deliberately omitted; SMB2/3 clients use 445 only.
@@ -61,6 +64,9 @@
             "ip": [
                 "tcp:445",
             ],
+            "srcPosture": [
+                "posture:upToDate",
+            ],
         },
         // Remote clients can push+pull from Git server using SSH.
         {
@@ -73,6 +79,9 @@
             ],
             "ip": [
                 "tcp:484",
+            ],
+            "srcPosture": [
+                "posture:upToDate",
             ],
         },
         // ====================================================================
@@ -104,6 +113,44 @@
                 "tcp:22",
             ],
         },
+        // ====================================================================
+        // Family (invited users; their devices are untagged)
+        // ====================================================================
+        // Web services only, reached via the NAS's Tailscale IP. Deliberately
+        // no 192.168.1.0/24 here. Note the subnet route still installs on
+        // their devices (route approval is separate from grants), so narrow
+        // TS_ROUTES before inviting anyone whose home LAN is 192.168.1.0/24.
+        // Per-service restriction is not possible at this layer: every
+        // *.lan.zanbaldwin.com name is the same IP and port. Use app logins
+        // and NPM access lists for that.
+        {
+            "src": [
+                "group:family",
+            ],
+            "dst": [
+                "tag:nas",
+            ],
+            "ip": [
+                "tcp:443",
+            ],
+        },
+        // ====================================================================
+        // Exit Node
+        // ====================================================================
+        // Remote clients may route all internet traffic via the NAS exit node.
+        // Only tagOwners (Zan) can apply tag:remote, so invited users' untagged
+        // devices never match. Do not widen the src to autogroup:member.
+        {
+            "src": [
+                "tag:remote",
+            ],
+            "dst": [
+                "autogroup:internet",
+            ],
+            "ip": [
+                "*",
+            ],
+        },
     ],
     // Define device posture rules requiring devices to meet
     // certain criteria to access parts of your system.
@@ -114,9 +161,19 @@
         "posture:mobile": [
             "node:os IN ['ios', 'android']",
         ],
+        // Do not require node:tsAutoUpdate: it is always false on App Store
+        // and Play Store clients and inside containers.
         "posture:upToDate": [
             "node:tsReleaseTrack == 'stable'",
-            "node:tsAutoUpdate == true",
+        ],
+    },
+    // Groups of invited users. The free plan allows 3 groups.
+    "groups": {
+        // Replace with the family members' login emails once invited.
+        // Zan is a placeholder so the group validates: Zan's devices are all
+        // tagged, and tagged devices never match user- or group-based rules.
+        "group:family": [
+            "hello@zanbaldwin.com",
         ],
     },
     // Define the tags which can be applied to devices and by which users.
@@ -161,6 +218,9 @@
                 "tag:nas",
             ],
         },
+        "exitNode": [
+            "tag:nas",
+        ],
     },
     // Tailscale is running in containers on the majority of devices, so
     // Tailscale SSH wouldn't work any way. Don't define "ssh" section.
@@ -186,6 +246,20 @@
             "src": "tag:client",
             "deny": [
                 "tag:nas:445",
+            ],
+        },
+        // Family reaches the web proxy and nothing else on the NAS.
+        {
+            "src": "group:family",
+            "accept": [
+                "tag:nas:443",
+            ],
+            "deny": [
+                "tag:nas:22",
+                "tag:nas:80",
+                "tag:nas:445",
+                "tag:nas:484",
+                "tag:nas:2049",
             ],
         },
     ],

@@ -46,11 +46,6 @@ services:
     deploy:
         image: 'linuxserver/openssh-server:amd64-latest'
         restart: 'unless-stopped'
-        networks:
-            default: {}
-            runner:
-                aliases:
-                    - 'sites-deployer'
         environment:
             LAST_PULL: '2026-09-17'
             DOCKER_MODS: 'linuxserver/mods:universal-package-install'
@@ -61,12 +56,17 @@ services:
             USER_NAME: 'deploy'
             PUBLIC_KEY_FILE: '/run/secrets/authorized'
             LOG_STDOUT: 'true'
+        configs:
+            - source: 'sshd'
+              target: '/config/sshd/sshd_config.d/hardening.conf'
         secrets:
             - 'authorized'
         ports:
+            # Don't restrict to loopback, the spawned runner container won't have
+            # access to the `runner` network, even if the parent DinD container
+            # is configured to.
             - target: 2222
               published: 7483
-              host_ip: '127.0.0.1'
               protocol: 'tcp'
         volumes:
             - type: 'bind'
@@ -79,10 +79,6 @@ services:
         pids_limit: 200
         mem_limit: '256m'
         cpus: 1.0
-
-networks:
-    runner:
-        external: true
 
 secrets:
     authorized:
@@ -107,3 +103,17 @@ configs:
                     try_files $$uri $$uri/ =404;
                 }
             }
+    sshd:
+        content: |
+            AuthenticationMethods publickey
+            AllowUsers deploy
+            PermitRootLogin no
+            AllowAgentForwarding no
+            PermitTunnel no
+            MaxAuthTries 3
+            MaxSessions 2
+            LoginGraceTime 20
+            MaxStartups 3:50:10
+            PubkeyAcceptedAlgorithms ssh-ed25519
+            HostKeyAlgorithms ssh-ed25519
+            LogLevel VERBOSE

@@ -102,10 +102,10 @@ variant = "default"
 
 [[shell.session.actions]]
 action = "command"
-command = "bash \"${HOME}/.local/bin/nfs-mount\""
+command = "bash \"${HOME}/.local/bin/smb-mount\""
 enabled = true
 glyph = "cloud-data-connection"
-label = "Mount NFS"
+label = "Mount Samba"
 shortcut = "6"
 variant = "ghost"
 

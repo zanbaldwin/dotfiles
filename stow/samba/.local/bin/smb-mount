@@ -1,0 +1,85 @@
+#!/usr/bin/env bash
+
+# Mount the home-network SMB shares on demand.
+#
+# Flow:
+#   - If the SMB server is reachable, just mount.
+#   - If not, bring up healthy Tailscale container, and then mount.
+#
+# All privileged work runs in a single pkexec call to smb-pkexec, so there
+# is exactly one polkit prompt and it works from a desktop launcher (no TTY,
+# where sudo could not prompt).
+set -euo pipefail
+
+SELF="$(readlink -f -- "$0")"
+THIS_DIR="$(dirname -- "${SELF}")"
+HELPER="${THIS_DIR}/smb-pkexec"
+
+# Shared config (SERVER, SERVER_PORT, CONTAINER, ...). Read from the user's home;
+# the helper reads the same file under root via the invoking user's home.
+CONFIG="${HOME}/.config/smb/config.sh"
+# shellcheck source=../../.config/smb/config.sh disable=SC1091
+if [[ -r "${CONFIG}" ]]; then
+    source "${CONFIG}"
+else
+    echo "smb-mount: config not found at ${CONFIG}" >&2
+    exit 1
+fi
+
+# Fail before the polkit prompt if the config is missing what we need.
+for var in SERVER SERVER_PORT CONTAINER; do
+    if [[ -z "${!var:-}" ]]; then
+        echo "smb-mount: config error: ${var} is not set in ${CONFIG}" >&2
+        exit 1
+    fi
+done
+CREDENTIALS="${HOME}/.config/smb/credentials"
+if [[ ! -r "${CREDENTIALS}" ]]; then
+    echo "smb-mount: credentials not found at ${CREDENTIALS}" >&2
+    exit 1
+fi
+
+notify() {
+    # $1 = urgency (normal|critical), $2 = message
+    command -v notify-send >'/dev/null' 2>&1 && notify-send --urgency="$1" 'SMB Mounts' "$2" || true
+}
+
+# A 2s TCP probe to the SMB port. Off-network the .lan name only resolves once
+# Tailscale is up, so this fails fast and routes us through the Tailscale path.
+# @see https://mareksuppa.com/til/bash-dev-tcp-http-without-curl/
+if timeout 2 bash -c "exec 3<>/dev/tcp/${SERVER}/${SERVER_PORT}" 2>'/dev/null'; then
+    MODE='mount'
+else
+    MODE='connect'
+fi
+
+rc=0
+pkexec "${HELPER}" "${MODE}" || rc=$?
+
+case "${rc}" in
+    0)
+        notify 'normal' 'SMB shares mounted.'
+        ;;
+    3)
+        msg="Tailscale container '${CONTAINER}' does not exist; cannot reach the SMB server."
+        echo "smb-mount: ${msg}" >&2; notify 'critical' "${msg}"
+        ;;
+    4)
+        msg="Tailscale (${CONTAINER}) did not become healthy; shares not mounted."
+        echo "smb-mount: ${msg}" >&2; notify 'critical' "${msg}"
+        ;;
+    5)
+        msg='Failed to mount one or more SMB shares.'
+        echo "smb-mount: ${msg}" >&2; notify 'critical' "${msg}"
+        ;;
+    126|127)
+        msg='Authentication is required to mount the SMB shares.'
+        echo "smb-mount: ${msg}" >&2; notify 'critical' "${msg}"
+        ;;
+    *)
+        msg="smb-mount failed (exit ${rc})."
+        echo "smb-mount: ${msg}" >&2; notify 'critical' "${msg}"
+        ;;
+esac
+
+exit "${rc}"

@@ -15,7 +15,7 @@ services:
             - 'default'
             - 'database'
         environment:
-            TZ: 'Europe/Amstedam'
+            TZ: 'Europe/Amsterdam'
             USER_UID: '${PUID:-1000}'
             USER_GID: '${PGID:-1000}'
             # Instance posture. FORGEJO__<section>__<KEY> env vars are written into

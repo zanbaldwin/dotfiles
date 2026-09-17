@@ -30,7 +30,7 @@ services:
       - source: 'secretsexec'
         target: '/secrets-exec.sh'
         mode: 0555
-    entrypoint: ['/secrets-exec.sh', 'web-entrypoint.sh']
+    entrypoint: ['/bin/sh', '/secrets-exec.sh', 'web-entrypoint.sh']
     command: ['bin/rails', 'server', '-p', '3000', '-b', '::']
     environment:
       PUID: '1000'
@@ -121,7 +121,7 @@ services:
       - source: 'secretsexec'
         target: '/secrets-exec.sh'
         mode: 0555
-    entrypoint: ['/secrets-exec.sh', 'sidekiq-entrypoint.sh']
+    entrypoint: ['/bin/sh', '/secrets-exec.sh', 'sidekiq-entrypoint.sh']
     command: ['sidekiq']
     restart: unless-stopped
     environment:

@@ -25,7 +25,12 @@ services:
             SYNC_PORT: '8080'
             MAX_SYNC_PAYLOAD_MEGS: '100'
         secrets:
-            - 'anki_sync_user'
+            - source: 'anki_sync_user'
+              target: 'SYNC_USER1'
+        configs:
+            - source: 'secretsexec'
+              target: '/secrets-exec.sh'
+              mode: 0555
         healthcheck:
             test: ['CMD', 'python', '-c', "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8080/health')"]
             interval: '30s'
@@ -41,11 +46,22 @@ services:
               source: '/mnt/tank4/anki'
               target: '/data'
               read_only: false
-        command:
-            - 'sh'
-            - '-c'
-            - 'export SYNC_USER1="$(cat /run/secrets/anki_sync_user)"; exec python -m anki.syncserver'
+        entrypoint: ['/bin/sh', '/secrets-exec.sh']
+        command: ['python', '-m', 'anki.syncserver']
 
 secrets:
     anki_sync_user:
         file: '/mnt/tank4/secrets/anki/sync_user'
+
+configs:
+    secretsexec:
+        # Exports every mounted secret as an env var named after its file (the
+        # service-level `target:` name), then hands off to the real entrypoint.
+        content: |
+            #!/bin/sh
+            set -eu
+            for file in /run/secrets/*; do
+                [ -f "$${file}" ] || continue
+                export "$$(basename "$${file}")=$$(cat "$${file}")"
+            done
+            exec "$$@"

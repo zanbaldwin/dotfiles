@@ -7,15 +7,15 @@
         // ====================================================================
         {
             "src": [
-                "*"
+                "*",
             ],
             "dst": [
-                "tag:dns"
+                "tag:dns",
             ],
             "ip": [
                 "udp:53",
-                "tcp:53"
-            ]
+                "tcp:53",
+            ],
         },
         // ====================================================================
         // LAN Subnet Access via Subnet Router (TrueNAS)
@@ -23,57 +23,57 @@
         // All clients can access HTTPS services on LAN (proxied through NPM).
         {
             "src": [
-                "tag:client"
+                "tag:client",
             ],
             "dst": [
                 "tag:nas",
-                "192.168.1.0/24"
+                "192.168.1.0/24",
             ],
             "ip": [
                 "tcp:443",
-                "tcp:80"
-            ]
+                "tcp:80",
+            ],
         },
         // Only computers can access NFS shares remotely.
         {
             "src": [
-                "tag:nfs"
+                "tag:nfs",
             ],
             "dst": [
                 "tag:nas",
-                "192.168.1.0/24"
+                "192.168.1.0/24",
             ],
             "ip": [
                 "tcp:2049",
-                "udp:2049"
-            ]
+                "udp:2049",
+            ],
         },
         // Devices allowed to mount SMB shares (iPadOS Files, laptops).
         // Port 139 (NetBIOS) is deliberately omitted; SMB2/3 clients use 445 only.
         {
             "src": [
-                "tag:smb"
+                "tag:smb",
             ],
             "dst": [
                 "tag:nas",
-                "192.168.1.0/24"
+                "192.168.1.0/24",
             ],
             "ip": [
-                "tcp:445"
-            ]
+                "tcp:445",
+            ],
         },
         // Remote clients can push+pull from Git server using SSH.
         {
             "src": [
-                "tag:remote"
+                "tag:remote",
             ],
             "dst": [
                 "tag:nas",
-                "192.168.1.0/24"
+                "192.168.1.0/24",
             ],
             "ip": [
-                "tcp:484"
-            ]
+                "tcp:484",
+            ],
         },
         // ====================================================================
         // Device Communication
@@ -82,85 +82,85 @@
         // (e.g., SSH from laptop to desktop, clipboard sync, etc.)
         {
             "src": [
-                "tag:client"
+                "tag:client",
             ],
             "dst": [
-                "tag:client"
+                "tag:client",
             ],
             "ip": [
-                "*"
-            ]
+                "*",
+            ],
         },
         // Remote clients can SSH into infrastructure devices for maintanence.
         {
             "src": [
-                "tag:remote"
+                "tag:remote",
             ],
             "dst": [
                 "tag:infra",
-                "192.168.1.0/24"
+                "192.168.1.0/24",
             ],
             "ip": [
-                "tcp:22"
-            ]
-        }
+                "tcp:22",
+            ],
+        },
     ],
     // Define device posture rules requiring devices to meet
     // certain criteria to access parts of your system.
     "postures": {
         "posture:computer": [
-            "node:os IN ['linux', 'macos', 'windows']"
+            "node:os IN ['linux', 'macos', 'windows']",
         ],
         "posture:mobile": [
-            "node:os IN ['ios', 'android']"
+            "node:os IN ['ios', 'android']",
         ],
         "posture:upToDate": [
             "node:tsReleaseTrack == 'stable'",
-            "node:tsAutoUpdate == true"
-        ]
+            "node:tsAutoUpdate == true",
+        ],
     },
     // Define the tags which can be applied to devices and by which users.
     // Note: "ssh" section omitted - Tailscale SSH not available on containerized deployments.
     "tagOwners": {
         // For human-operated machines I own and trust
         "tag:client": [
-            "hello@zanbaldwin.com"
+            "hello@zanbaldwin.com",
         ],
         // For clients that may access from outside the home LAN
         "tag:remote": [
-            "hello@zanbaldwin.com"
+            "hello@zanbaldwin.com",
         ],
         // For always-on LAN infrastructure
         "tag:infra": [
-            "hello@zanbaldwin.com"
+            "hello@zanbaldwin.com",
         ],
         // For NAS-specific ACLs
         "tag:nas": [
-            "hello@zanbaldwin.com"
+            "hello@zanbaldwin.com",
         ],
         // For Pi-hole / DNS resolvers
         "tag:dns": [
-            "hello@zanbaldwin.com"
+            "hello@zanbaldwin.com",
         ],
         // For human-operated machines I do NOT own and trust (future)
         "tag:guest": [
-            "hello@zanbaldwin.com"
+            "hello@zanbaldwin.com",
         ],
         // Allow devices remote-access to NFS shares
         "tag:nfs": [
-            "hello@zanbaldwin.com"
+            "hello@zanbaldwin.com",
         ],
         // Allow devices remote-access to SMB shares
         "tag:smb": [
-            "hello@zanbaldwin.com"
-        ]
+            "hello@zanbaldwin.com",
+        ],
     },
     "autoApprovers": {
         "routes": {
             "192.168.1.0/24": [
-                "tag:nas"
-            ]
-        }
+                "tag:nas",
+            ],
+        },
     },
     // Tailscale is running in containers on the majority of devices, so
     // Tailscale SSH wouldn't work any way. Don't define "ssh" section.
@@ -172,21 +172,21 @@
             "accept": [
                 "tag:dns:53",
                 "tag:nas:443",
-                "tag:nas:80"
-            ]
+                "tag:nas:80",
+            ],
         },
         // Only SMB-tagged devices reach the file server; plain clients must not.
         {
             "src": "tag:smb",
             "accept": [
-                "tag:nas:445"
-            ]
+                "tag:nas:445",
+            ],
         },
         {
             "src": "tag:client",
             "deny": [
-                "tag:nas:445"
-            ]
-        }
-    ]
+                "tag:nas:445",
+            ],
+        },
+    ],
 }

@@ -58,7 +58,7 @@ services:
         command: ['postgres', '-c', 'config_file=/etc/postgresql/postgresql.conf']
 
     valkey:
-        image: 'valkey/valkey:9.1.2-alpine'
+        image: 'valkey/valkey:9.2-alpine'
         restart: 'unless-stopped'
         deploy:
             resources:
@@ -123,7 +123,7 @@ services:
             retries: 3
             start_period: '10s'
     webui:
-        image: 'noooste/garage-ui:v0.11.3'
+        image: 'noooste/garage-ui:v0.12.1'
         restart: 'unless-stopped'
         depends_on:
             garage:

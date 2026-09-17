@@ -1,7 +1,7 @@
 name: 'sites'
 services:
     web:
-        image: 'nginx:1.31.5-alpine'
+        image: 'nginx:1.31.6-alpine'
         restart: 'unless-stopped'
         environment:
             TZ: 'Europe/Amsterdam'
@@ -20,7 +20,7 @@ services:
               read_only: true
 
     public:
-        image: 'nginx:1.31.5-alpine'
+        image: 'nginx:1.31.6-alpine'
         restart: 'unless-stopped'
         environment:
             TZ: 'Europe/Amsterdam'

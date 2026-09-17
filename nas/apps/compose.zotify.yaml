@@ -4,7 +4,7 @@ services:
         build:
             context: '/mnt/tank4/music/Zotify'
             dockerfile_inline: |
-                FROM python:3.12-slim
+                FROM python:3.14-slim
                 RUN apt-get update \
                     && apt-get install -y --no-install-recommends ffmpeg git \
                     && rm -rf /var/lib/apt/lists/*
@@ -26,7 +26,7 @@ services:
                     '            _reconnect_time.sleep(min(2 ** attempt, 30))' \
                     '    raise last_err' \
                     'Session.reconnect = _retry_reconnect' \
-                    >> /usr/local/lib/python3.12/site-packages/librespot/core.py \
+                    >> /usr/local/lib/python3.14/site-packages/librespot/core.py \
                     && python3 -c 'import librespot.core'
                 WORKDIR "/zotify"
                 CMD ["/zotify/download.sh"]

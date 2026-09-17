@@ -12,6 +12,7 @@ services:
             - 'aws'
             - 'cache'
         environment:
+            LAST_PULL: '2026-09-17'
             TZ: 'Europe/Amsterdam'
             # Host, port, username, password and database name are required and
             # the container will fast-fail if they are not set (even though we
@@ -73,6 +74,7 @@ services:
         image: 'standardnotes/web:latest'
         restart: 'unless-stopped'
         environment:
+            LAST_PULL: '2026-09-17'
             TZ: 'Europe/Amsterdam'
         ports:
             # Web Client

@@ -15,6 +15,7 @@ services:
             # net.ipv4.ip_forward = 1
             # net.ipv6.conf.all.forwarding = 1
             TS_ROUTES: '192.168.1.0/24'
+            TS_EXTRA_ARGS: '--advertise-exit-node'
             TS_USERSPACE: 'false'
             TS_NO_LOGS_NO_SUPPORT: 'true'
         healthcheck:

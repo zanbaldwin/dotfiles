@@ -19,6 +19,7 @@ services:
     ports:
       - target: 3000
         published: 3562
+        host_ip: '127.0.0.1'
         protocol: 'tcp'
     secrets:
       - source: 'dbpass'

@@ -105,6 +105,7 @@ services:
         ports:
             - target: 3900
               published: 3900
+              host_ip: '127.0.0.1'
               protocol: 'tcp'
         deploy:
             resources:
@@ -140,6 +141,7 @@ services:
         ports:
             - target: 8080
               published: 3909
+              host_ip: '127.0.0.1'
               protocol: 'tcp'
         deploy:
             resources:

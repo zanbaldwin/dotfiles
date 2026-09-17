@@ -8,6 +8,7 @@ services:
         ports:
             - target: 80
               published: 7487
+              host_ip: '127.0.0.1'
               protocol: 'tcp'
         configs:
             - source: 'nginx'
@@ -49,6 +50,7 @@ services:
         ports:
             - target: 2222
               published: 7483
+              host_ip: '127.0.0.1'
               protocol: 'tcp'
         volumes:
             - type: 'bind'

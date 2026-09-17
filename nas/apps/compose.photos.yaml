@@ -39,6 +39,7 @@ services:
         ports:
             - target: 2283
               published: 2283
+              host_ip: '127.0.0.1'
               protocol: 'tcp'
         volumes:
             - type: 'bind'

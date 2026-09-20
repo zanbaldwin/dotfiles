@@ -161,6 +161,13 @@ bash '/tmp/pihole.sh'
 pihole-FTL --config database.DBinterval 600
 pihole-FTL --config database.maxDBdays 30
 
+# Stop tailscaled uploading client logs to Tailscale. Tailscale then refuses
+# support requests from this node, which does not matter here.
+sed -i 's|^FLAGS=.*|FLAGS="--no-logs-no-support"|' '/etc/default/tailscaled'
+# Cap the Go heap so tailscaled stays small on the 512M device.
+echo 'GOMEMLIMIT=128MiB' | tee -a '/etc/default/tailscaled'
+systemctl restart 'tailscaled'
+
 # The following command is interactive...
 tailscale up --accept-dns=false
 

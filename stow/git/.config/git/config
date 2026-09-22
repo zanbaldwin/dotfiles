@@ -70,7 +70,10 @@
     name = Zan Baldwin
     email = hello@zanbaldwin.com
 [init]
-	defaultBranch = "main"
+    defaultBranch = "main"
+    defaultRefFormat = "reftable"
+    # Enable this when GitHub eventually decides to live in the modern world...
+    # defaultObjectFormat = "sha256"
 [column]
     ui = "auto"
 [branch]
@@ -89,9 +92,11 @@
     prune = true
     pruneTags = true
     all = true
+    writeCommitGraph = true
 [rebase]
     autoStash = true
     updateRefs = true
+    missingCommitsCheck = "error"
 [pager]
     # The default Git diffing tool isn't very nice to look at, use something better.
     log = "delta"
@@ -100,6 +105,7 @@
     blame = "delta"
 [interactive]
     diffFilter = "delta --color-only --features='interactive'"
+    singleKey = true
 [diff]
     compactionHeuristic = true
     algorithm = "histogram"
@@ -126,6 +132,7 @@
     editor = "nano -AES --tabsize=4"
     pager = "delta"
     attributesfile = "~/.config/git/attributes"
+    fsmonitor = true
 
 # Force Git to always download over SSH to prevent GitHub's API throttling and/or
 # asking for username and password (which is near-to-impossible to do on the
@@ -136,6 +143,7 @@
 [merge]
     # ff = only
     conflictStyle = "zdiff3"
+    autoStash = true
 
 [commit]
     verbose = true
@@ -155,6 +163,18 @@
 
 [pack]
     usePathWalk = true
+
+[feature]
+    experimental = true
+    manyFiles = true
+[transfer]
+    fsckObjects = true
+[revert]
+    reference = true
+[blame]
+    ignoreRevsFile = ".git-blame-ignore-revs"
+[grep]
+    patternType = "perl"
 
 # Better Diffing with Delta!
 # See: https://github.com/dandavison/delta

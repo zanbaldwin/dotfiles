@@ -43,7 +43,7 @@ function cd {
         if git rev-parse --show-toplevel >"/dev/null" 2>&1; then
             NEW_REPO="$(git rev-parse --show-toplevel 2>"/dev/null")"
             if [ "${CD_LAST_REPO}" != "${NEW_REPO}" ]; then
-                onefetch
+                onefetch 2>'/dev/null'
                 CD_LAST_REPO="${NEW_REPO}"
             fi
         fi

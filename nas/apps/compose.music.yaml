@@ -6,6 +6,9 @@ services:
         user: '1000:1000'
         environment:
             TZ: 'Europe/Amsterdam'
+            # Environment variables have a higher priority than configuration files.
+            # Navidrome's Docker image defines ND_MUSICFOLDER as `/music` so we have to override it.
+            ND_MUSICFOLDER: '/var/empty'
             ND_LASTFM_APIKEY: 'cdd6ee6c6fb2d399252e19e0e6f23980'
         configs:
             - source: 'navidrome'
@@ -57,7 +60,8 @@ configs:
         content: |
             LogLevel = 'WARNING'
             Scanner.Schedule = '@every 24h'
-            MusicFolder = '/music'
+            # Default library for all users `/var/empty`; Legacy `/music/legacy`; Modern `/music/modern`.
+            MusicFolder = '/var/empty'
             DataFolder = '/data'
             CacheFolder = '/data/cache'
             Address = '0.0.0.0'
@@ -67,4 +71,4 @@ configs:
             Tags.Artist.Split = [' / ', ' feat. ', ' feat ', ' ft. ', ' ft ', '; ', ', ']
             Tags.AlbumArtist.Split = [' / ', ' feat. ', ' feat ', ' ft. ', ' ft ', '; ', ', ']
             Scanner.ArtistSplitExceptions = ['ABBA (Björn, Benny, Agnetha & Frida)', 'Blood, Sweat & Tears', 'Woe, Is Me', 'The Chapel Choir of Pembroke College, Cambridge', 'Mr. Garrison, The 3rd Grade Teacher']
-            Agents = 'lastfm'
+            Agents = 'lastfm,deezer'

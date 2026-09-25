@@ -16,15 +16,16 @@ services:
             - source: 'secretsexec'
               target: '/secrets-exec.sh'
               mode: 0555
+        secrets:
+            - source: 'lastfm'
+              target: 'ND_LASTFM_SECRET'
         entrypoint: ['/bin/sh', '/secrets-exec.sh']
+        command: ['navidrome', '--configfile', '/data/navidrome.toml']
         ports:
             - target: 4533
               published: 4533
               host_ip: '127.0.0.1'
               protocol: 'tcp'
-        secrets:
-            - source: 'lastfm'
-              target: 'ND_LASTFM_SECRET'
         volumes:
             - type: 'bind'
               source: '/mnt/fast/apps/navidrome'
@@ -38,11 +39,52 @@ services:
               source: '/mnt/tank4/books/Audible'
               target: '/books'
               read_only: true
-        command: ['navidrome', '--configfile', '/data/navidrome.toml']
+
+    spindle:
+        image: 'ghcr.io/xmorose/spindle:0.3.2'
+        restart: 'unless-stopped'
+        user: '1000:1000'
+        environment:
+            WEB_DIR: '/app/web'
+            STATS_DB_PATH: '/app/data/stats.db'
+            COVER_CACHE_DIR: '/app/data/covers'
+            NAVIDROME_DB_PATH: '/nddata/navidrome.db'
+            DEFAULT_USER: 'zanbaldwin'
+            NAVIDROME_URL: 'http://navidrome:4533'
+            NAVIDROME_USER: 'zanbaldwin'
+        configs:
+            - source: 'secretsexec'
+              target: '/secrets-exec.sh'
+              mode: 0555
+        secrets:
+            - source: 'spindle_ingest'
+              target: 'INGEST_SECRET'
+            - source: 'user_password'
+              target: 'NAVIDROME_PASSWORD'
+        entrypoint: ['/bin/sh', '/secrets-exec.sh']
+        command: ['node', 'dist/server.js']
+        ports:
+            - target: 3590
+              published: 3590
+              host_ip: '127.0.0.1'
+              protocol: 'tcp'
+        volumes:
+            - type: 'bind'
+              source: '/mnt/fast/apps/spindle'
+              target: '/app/data'
+              read_only: false
+            - type: 'bind'
+              source: '/mnt/fast/apps/navidrome'
+              target: '/nddata'
+              read_only: true
 
 secrets:
     lastfm:
         file: '/mnt/tank4/secrets/lastfm/api_secret'
+    spindle_ingest:
+        file: '/mnt/tank4/secrets/navidrome/spindle_ingest'
+    user_password:
+        file: '/mnt/tank4/secrets/navidrome/default_user_password'
 
 configs:
     secretsexec:

@@ -1,0 +1,83 @@
+name: 'code'
+services:
+    # printf '%s' '<argon2-hash>' | tr -d '\n' | sudo tee '/mnt/tank4/secrets/dev/password' >'/dev/null'
+    # openssl passwd -6 | tr -d '\n' | sudo tee '/mnt/tank4/secrets/code/sudo' >'/dev/null'
+    code:
+        image: 'lscr.io/linuxserver/code-server:4.138.0'
+        restart: 'unless-stopped'
+        deploy:
+            resources:
+                limits:
+                    cpus: 2.00
+                    memory: '4G'
+        environment:
+            PUID: '1000'
+            PGID: '1000'
+            TZ: 'Europe/Amsterdam'
+            FILE__HASHED_PASSWORD: '/run/secrets/password'
+            FILE__SUDO_PASSWORD_HASH: '/run/secrets/sudo'
+            DEFAULT_WORKSPACE: '/config/workspace'
+            PWA_APPNAME: 'Code'
+            DOCKER_MODS: 'linuxserver/mods:code-server-php|linuxserver/mods:code-server-nodejs|linuxserver/mods:code-server-rust'
+            NODEJS_MOD_VERSION: '24'
+        secrets: ['password', 'sudo']
+        configs:
+            - source: 'gitconfig'
+              target: '/etc/gitconfig'
+              mode: 0444
+            - source: 'sshconfig'
+              target: '/config/.ssh/config'
+              mode: 0600
+        ports:
+            - target: 8443
+              published: 2633
+              host_ip: '127.0.0.1'
+              protocol: 'tcp'
+        volumes:
+            - type: 'bind'
+              source: '/mnt/fast/apps/code'
+              target: '/config'
+              read_only: false
+        logging:
+            driver: 'json-file'
+            options:
+                max-size: '100m'
+                max-file: 5
+
+secrets:
+    password:
+        file: '/mnt/tank4/secrets/code/password'
+    sudo:
+        file: '/mnt/tank4/secrets/code/sudo'
+
+configs:
+    sshconfig:
+        content: |
+            Include conf.d/*
+            Host git.lan.zanbaldwin.com
+                User git
+                Port 484
+            Host github.com
+                ControlMaster auto
+                ControlPersist 120
+            Host 127.0.0.1
+                StrictHostKeyChecking no
+                UserKnownHostsFile=/dev/null
+            Host *
+                # Always use SSH2.
+                Protocol 2
+                # Use a shared channel for all sessions to the same host,
+                # instead of always opening a new one. This leads to much
+                # quicker connection times.
+                ControlMaster auto
+                ControlPath /tmp/.ssh-control-%r@%h:%p
+                ControlPersist 1800
+                # also this stuff
+                Compression yes
+                TCPKeepAlive yes
+                ServerAliveInterval 20
+                ServerAliveCountMax 10
+    gitconfig:
+        content: |
+            [credential]
+                helper = store

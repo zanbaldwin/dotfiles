@@ -221,4 +221,5 @@
     "workbench.colorTheme": "Ayu Dark Bordered",
     "sqltools.formatLanguages": [],
     "sqltools.highlightQuery": false,
+    "chat.disableAIFeatures": true,
 }

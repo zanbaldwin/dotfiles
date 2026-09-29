@@ -8,7 +8,7 @@ services:
   #   ALTER DATABASE dawarich OWNER TO dawarich;
   #   CREATE EXTENSION postgis CASCADE;
   dawarich:
-    image: 'freikin/dawarich:1.14.5'
+    image: 'freikin/dawarich:1.15.2'
     stdin_open: true
     tty: true
     restart: 'unless-stopped'
@@ -50,6 +50,8 @@ services:
       RAILS_LOG_TO_STDOUT: 'true'
       SELF_HOSTED: 'true'
       STORE_GEODATA: 'true'
+      PHOTON_API_HOST: 'photon:2322'
+      PHOTON_API_USE_HTTPS: 'false'
       # One preloaded Puma worker is plenty for a household instance and
       # halves idle memory. Raise for busier instances.
       WEB_CONCURRENCY: '1'
@@ -92,7 +94,7 @@ services:
           memory: '4G'
 
   dawarich_sidekiq:
-    image: 'freikin/dawarich:1.14.5'
+    image: 'freikin/dawarich:1.15.2'
     volumes:
       - type: 'bind'
         source: '/mnt/fast/apps/dawarich/public'
@@ -144,6 +146,8 @@ services:
       RAILS_LOG_TO_STDOUT: 'true'
       SELF_HOSTED: 'true'
       STORE_GEODATA: 'true'
+      PHOTON_API_HOST: 'photon:2322'
+      PHOTON_API_USE_HTTPS: 'false'
       ### OTP encryption keys are required if you want to use 2FA
       # OTP_ENCRYPTION_PRIMARY_KEY: ''
       # OTP_ENCRYPTION_DETERMINISTIC_KEY: ''
@@ -163,6 +167,28 @@ services:
       dawarich:
         condition: 'service_healthy'
         restart: true
+
+  photon:
+    image: 'rtuszik/photon-docker:2.4.0'
+    restart: 'unless-stopped'
+    networks:
+      - 'default'
+    environment:
+      PUID: '1000'
+      PGID: '1000'
+      REGION: 'planet'
+      UPDATE_STRATEGY: 'SEQUENTIAL'
+      UPDATE_INTERVAL: '30d'
+    volumes:
+      - type: 'bind'
+        source: '/mnt/fast/apps/dawarich/geodata'
+        target: '/photon/data'
+        read_only: false
+    logging:
+      driver: "json-file"
+      options:
+        max-size: '100m'
+        max-file: 5
 
 networks:
   default: {}

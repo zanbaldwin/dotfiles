@@ -38,6 +38,9 @@ services:
               source: '/mnt/fast/apps/code'
               target: '/config'
               read_only: false
+            - type: 'tmpfs'
+              target: '/tmp'
+              read_only: false
         logging:
             driver: 'json-file'
             options:

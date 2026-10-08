@@ -1,0 +1,51 @@
+name: 'calendar'
+services:
+    # Stalwart, used only for CalDAV and CardDAV. Since v0.16 all settings live
+    # in its database, not in a config file, so they are set in the web UI.
+    #
+    # Setup: `chown -R 2000:2000 /mnt/fast/apps/stalwart` (the image's own user).
+    #
+    # First start runs in bootstrap mode; get the temporary admin password with
+    #   docker logs calendar-stalwart-1 2>&1 | grep -A8 'bootstrap mode'
+    # Then, in the setup wizard:
+    #   1. Hostname and default domain `dav.lan.zanbaldwin.com`; untick ACME and DKIM.
+    #   2. RocksDB.  3. Internal directory.  4. Console logging.  5. Manual DNS.
+    # Restart, then in the web UI:
+    #   - Settings > Network > Listeners: delete everything except `http` (8080).
+    #   - Settings > Network > HTTP: enable "Use X-Forwarded".
+    #   - Settings > Calendar & Contacts: disable Scheduling and Alarms, which
+    #     would otherwise queue outbound email.
+    #   - Management > Directory > Accounts: create the DAV users.
+    #
+    # With X-Forwarded enabled, NPM must overwrite the client's headers in a
+    # custom `location /` block, or clients can spoof 127.0.0.1:
+    #   proxy_set_header X-Forwarded-For $remote_addr;
+    #   proxy_set_header Forwarded "";
+    #
+    # The image ships its own HEALTHCHECK against /healthz/live, so none is declared.
+    stalwart:
+        image: 'stalwartlabs/stalwart:v0.16.25'
+        restart: 'unless-stopped'
+        deploy:
+            resources:
+                limits:
+                    memory: '512M'
+        environment:
+            TZ: 'Europe/Amsterdam'
+            STALWART_HOSTNAME: 'dav.lan.zanbaldwin.com'
+            STALWART_PUBLIC_URL: 'https://dav.lan.zanbaldwin.com'
+        ports:
+            - target: 8080
+              published: 7825
+              host_ip: '127.0.0.1'
+              protocol: 'tcp'
+        volumes:
+            # Holds only `config.json` (the datastore location), written by the setup wizard.
+            - type: 'bind'
+              source: '/mnt/fast/apps/stalwart/config'
+              target: '/etc/stalwart'
+              read_only: false
+            - type: 'bind'
+              source: '/mnt/fast/apps/stalwart/data'
+              target: '/var/lib/stalwart'
+              read_only: false

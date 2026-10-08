@@ -1,0 +1,78 @@
+name: 'tracking'
+services:
+    # Database Setup
+    # ==============
+    #   CREATE USER ryot WITH ENCRYPTED PASSWORD '<password>';
+    #   CREATE DATABASE ryot;
+    #   \c ryot
+    #   ALTER DATABASE ryot OWNER TO ryot;
+    #   ALTER SCHEMA public OWNER TO ryot;
+    #
+    # Secrets:
+    #   printf 'postgres://ryot:<password>@postgres:5432/ryot' > /mnt/tank4/secrets/ryot/dsn
+    #   openssl rand -hex 32 | tr -d '\n' > /mnt/tank4/secrets/ryot/admin_token
+    ryot:
+        image: 'ignisda/ryot:v10.5.0'
+        restart: 'unless-stopped'
+        deploy:
+            resources:
+                limits:
+                    memory: '1G'
+        networks:
+            - 'database'
+            - 'default'
+        environment:
+            TZ: 'Europe/Amsterdam'
+            FRONTEND_URL: 'https://ryot.lan.zanbaldwin.com'
+            DISABLE_TELEMETRY: 'true'
+        secrets:
+            - source: 'dsn'
+              target: 'DATABASE_URL'
+            - source: 'admin_token'
+              target: 'SERVER_ADMIN_ACCESS_TOKEN'
+            # Needed for films and TV; books, audiobooks and podcasts work without it.
+            # - source: 'tmdb'
+            #   target: 'MOVIES_AND_SHOWS_TMDB_ACCESS_TOKEN'
+        configs:
+            - source: 'secretsexec'
+              target: '/secrets-exec.sh'
+              mode: 0555
+        entrypoint: ['/bin/sh', '/secrets-exec.sh']
+        command: ['/usr/local/bin/run-container.sh']
+        healthcheck:
+            test: ['CMD', 'wget', '-qO-', 'http://127.0.0.1:8000/health']
+            interval: '60s'
+            timeout: '10s'
+            retries: 3
+            start_period: '30s'
+        ports:
+            - target: 8000
+              published: 7968
+              host_ip: '127.0.0.1'
+              protocol: 'tcp'
+
+networks:
+    default: {}
+    database:
+        external: true
+
+secrets:
+    dsn:
+        file: '/mnt/tank4/secrets/ryot/dsn'
+    admin_token:
+        file: '/mnt/tank4/secrets/ryot/admin_token'
+    # tmdb:
+    #     file: '/mnt/tank4/secrets/ryot/tmdb'
+
+configs:
+    secretsexec:
+        # Exports every mounted secret as an env var named after its file (the
+        # service-level `target:` name), then hands off to the real entrypoint.
+        content: |
+            #!/bin/sh
+            set -eu
+            for file in /run/secrets/*; do
+                [ -f "$${file}" ] || continue
+                export "$$(basename "$${file}")=$$(cat "$${file}")"
+            done
+            exec "$$@"

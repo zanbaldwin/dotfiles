@@ -1,0 +1,81 @@
+name: 'maps'
+services:
+    # Protomaps vector tiles. Every `<name>.pmtiles` in the directory is served at
+    # `/<name>/{z}/{x}/{y}.mvt`, with TileJSON at `/<name>.json`.
+    #
+    # Setup: extract the Netherlands (~1.9GB) from a daily planet build. Builds are
+    # kept for 7 days only, so use a recent date.
+    #   docker run --rm --user 1000:1000 \
+    #       --volume /mnt/tank4/maps/tiles:/data \
+    #       protomaps/go-pmtiles:v1.31.2 \
+    #       extract https://build.protomaps.com/YYYYMMDD.pmtiles /data/nl.pmtiles --bbox=3.31,50.75,7.23,53.56
+    #
+    # Dawarich: Map settings > Custom basemap URL
+    #   https://maps.lan.zanbaldwin.com/nl/{z}/{x}/{y}.mvt
+    tiles:
+        image: 'protomaps/go-pmtiles:v1.31.2'
+        restart: 'unless-stopped'
+        user: '1000:1000'
+        deploy:
+            resources:
+                limits:
+                    memory: '256M'
+        # No healthcheck: the image is distroless with no shell, so a CMD
+        # healthcheck cannot run.
+        command:
+            - 'serve'
+            - '/data'
+            - '--port=8080'
+            - '--cors=https://location.lan.zanbaldwin.com'
+            - '--public-url=https://maps.lan.zanbaldwin.com'
+        ports:
+            - target: 8080
+              published: 6277
+              host_ip: '127.0.0.1'
+              protocol: 'tcp'
+        volumes:
+            - type: 'bind'
+              source: '/mnt/tank4/maps/tiles'
+              target: '/data'
+              read_only: true
+
+    # Valhalla routing. The first start downloads the PBF and builds routing tiles
+    # (about an hour on the N100) before it serves anything; later starts reuse them.
+    # Set `force_rebuild` to 'True' for one start to pick up a newer PBF.
+    #
+    # Setup: `chown -R 1000:1000 /mnt/fast/apps/valhalla`.
+    routing:
+        image: 'ghcr.io/valhalla/valhalla-scripted:3.9.1'
+        restart: 'unless-stopped'
+        user: '1000:1000'
+        deploy:
+            resources:
+                limits:
+                    memory: '6G'
+        environment:
+            TZ: 'Europe/Amsterdam'
+            tile_urls: 'https://download.geofabrik.de/europe/netherlands-latest.osm.pbf'
+            # Used for both building and serving; lower it if the build is OOM-killed.
+            server_threads: '2'
+            serve_tiles: 'True'
+            force_rebuild: 'False'
+            build_admins: 'True'
+            build_time_zones: 'True'
+            build_elevation: 'False'
+            build_transit: 'False'
+        healthcheck:
+            test: ['CMD', 'curl', '-fsS', 'http://127.0.0.1:8002/status']
+            interval: '60s'
+            timeout: '10s'
+            retries: 3
+            start_period: '2h'
+        ports:
+            - target: 8002
+              published: 7688
+              host_ip: '127.0.0.1'
+              protocol: 'tcp'
+        volumes:
+            - type: 'bind'
+              source: '/mnt/fast/apps/valhalla'
+              target: '/custom_files'
+              read_only: false

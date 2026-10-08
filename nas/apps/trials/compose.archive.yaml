@@ -1,0 +1,169 @@
+name: 'archive'
+services:
+    # Database Setup
+    # ==============
+    # Use a hex or alphanumeric password: Open Archiver URL-encodes it again.
+    #   CREATE USER openarchiver WITH ENCRYPTED PASSWORD '<password>';
+    #   CREATE DATABASE openarchiver;
+    #   \c openarchiver
+    #   ALTER DATABASE openarchiver OWNER TO openarchiver;
+    #   ALTER SCHEMA public OWNER TO openarchiver;
+    #
+    # Secrets:
+    #   printf 'postgres://openarchiver:<password>@postgres:5432/openarchiver' > /mnt/tank4/secrets/openarchiver/dsn
+    #   openssl rand -hex 32 | tr -d '\n' > /mnt/tank4/secrets/openarchiver/encryption_key
+    #   openssl rand -hex 32 | tr -d '\n' > /mnt/tank4/secrets/openarchiver/jwt_secret
+    #   openssl rand -hex 32 | tr -d '\n' > /mnt/tank4/secrets/openarchiver/meili_master_key
+    #
+    # Losing `encryption_key` loses the stored credentials of every mail source.
+    # The first visitor to /setup becomes the admin: claim it straight away.
+    server:
+        image: 'logiclabshq/open-archiver:v0.6.0'
+        restart: 'unless-stopped'
+        deploy:
+            resources:
+                limits:
+                    memory: '3G'
+        depends_on:
+            search:
+                condition: 'service_healthy'
+            queue:
+                condition: 'service_healthy'
+        networks:
+            - 'database'
+            - 'default'
+        environment:
+            TZ: 'Europe/Amsterdam'
+            NODE_ENV: 'production'
+            PORT_BACKEND: '4000'
+            PORT_FRONTEND: '3000'
+            APP_URL: 'https://archive.lan.zanbaldwin.com'
+            ORIGIN: 'https://archive.lan.zanbaldwin.com'
+            BODY_SIZE_LIMIT: '100M'
+            MEILI_HOST: 'http://search:7700'
+            REDIS_HOST: 'queue'
+            REDIS_PORT: '6379'
+            REDIS_PASSWORD: ''
+            REDIS_TLS_ENABLED: 'false'
+            STORAGE_TYPE: 'local'
+            STORAGE_LOCAL_ROOT_PATH: '/var/data/open-archiver'
+        secrets:
+            - source: 'dsn'
+              target: 'DATABASE_URL'
+            - source: 'encryption_key'
+              target: 'ENCRYPTION_KEY'
+            - source: 'jwt_secret'
+              target: 'JWT_SECRET'
+            - source: 'meili_master_key'
+              target: 'MEILI_MASTER_KEY'
+        configs:
+            - source: 'secretsexec'
+              target: '/secrets-exec.sh'
+              mode: 0555
+        entrypoint: ['/bin/sh', '/secrets-exec.sh', 'docker-entrypoint.sh']
+        command: ['pnpm', 'docker-start:oss']
+        healthcheck:
+            test: ['CMD', 'wget', '-qO-', 'http://127.0.0.1:3000/api/v1/auth/status']
+            interval: '60s'
+            timeout: '10s'
+            retries: 3
+            # Runs `pnpm install` from the npm registry on every start.
+            start_period: '5m'
+        ports:
+            - target: 3000
+              published: 2724
+              host_ip: '127.0.0.1'
+              protocol: 'tcp'
+        volumes:
+            - type: 'bind'
+              source: '/mnt/tank4/mail/archive'
+              target: '/var/data/open-archiver'
+              read_only: false
+            # Drop Google Takeout mbox, PST or EML exports here for "Local Path" imports.
+            - type: 'bind'
+              source: '/mnt/tank4/mail/imports'
+              target: '/imports'
+              read_only: true
+
+    search:
+        # Pinned to the version Open Archiver ships with. A Meilisearch upgrade
+        # needs a dump and re-import.
+        image: 'getmeili/meilisearch:v1.38'
+        restart: 'unless-stopped'
+        deploy:
+            resources:
+                limits:
+                    memory: '1G'
+        environment:
+            MEILI_ENV: 'production'
+            MEILI_NO_ANALYTICS: 'true'
+        secrets:
+            - source: 'meili_master_key'
+              target: 'MEILI_MASTER_KEY'
+        configs:
+            - source: 'secretsexec'
+              target: '/secrets-exec.sh'
+              mode: 0555
+        entrypoint: ['tini', '--', '/bin/sh', '/secrets-exec.sh']
+        command: ['/bin/meilisearch']
+        healthcheck:
+            test: ['CMD', 'wget', '-qO-', 'http://127.0.0.1:7700/health']
+            interval: '30s'
+            timeout: '5s'
+            retries: 3
+            start_period: '10s'
+        volumes:
+            - type: 'bind'
+              source: '/mnt/fast/apps/openarchiver/meili'
+              target: '/meili_data'
+              read_only: false
+
+    # Dedicated Valkey: BullMQ requires `noeviction`, but the shared instance
+    # runs `allkeys-lru` and would silently drop queued jobs.
+    queue:
+        image: 'valkey/valkey:9.2-alpine'
+        restart: 'unless-stopped'
+        deploy:
+            resources:
+                limits:
+                    memory: '256M'
+        command: ['valkey-server', '--maxmemory-policy', 'noeviction', '--save', '60', '100']
+        healthcheck:
+            test: ['CMD', 'valkey-cli', '--raw', 'ping']
+            interval: '30s'
+            timeout: '5s'
+            retries: 3
+            start_period: '10s'
+        volumes:
+            - type: 'bind'
+              source: '/mnt/fast/apps/openarchiver/valkey'
+              target: '/data'
+              read_only: false
+
+networks:
+    default: {}
+    database:
+        external: true
+
+secrets:
+    dsn:
+        file: '/mnt/tank4/secrets/openarchiver/dsn'
+    encryption_key:
+        file: '/mnt/tank4/secrets/openarchiver/encryption_key'
+    jwt_secret:
+        file: '/mnt/tank4/secrets/openarchiver/jwt_secret'
+    meili_master_key:
+        file: '/mnt/tank4/secrets/openarchiver/meili_master_key'
+
+configs:
+    secretsexec:
+        # Exports every mounted secret as an env var named after its file (the
+        # service-level `target:` name), then hands off to the real entrypoint.
+        content: |
+            #!/bin/sh
+            set -eu
+            for file in /run/secrets/*; do
+                [ -f "$${file}" ] || continue
+                export "$$(basename "$${file}")=$$(cat "$${file}")"
+            done
+            exec "$$@"

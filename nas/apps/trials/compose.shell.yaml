@@ -1,0 +1,36 @@
+name: 'shell'
+services:
+    # Atuin shell history sync server, on SQLite rather than the shared Postgres:
+    # the image has no shell, so the secrets-exec wrapper cannot inject a DSN.
+    #
+    # Setup: `chown -R 1000:1000 /mnt/fast/apps/atuin`.
+    # Register each machine with `atuin register`, then set
+    # ATUIN_OPEN_REGISTRATION to 'false' and redeploy.
+    atuin:
+        image: 'ghcr.io/atuinsh/atuin:v18.23.0'
+        restart: 'unless-stopped'
+        user: '1000:1000'
+        deploy:
+            resources:
+                limits:
+                    memory: '256M'
+        # No healthcheck: the image has no shell, wget or curl, so a CMD
+        # healthcheck cannot run.
+        command: ['server', 'start']
+        environment:
+            TZ: 'Europe/Amsterdam'
+            ATUIN_HOST: '0.0.0.0'
+            ATUIN_PORT: '8888'
+            ATUIN_OPEN_REGISTRATION: 'true'
+            ATUIN_DB_URI: 'sqlite:///config/atuin.db'
+            RUST_LOG: 'info'
+        ports:
+            - target: 8888
+              published: 2884
+              host_ip: '127.0.0.1'
+              protocol: 'tcp'
+        volumes:
+            - type: 'bind'
+              source: '/mnt/fast/apps/atuin'
+              target: '/config'
+              read_only: false

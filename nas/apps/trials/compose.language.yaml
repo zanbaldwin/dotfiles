@@ -1,0 +1,36 @@
+name: 'language'
+services:
+    # Lute v3 (Learning Using Texts). Keeps its SQLite database and images in
+    # /lute_data; both mounts must exist or the container will not start.
+    #
+    # Setup: `chown -R 1000:1000 /mnt/fast/apps/lute /mnt/tank4/backups/lute`.
+    lute:
+        image: 'jzohrab/lute3:3.10.3'
+        restart: 'unless-stopped'
+        user: '1000:1000'
+        deploy:
+            resources:
+                limits:
+                    memory: '1G'
+        environment:
+            TZ: 'Europe/Amsterdam'
+        healthcheck:
+            test: ['CMD', 'python', '-c', "import urllib.request; urllib.request.urlopen('http://127.0.0.1:5001/')"]
+            interval: '60s'
+            timeout: '10s'
+            retries: 3
+            start_period: '30s'
+        ports:
+            - target: 5001
+              published: 5883
+              host_ip: '127.0.0.1'
+              protocol: 'tcp'
+        volumes:
+            - type: 'bind'
+              source: '/mnt/fast/apps/lute'
+              target: '/lute_data'
+              read_only: false
+            - type: 'bind'
+              source: '/mnt/tank4/backups/lute'
+              target: '/lute_backup'
+              read_only: false

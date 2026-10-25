@@ -44,7 +44,7 @@ services:
       DATABASE_PORT: '5432'
       DATABASE_USERNAME: 'dawarich'
       DATABASE_NAME: 'dawarich'
-      APPLICATION_HOSTS: 'location.lan.zanbaldwin.com,localhost,::1,127.0.0.1'
+      APPLICATION_HOSTS: 'location.lan.zanbaldwin.com,location.wan.zanbaldwin.com,localhost,::1,127.0.0.1'
       # Must stay 'http': TLS terminates at the proxy, and 'https' enables
       # Rails force_ssl which 301s the plain-HTTP healthcheck (dawarich#1454).
       APPLICATION_PROTOCOL: 'http'

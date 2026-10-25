@@ -3,7 +3,7 @@ services:
     # Stalwart, used only for CalDAV and CardDAV. Since v0.16 all settings live
     # in its database, not in a config file, so they are set in the web UI.
     #
-    # Setup: `chown -R 2000:2000 /mnt/fast/apps/stalwart` (the image's own user).
+    # Setup: `chown -R 1000:1000 /mnt/fast/apps/stalwart`.
     #
     # First start runs in bootstrap mode; get the temporary admin password with
     #   docker logs calendar-stalwart-1 2>&1 | grep -A8 'bootstrap mode'
@@ -26,6 +26,8 @@ services:
     stalwart:
         image: 'stalwartlabs/stalwart:v0.16.25'
         restart: 'unless-stopped'
+        user: '1000:1000'
+        networks: ['default', 'cache']
         deploy:
             resources:
                 limits:
@@ -51,3 +53,8 @@ services:
               source: '/mnt/fast/apps/stalwart/data'
               target: '/var/lib/stalwart'
               read_only: false
+
+networks:
+    default: {}
+    cache:
+        external: true

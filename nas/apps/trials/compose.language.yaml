@@ -5,7 +5,11 @@ services:
     #
     # Setup: `chown -R 1000:1000 /mnt/fast/apps/lute /mnt/tank4/backups/lute`.
     lute:
-        image: 'jzohrab/lute3:3.10.3'
+        build:
+            dockerfile_inline: |
+                FROM jzohrab/lute3:3.10.3
+                RUN pip install --no-cache-dir 'lute3-korean==0.0.2'
+        image: 'lan.zanbaldwin.com/lute3:3.10.3'
         restart: 'unless-stopped'
         user: '1000:1000'
         cap_drop: ['ALL']
@@ -15,6 +19,7 @@ services:
                     memory: '1G'
         environment:
             TZ: 'Europe/Amsterdam'
+            PYTHAINLP_DATA_DIR: '/lute_data/pythainlp-data'
         healthcheck:
             test: ['CMD', 'python', '-c', "import urllib.request; urllib.request.urlopen('http://127.0.0.1:5001/')"]
             interval: '60s'

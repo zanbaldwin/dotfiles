@@ -7,7 +7,7 @@
     "includePaths": [
         "nas/apps/**"
     ],
-    "pinDigests": false,
+    "pinDigests": true,
     "packageRules": [
         {
             "description": "Floating tags have no version to compare.",

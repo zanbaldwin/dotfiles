@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-NOCTALIA_VERSION_TAG='v5.1.0'
+NOCTALIA_VERSION_TAG='v5.3.0'
 
 if [ ! -f '/run/.toolboxenv' ]; then
     echo 'error: not inside a toolbox; refusing to modify system packages outside a toolbox.' >&2

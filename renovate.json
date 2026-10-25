@@ -5,7 +5,8 @@
     ],
     "timezone": "Europe/Amsterdam",
     "includePaths": [
-        "nas/apps/**"
+        "nas/apps/**",
+        "stow/localhost/code/**"
     ],
     "pinDigests": true,
     "packageRules": [

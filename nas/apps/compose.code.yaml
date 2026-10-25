@@ -20,7 +20,7 @@ services:
       FILE__SUDO_PASSWORD_HASH: '/run/secrets/sudo'
       DEFAULT_WORKSPACE: '/config/workspace'
       PWA_APPNAME: 'Code'
-      DOCKER_MODS: 'linuxserver/mods:code-server-php|linuxserver/mods:code-server-nodejs|linuxserver/mods:code-server-rust'
+      DOCKER_MODS: 'ghcr.io/linuxserver/mods:code-server-php|ghcr.io/linuxserver/mods:code-server-nodejs|ghcr.io/linuxserver/mods:code-server-rust'
       NODEJS_MOD_VERSION: '24'
     secrets: ['password', 'sudo']
     configs:

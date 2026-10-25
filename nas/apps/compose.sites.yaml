@@ -50,11 +50,11 @@ services:
     command: ['tunnel', '--no-autoupdate', 'run']
 
   deploy:
-    image: 'linuxserver/openssh-server:amd64-latest'
+    image: 'ghcr.io/linuxserver/openssh-server:amd64-latest'
     restart: 'unless-stopped'
     environment:
       LAST_PULL: '2026-09-17'
-      DOCKER_MODS: 'linuxserver/mods:universal-package-install'
+      DOCKER_MODS: 'ghcr.io/linuxserver/mods:universal-package-install'
       INSTALL_PACKAGES: 'rsync'
       PUID: '1000'
       PGID: '1000'

@@ -5,10 +5,7 @@ services:
     restart: 'unless-stopped'
     user: '1000:1000'
     cap_drop: ['ALL']
-    command:
-      - '/opt/rawr/rawr-web'
-      - '--bind'
-      - '0.0.0.0:7297'
+    command: ['/opt/rawr/rawr-web', '--bind', '0.0.0.0:7297']
     environment:
       RAWR_CONFIG: '/library/rawr.toml'
       RAWR__LIBRARY__CACHE: '/opt/rawr/cache.db'

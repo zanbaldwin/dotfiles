@@ -1,58 +1,58 @@
 name: 'vault'
 services:
-    # Database Setup
-    # ==============
-    #   CREATE USER immich WITH ENCRYPTED PASSWORD '<password>';
-    #   CREATE DATABASE immich;
-    #   \c immich
-    #   ALTER DATABASE immich OWNER TO immich;
-    server:
-        image: 'vaultwarden/server:1.37.3-alpine'
-        restart: 'unless-stopped'
-        cap_drop: ['ALL']
-        networks:
-            - 'database'
-        environment:
-            DATABASE_URL_FILE: '/run/secrets/vaultdsn'
-        secrets:
-            - 'vaultdsn'
-        ports:
-            - target: 80
-              published: 2489
-              host_ip: '127.0.0.1'
-              protocol: 'tcp'
-        configs:
-            - source: 'vaultwarden'
-              target: '/data/config.json'
-        volumes:
-            - type: 'bind'
-              source: '/mnt/fast/apps/vaultwarden'
-              target: '/data'
-              read_only: false
+  # Database Setup
+  # ==============
+  #   CREATE USER immich WITH ENCRYPTED PASSWORD '<password>';
+  #   CREATE DATABASE immich;
+  #   \c immich
+  #   ALTER DATABASE immich OWNER TO immich;
+  server:
+    image: 'vaultwarden/server:1.37.3-alpine'
+    restart: 'unless-stopped'
+    cap_drop: ['ALL']
+    networks:
+      - 'database'
+    environment:
+      DATABASE_URL_FILE: '/run/secrets/vaultdsn'
+    secrets:
+      - 'vaultdsn'
+    ports:
+      - target: 80
+        published: 2489
+        host_ip: '127.0.0.1'
+        protocol: 'tcp'
+    configs:
+      - source: 'vaultwarden'
+        target: '/data/config.json'
+    volumes:
+      - type: 'bind'
+        source: '/mnt/fast/apps/vaultwarden'
+        target: '/data'
+        read_only: false
 
 networks:
-    database:
-        external: true
+  database:
+    external: true
 
 secrets:
-    vaultdsn:
-        file: '/mnt/tank4/secrets/postgres/vault_dsn'
+  vaultdsn:
+    file: '/mnt/tank4/secrets/postgres/vault_dsn'
 
 configs:
-    vaultwarden:
-        content: |
-            {
-                "domain": "https://vault.lan.zanbaldwin.com",
-                "signups_allowed": false,
-                "sends_allowed": false,
-                "invitations_allowed": true,
-                "emergency_access_allowed": true,
-                "email_change_allowed": true,
-                "password_hints_allowed": false,
-                "show_password_hint": false,
-                "sso_enabled": false,
-                "sso_only": false,
-                "_enable_yubico": false,
-                "_enable_duo": false,
-                "_enable_smtp": false
-            }
+  vaultwarden:
+    content: |
+      {
+          "domain": "https://vault.lan.zanbaldwin.com",
+          "signups_allowed": false,
+          "sends_allowed": false,
+          "invitations_allowed": true,
+          "emergency_access_allowed": true,
+          "email_change_allowed": true,
+          "password_hints_allowed": false,
+          "show_password_hint": false,
+          "sso_enabled": false,
+          "sso_only": false,
+          "_enable_yubico": false,
+          "_enable_duo": false,
+          "_enable_smtp": false
+      }

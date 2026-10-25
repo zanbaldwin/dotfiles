@@ -1,6 +1,5 @@
 name: 'drive'
 services:
-
   # Minimal Basic-auth-only WebDAV for iPad note apps. OpenCloud advertises a
   # Bearer challenge before Basic, which CFNetwork clients (Noteshelf 3) cannot
   # negotiate - they give up without ever sending credentials, so they can never

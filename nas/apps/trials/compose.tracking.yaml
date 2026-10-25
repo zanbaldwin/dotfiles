@@ -13,7 +13,7 @@ services:
   #   printf 'postgres://ryot:<password>@postgres:5432/ryot' > /mnt/tank4/secrets/ryot/dsn
   #   openssl rand -hex 32 | tr -d '\n' > /mnt/tank4/secrets/ryot/admin_token
   ryot:
-    image: 'ignisda/ryot:v10.5.0@sha256:a752b6aee5378527b20e69076a3e9bd53dae6b550d2c2d67f7f71c7aadbc69cc'
+    image: 'ignisda/ryot:v10.5.5@sha256:046a79d34b43baceb119716b978554c41715c736ba118e5b77c3d8865e9fc011'
     restart: 'unless-stopped'
     cap_drop: ['ALL']
     cap_add: ['NET_BIND_SERVICE']

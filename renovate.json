@@ -25,6 +25,16 @@
             "dependencyDashboardApproval": true
         },
         {
+            "description": "Digest updates arrive together once a week.",
+            "matchUpdateTypes": [
+                "digest"
+            ],
+            "groupName": "Docker digests",
+            "schedule": [
+                "* 0-6 * * 1"
+            ]
+        },
+        {
             "matchPackageNames": [
                 "tensorchord/vchord-postgres"
             ],
@@ -63,7 +73,7 @@
             ],
             "matchStrings": [
                 "'anki==(?<currentValue>[^']+)'",
-                "image:\\s*'local/anki-sync-server:(?<currentValue>[^'@]+)'"
+                "image:\\s*'lan\\.zanbaldwin\\.com/anki-sync-server:(?<currentValue>[^'@]+)'"
             ],
             "depNameTemplate": "anki",
             "datasourceTemplate": "pypi"

@@ -1,58 +1,58 @@
 name: 'rotter'
 services:
-    rotter:
-        image: 'alpine:3.24'
-        restart: 'no'
-        user: '1000:1000'
-        deploy:
-            resources:
-                limits:
-                    memory: 192M
-        stop_grace_period: '20m'
-        command: ['/rotter/bin/rotter', 'process']
-        secrets:
-            - credentials
-            - serve_token
-        environment:
-            TZ: 'Europe/Amsterdam'
-            ROTTER_CREDENTIALS_FILE: '/run/secrets/credentials'
-            ROTTER_EXPORT_PATH_PREFIX: '../'
-            ROTTER_MUSIC: '/music'
-            ROTTER_PLAYLISTS: '/music/playlists'
-            ROTTER_ROOT: '/rotter'
-            ROTTER_SERVE: '0.0.0.0:7688'
-            ROTTER_SERVE_TOKEN_FILE: '/run/secrets/serve_token'
-        ports:
-            -   host_ip: 127.0.0.1
-                mode: host
-                protocol: tcp
-                published: '7688'
-                target: '7688'
-        volumes:
-            -   read_only: false
-                source: /mnt/fast/apps/rotter
-                target: /rotter
-                type: bind
-            -   read_only: false
-                source: /mnt/tank4/music/modern
-                target: /music
-                type: bind
+  rotter:
+    image: 'alpine:3.24'
+    restart: 'no'
+    user: '1000:1000'
+    deploy:
+      resources:
+        limits:
+          memory: 192M
+    stop_grace_period: '20m'
+    command: ['/rotter/bin/rotter', 'process']
+    secrets:
+      - credentials
+      - serve_token
+    environment:
+      TZ: 'Europe/Amsterdam'
+      ROTTER_CREDENTIALS_FILE: '/run/secrets/credentials'
+      ROTTER_EXPORT_PATH_PREFIX: '../'
+      ROTTER_MUSIC: '/music'
+      ROTTER_PLAYLISTS: '/music/playlists'
+      ROTTER_ROOT: '/rotter'
+      ROTTER_SERVE: '0.0.0.0:7688'
+      ROTTER_SERVE_TOKEN_FILE: '/run/secrets/serve_token'
+    ports:
+      - host_ip: 127.0.0.1
+        mode: host
+        protocol: tcp
+        published: '7688'
+        target: '7688'
+    volumes:
+      - read_only: false
+        source: /mnt/fast/apps/rotter
+        target: /rotter
+        type: bind
+      - read_only: false
+        source: /mnt/tank4/music/modern
+        target: /music
+        type: bind
 
 secrets:
-    credentials:
-        file: /mnt/tank4/secrets/rotter/credentials.json
-    serve_token:
-        file: /mnt/tank4/secrets/rotter/serve_token
+  credentials:
+    file: /mnt/tank4/secrets/rotter/credentials.json
+  serve_token:
+    file: /mnt/tank4/secrets/rotter/serve_token
 
 configs:
-    secretsexec:
-        # Exports every mounted secret as an env var named after its file (the
-        # service-level `target:` name), then hands off to the real entrypoint.
-        content: |
-            #!/bin/sh
-            set -eu
-            for file in /run/secrets/*; do
-                [ -f "$${file}" ] || continue
-                export "$$(basename "$${file}")=$$(cat "$${file}")"
-            done
-            exec "$$@"
+  secretsexec:
+    # Exports every mounted secret as an env var named after its file (the
+    # service-level `target:` name), then hands off to the real entrypoint.
+    content: |
+      #!/bin/sh
+      set -eu
+      for file in /run/secrets/*; do
+          [ -f "$${file}" ] || continue
+          export "$$(basename "$${file}")=$$(cat "$${file}")"
+      done
+      exec "$$@"

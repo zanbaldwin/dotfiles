@@ -1,124 +1,124 @@
 name: 'sites'
 services:
-    web:
-        image: 'nginx:1.31.6-alpine'
-        restart: 'unless-stopped'
-        cap_drop: ['ALL']
-        cap_add: ['CHOWN', 'SETUID', 'SETGID']
-        environment:
-            TZ: 'Europe/Amsterdam'
-        ports:
-            - target: 80
-              published: 7487
-              host_ip: '127.0.0.1'
-              protocol: 'tcp'
-        configs:
-            - source: 'nginx'
-              target: '/etc/nginx/conf.d/default.conf'
-        volumes:
-            - type: 'bind'
-              source: '/mnt/tank4/sites'
-              target: '/var/www/html'
-              read_only: true
+  web:
+    image: 'nginx:1.31.6-alpine'
+    restart: 'unless-stopped'
+    cap_drop: ['ALL']
+    cap_add: ['CHOWN', 'SETUID', 'SETGID']
+    environment:
+      TZ: 'Europe/Amsterdam'
+    ports:
+      - target: 80
+        published: 7487
+        host_ip: '127.0.0.1'
+        protocol: 'tcp'
+    configs:
+      - source: 'nginx'
+        target: '/etc/nginx/conf.d/default.conf'
+    volumes:
+      - type: 'bind'
+        source: '/mnt/tank4/sites'
+        target: '/var/www/html'
+        read_only: true
 
-    public:
-        image: 'nginx:1.31.6-alpine'
-        restart: 'unless-stopped'
-        cap_drop: ['ALL']
-        cap_add: ['CHOWN', 'SETUID', 'SETGID']
-        environment:
-            TZ: 'Europe/Amsterdam'
-        configs:
-            - source: 'nginx'
-              target: '/etc/nginx/conf.d/default.conf'
-        volumes:
-            - type: 'bind'
-              source: '/mnt/tank4/drive/Public'
-              target: '/var/www/html'
-              read_only: true
+  public:
+    image: 'nginx:1.31.6-alpine'
+    restart: 'unless-stopped'
+    cap_drop: ['ALL']
+    cap_add: ['CHOWN', 'SETUID', 'SETGID']
+    environment:
+      TZ: 'Europe/Amsterdam'
+    configs:
+      - source: 'nginx'
+        target: '/etc/nginx/conf.d/default.conf'
+    volumes:
+      - type: 'bind'
+        source: '/mnt/tank4/drive/Public'
+        target: '/var/www/html'
+        read_only: true
 
-    tunnel:
-        image: 'cloudflare/cloudflared:2026.9.1'
-        restart: 'unless-stopped'
-        cap_drop: ['ALL']
-        depends_on: ['public']
-        environment:
-            TZ: 'Europe/Amsterdam'
-            TUNNEL_TOKEN_FILE: '/run/secrets/tunnel'
-        secrets: ['tunnel']
-        command: ['tunnel', '--no-autoupdate', 'run']
+  tunnel:
+    image: 'cloudflare/cloudflared:2026.9.1'
+    restart: 'unless-stopped'
+    cap_drop: ['ALL']
+    depends_on: ['public']
+    environment:
+      TZ: 'Europe/Amsterdam'
+      TUNNEL_TOKEN_FILE: '/run/secrets/tunnel'
+    secrets: ['tunnel']
+    command: ['tunnel', '--no-autoupdate', 'run']
 
-    deploy:
-        image: 'linuxserver/openssh-server:amd64-latest'
-        restart: 'unless-stopped'
-        environment:
-            LAST_PULL: '2026-09-17'
-            DOCKER_MODS: 'linuxserver/mods:universal-package-install'
-            INSTALL_PACKAGES: 'rsync'
-            PUID: '1000'
-            PGID: '1000'
-            TZ: 'Europe/Amsterdam'
-            USER_NAME: 'deploy'
-            PUBLIC_KEY_FILE: '/run/secrets/authorized'
-            LOG_STDOUT: 'true'
-        configs:
-            - source: 'sshd'
-              target: '/config/sshd/sshd_config.d/hardening.conf'
-        secrets:
-            - 'authorized'
-        ports:
-            # Don't restrict to loopback, the spawned runner container won't have
-            # access to the `runner` network, even if the parent DinD container
-            # is configured to.
-            - target: 2222
-              published: 7483
-              protocol: 'tcp'
-        volumes:
-            - type: 'bind'
-              source: '/mnt/tank4/sites'
-              target: '/var/www/html'
-              read_only: false
-        security_opt: ['no-new-privileges:true']
-        cap_drop: ['ALL']
-        cap_add: ['CHOWN', 'DAC_OVERRIDE', 'FOWNER', 'SETUID', 'SETGID', 'KILL', 'SYS_CHROOT', 'AUDIT_WRITE']
-        pids_limit: 200
-        mem_limit: '256m'
-        cpus: 1.0
+  deploy:
+    image: 'linuxserver/openssh-server:amd64-latest'
+    restart: 'unless-stopped'
+    environment:
+      LAST_PULL: '2026-09-17'
+      DOCKER_MODS: 'linuxserver/mods:universal-package-install'
+      INSTALL_PACKAGES: 'rsync'
+      PUID: '1000'
+      PGID: '1000'
+      TZ: 'Europe/Amsterdam'
+      USER_NAME: 'deploy'
+      PUBLIC_KEY_FILE: '/run/secrets/authorized'
+      LOG_STDOUT: 'true'
+    configs:
+      - source: 'sshd'
+        target: '/config/sshd/sshd_config.d/hardening.conf'
+    secrets:
+      - 'authorized'
+    ports:
+      # Don't restrict to loopback, the spawned runner container won't have
+      # access to the `runner` network, even if the parent DinD container
+      # is configured to.
+      - target: 2222
+        published: 7483
+        protocol: 'tcp'
+    volumes:
+      - type: 'bind'
+        source: '/mnt/tank4/sites'
+        target: '/var/www/html'
+        read_only: false
+    security_opt: ['no-new-privileges:true']
+    cap_drop: ['ALL']
+    cap_add: ['CHOWN', 'DAC_OVERRIDE', 'FOWNER', 'SETUID', 'SETGID', 'KILL', 'SYS_CHROOT', 'AUDIT_WRITE']
+    pids_limit: 200
+    mem_limit: '256m'
+    cpus: 1.0
 
 secrets:
-    authorized:
-        file: '/mnt/tank4/secrets/sites/public'
-    tunnel:
-        file: '/mnt/tank4/secrets/sites/public-tunnel-token'
+  authorized:
+    file: '/mnt/tank4/secrets/sites/public'
+  tunnel:
+    file: '/mnt/tank4/secrets/sites/public-tunnel-token'
 
 configs:
-    nginx:
-        content: |
-            server {
-                listen 80 default_server;
-                server_name _;
-                root /var/www/html;
-                server_tokens off;
-                charset utf-8;
-                location / {
-                    index index.html;
-                    autoindex on;
-                    autoindex_exact_size off;
-                    autoindex_localtime on;
-                    try_files $$uri $$uri/ =404;
-                }
-            }
-    sshd:
-        content: |
-            AuthenticationMethods publickey
-            AllowUsers deploy
-            PermitRootLogin no
-            AllowAgentForwarding no
-            PermitTunnel no
-            MaxAuthTries 3
-            MaxSessions 2
-            LoginGraceTime 20
-            MaxStartups 3:50:10
-            PubkeyAcceptedAlgorithms ssh-ed25519
-            HostKeyAlgorithms ssh-ed25519
-            LogLevel VERBOSE
+  nginx:
+    content: |
+      server {
+          listen 80 default_server;
+          server_name _;
+          root /var/www/html;
+          server_tokens off;
+          charset utf-8;
+          location / {
+              index index.html;
+              autoindex on;
+              autoindex_exact_size off;
+              autoindex_localtime on;
+              try_files $$uri $$uri/ =404;
+          }
+      }
+  sshd:
+    content: |
+      AuthenticationMethods publickey
+      AllowUsers deploy
+      PermitRootLogin no
+      AllowAgentForwarding no
+      PermitTunnel no
+      MaxAuthTries 3
+      MaxSessions 2
+      LoginGraceTime 20
+      MaxStartups 3:50:10
+      PubkeyAcceptedAlgorithms ssh-ed25519
+      HostKeyAlgorithms ssh-ed25519
+      LogLevel VERBOSE

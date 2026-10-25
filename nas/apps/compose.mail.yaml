@@ -18,7 +18,7 @@ services:
   # Losing `encryption_key` loses the stored credentials of every mail source.
   # The first visitor to /setup becomes the admin: claim it straight away.
   server:
-    image: 'logiclabshq/open-archiver:v0.6.0@sha256:3c240bf852d604b73a5229c0a22e2e69987e8e9cfe7241710598ca6187c08b83'
+    image: 'logiclabshq/open-archiver:v0.6.2@sha256:ec2e954959f7d0ee0089c4338437720da9b85520a23779cb6d7642943b3ae8e5'
     restart: 'unless-stopped'
     cap_drop: ['ALL']
     deploy:

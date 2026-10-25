@@ -138,7 +138,7 @@ services:
       retries: 3
       start_period: '10s'
   webui:
-    image: 'noooste/garage-ui:v0.12.1@sha256:0b68a9237da67a705f9bdb9127c8d56f38df7810f844bd6c25c3cd0d19d89795'
+    image: 'noooste/garage-ui:v0.14.0@sha256:e4a33c448304a3f6e60f08d6aa71b2471fd79ac870a5c7e178ea247dea3238b3'
     restart: 'unless-stopped'
     cap_drop: ['ALL']
     depends_on:

@@ -28,9 +28,8 @@ services:
         depends_on:
             search:
                 condition: 'service_healthy'
-            queue:
-                condition: 'service_healthy'
         networks:
+            - 'cache'
             - 'database'
             - 'default'
         environment:
@@ -41,8 +40,10 @@ services:
             APP_URL: 'https://archive.lan.zanbaldwin.com'
             ORIGIN: 'https://archive.lan.zanbaldwin.com'
             BODY_SIZE_LIMIT: '100M'
+            JWT_EXPIRES_IN: '7d'
             MEILI_HOST: 'http://search:7700'
-            REDIS_HOST: 'queue'
+            # Open Archiver has no database index option, so it always uses 0.
+            REDIS_HOST: 'valkey'
             REDIS_PORT: '6379'
             REDIS_PASSWORD: ''
             REDIS_TLS_ENABLED: 'false'
@@ -120,32 +121,10 @@ services:
               target: '/meili_data'
               read_only: false
 
-    # Dedicated Valkey: BullMQ requires `noeviction`, but the shared instance
-    # runs `allkeys-lru` and would silently drop queued jobs.
-    queue:
-        image: 'valkey/valkey:9.2-alpine'
-        restart: 'unless-stopped'
-        cap_drop: ['ALL']
-        cap_add: ['CHOWN', 'DAC_READ_SEARCH', 'SETUID', 'SETGID']
-        deploy:
-            resources:
-                limits:
-                    memory: '256M'
-        command: ['valkey-server', '--maxmemory-policy', 'noeviction', '--save', '60', '100']
-        healthcheck:
-            test: ['CMD', 'valkey-cli', '--raw', 'ping']
-            interval: '30s'
-            timeout: '5s'
-            retries: 3
-            start_period: '10s'
-        volumes:
-            - type: 'bind'
-              source: '/mnt/fast/apps/openarchiver/valkey'
-              target: '/data'
-              read_only: false
-
 networks:
     default: {}
+    cache:
+        external: true
     database:
         external: true
 

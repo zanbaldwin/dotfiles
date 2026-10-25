@@ -5,7 +5,7 @@ services:
   # negotiate - they give up without ever sending credentials, so they can never
   # authenticate against the opencloud service above.
   webdav:
-    image: 'ghcr.io/hacdias/webdav:v5.15.1@sha256:7fbcb867b704ed7aee2d2e8795c4836e86eb910244e7cc69278e8dfa5702a80b'
+    image: 'ghcr.io/hacdias/webdav:v5.17.2@sha256:f4b20163b251eadf656e9d9953e5a4a337f6c86483622f80f10a8ef54acbcd7b'
     restart: 'unless-stopped'
     cap_drop: ['ALL']
     # Must match OpenCloud's uid so its posix driver can assimilate new files.

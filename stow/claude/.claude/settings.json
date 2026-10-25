@@ -14,9 +14,9 @@
       "Bash(grep:*)",
       "Bash(rg:*)"
     ],
-    "defaultMode": "plan"
+    "defaultMode": "auto"
   },
-  "model": "claude-fable-5[1m]",
+  "model": "opus",
   "hooks": {
     "PreToolUse": []
   },
@@ -33,7 +33,8 @@
     "context7@claude-plugins-official": true,
     "adamsreview@adamsreview": false,
     "codebase-audit-suite@levnikolaevich-skills-marketplace": false,
-    "frontend-design@claude-plugins-official": true
+    "frontend-design@claude-plugins-official": true,
+    "storyflow@storyflow-marketplace": true
   },
   "extraKnownMarketplaces": {
     "adamsreview": {
@@ -53,6 +54,12 @@
         "source": "github",
         "repo": "DietrichGebert/ponytail"
       }
+    },
+    "storyflow-marketplace": {
+      "source": {
+        "source": "github",
+        "repo": "wedevelopnl/storyflow-marketplace"
+      }
     }
   },
   "effortLevel": "high",
@@ -61,6 +68,12 @@
   "skipWorkflowUsageWarning": true,
   "theme": "dark",
   "verbose": true,
+  "preferredNotifChannel": "notifications_disabled",
   "remoteControlAtStartup": false,
-  "skipAutoPermissionPrompt": true
+  "skipAutoPermissionPrompt": true,
+  "modelSettings": {
+    "claude-opus-5-5": {
+      "effortLevel": "high"
+    }
+  }
 }

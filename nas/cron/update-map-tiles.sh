@@ -8,7 +8,7 @@ set -euo pipefail
 #   regions  monthly
 #   world    monthly
 
-export TILES_DIRECTORY="/mnt/fast/apps/maps/tiles"
+export TILES_DIRECTORY="/mnt/fast/apps/dawarich/tiles"
 export PMTILES_IMAGE="protomaps/go-pmtiles:v1.31.2"
 
 ARCHIVE="${1:-}"

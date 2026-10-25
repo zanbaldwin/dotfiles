@@ -225,7 +225,7 @@ services:
       - 'serve'
       - '/data'
       - '--port=8080'
-      - '--cors=https://location.lan.zanbaldwin.com'
+      - '--cors=https://location.lan.zanbaldwin.com,https://location.wan.zanbaldwin.com'
       - '--public-url=https://maps.lan.zanbaldwin.com'
     volumes:
       - type: 'bind'

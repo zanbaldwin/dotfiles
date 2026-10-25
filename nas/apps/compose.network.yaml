@@ -72,8 +72,64 @@ services:
         target: '/etc/letsencrypt'
         read_only: false
 
+  # Database Setup
+  # ==============
+  #   CREATE USER pocketid WITH ENCRYPTED PASSWORD '<password>';
+  #   CREATE DATABASE pocketid;
+  #   \c pocketid
+  #   ALTER DATABASE pocketid OWNER TO pocketid;
+  #   ALTER SCHEMA public OWNER TO pocketid;
+  #
+  # Secrets:
+  #   printf 'postgres://pocketid:<password>@postgres:5432/pocketid' > /mnt/tank4/secrets/pocketid/dsn
+  #   openssl rand -base64 32 | tr -d '\n' > /mnt/tank4/secrets/pocketid/encryption_key
+  #
+  # Losing `encryption_key` makes the stored signing keys unreadable.
+  # Visit /setup straight away to register the admin passkey.
+  pocketid:
+    image: 'ghcr.io/pocket-id/pocket-id:v2.19.1-distroless@sha256:d035c9c229304cfd25f97a79b2da00bde9cf942abbd70430d452a95420e2836b'
+    restart: 'unless-stopped'
+    user: '1000:1000'
+    cap_drop: ['ALL']
+    networks:
+      - 'database'
+    environment:
+      TZ: 'Europe/Amsterdam'
+      APP_URL: 'https://auth.wan.zanbaldwin.com'
+      TRUST_PROXY: 'true'
+      ANALYTICS_DISABLED: 'true'
+      DB_CONNECTION_STRING_FILE: '/run/secrets/pocketid_dsn'
+      ENCRYPTION_KEY_FILE: '/run/secrets/pocketid_encryption_key'
+    secrets:
+      - 'pocketid_dsn'
+      - 'pocketid_encryption_key'
+    healthcheck:
+      test: ['CMD', '/app/pocket-id', 'healthcheck']
+      interval: '90s'
+      timeout: '5s'
+      retries: 3
+      start_period: '10s'
+    ports:
+      - target: 1411
+        published: 2884
+        host_ip: '127.0.0.1'
+        protocol: 'tcp'
+    volumes:
+      - type: 'bind'
+        source: '/mnt/fast/apps/pocketid'
+        target: '/app/data'
+        read_only: false
+
+networks:
+  database:
+    external: true
+
 secrets:
   authkey:
     file: '/mnt/tank4/secrets/tailscale'
   cloudflare:
     file: '/mnt/tank4/secrets/cloudflare'
+  pocketid_dsn:
+    file: '/mnt/tank4/secrets/pocketid/dsn'
+  pocketid_encryption_key:
+    file: '/mnt/tank4/secrets/pocketid/encryption_key'

@@ -16,6 +16,7 @@ services:
         image: 'protomaps/go-pmtiles:v1.31.2'
         restart: 'unless-stopped'
         user: '1000:1000'
+        cap_drop: ['ALL']
         deploy:
             resources:
                 limits:
@@ -48,6 +49,7 @@ services:
         image: 'ghcr.io/valhalla/valhalla-scripted:3.9.1'
         restart: 'unless-stopped'
         user: '1000:1000'
+        cap_drop: ['ALL']
         deploy:
             resources:
                 limits:

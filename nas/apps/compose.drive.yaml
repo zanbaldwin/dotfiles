@@ -8,6 +8,7 @@ services:
   webdav:
     image: 'ghcr.io/hacdias/webdav:v5.15.1'
     restart: 'unless-stopped'
+    cap_drop: ['ALL']
     # Must match OpenCloud's uid so its posix driver can assimilate new files.
     user: '1000:1000'
     deploy:
@@ -43,6 +44,7 @@ services:
   files:
     image: 'gtstef/filebrowser:1.5.6-stable'
     restart: 'unless-stopped'
+    cap_drop: ['ALL']
     # The image's own user is already uid 1000, matching OpenCloud, so files
     # created from the web UI get ownership the posix driver expects.
     user: '1000:1000'

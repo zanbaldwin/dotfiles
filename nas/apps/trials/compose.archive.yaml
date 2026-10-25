@@ -20,6 +20,7 @@ services:
     server:
         image: 'logiclabshq/open-archiver:v0.6.0'
         restart: 'unless-stopped'
+        cap_drop: ['ALL']
         deploy:
             resources:
                 limits:
@@ -90,6 +91,7 @@ services:
         # needs a dump and re-import.
         image: 'getmeili/meilisearch:v1.38'
         restart: 'unless-stopped'
+        cap_drop: ['ALL']
         deploy:
             resources:
                 limits:
@@ -123,6 +125,8 @@ services:
     queue:
         image: 'valkey/valkey:9.2-alpine'
         restart: 'unless-stopped'
+        cap_drop: ['ALL']
+        cap_add: ['CHOWN', 'DAC_READ_SEARCH', 'SETUID', 'SETGID']
         deploy:
             resources:
                 limits:

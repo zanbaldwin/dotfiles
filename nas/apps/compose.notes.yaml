@@ -8,6 +8,7 @@ services:
     server:
         image: 'standardnotes/server:latest'
         restart: 'unless-stopped'
+        cap_drop: ['ALL']
         networks:
             - 'aws'
             - 'cache'
@@ -73,6 +74,8 @@ services:
     web:
         image: 'standardnotes/web:latest'
         restart: 'unless-stopped'
+        cap_drop: ['ALL']
+        cap_add: ['CHOWN', 'SETUID', 'SETGID']
         environment:
             LAST_PULL: '2026-09-17'
             TZ: 'Europe/Amsterdam'
@@ -93,6 +96,7 @@ services:
     goaws:
         image: 'admiralpiett/goaws:v0.5.4'
         restart: 'unless-stopped'
+        cap_drop: ['ALL']
         command: ['-config', '/conf/goaws.yaml', '-loglevel', 'error']
         networks:
             aws:

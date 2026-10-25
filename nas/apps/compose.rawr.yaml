@@ -4,6 +4,7 @@ services:
     image: 'alpine:3.24'
     restart: 'unless-stopped'
     user: '1000:1000'
+    cap_drop: ['ALL']
     command:
       - '/opt/rawr/rawr-web'
       - '--bind'

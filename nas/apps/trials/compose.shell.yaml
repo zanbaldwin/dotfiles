@@ -10,6 +10,7 @@ services:
         image: 'ghcr.io/atuinsh/atuin:v18.23.0'
         restart: 'unless-stopped'
         user: '1000:1000'
+        cap_drop: ['ALL']
         deploy:
             resources:
                 limits:

@@ -17,6 +17,8 @@ services:
         # otherwise Compose will keep using the stale previously-built image.
         image: 'vchord-postgis:pg18-v1.1.1'
         restart: 'unless-stopped'
+        cap_drop: ['ALL']
+        cap_add: ['CHOWN', 'DAC_READ_SEARCH', 'SETUID', 'SETGID']
         healthcheck:
             test: ['CMD', 'bash', '/usr/local/bin/healthcheck.sh']
             interval: '30s'
@@ -60,6 +62,8 @@ services:
     valkey:
         image: 'valkey/valkey:9.2-alpine'
         restart: 'unless-stopped'
+        cap_drop: ['ALL']
+        cap_add: ['CHOWN', 'DAC_READ_SEARCH', 'SETUID', 'SETGID']
         deploy:
             resources:
                 limits:
@@ -83,6 +87,8 @@ services:
     garage:
         image: 'dxflrs/garage:v2.4.1'
         restart: 'unless-stopped'
+        cap_drop: ['ALL']
+        cap_add: ['DAC_READ_SEARCH']
         networks:
             s3:
                 aliases: ['s3', 'garage']
@@ -125,6 +131,7 @@ services:
     webui:
         image: 'noooste/garage-ui:v0.12.1'
         restart: 'unless-stopped'
+        cap_drop: ['ALL']
         depends_on:
             garage:
                 condition: 'service_healthy'

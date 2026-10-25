@@ -11,6 +11,8 @@ services:
     forgejo:
         image: 'codeberg.org/forgejo/forgejo:15.0.8'
         restart: 'unless-stopped'
+        cap_drop: ['ALL']
+        cap_add: ['CHOWN', 'DAC_OVERRIDE', 'FOWNER', 'SETUID', 'SETGID', 'KILL', 'SYS_CHROOT']
         networks:
             - 'default'
             - 'database'
@@ -80,6 +82,7 @@ services:
     runner:
         image: 'code.forgejo.org/forgejo/runner:13.1.0'
         restart: 'unless-stopped'
+        cap_drop: ['ALL']
         # The image already defaults to USER 1000:1000 (HOME=/data) and has no
         # PUID/PGID env vars like the Forgejo server image; set it explicitly so
         # ownership is unambiguous.

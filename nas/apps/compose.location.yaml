@@ -12,6 +12,8 @@ services:
     stdin_open: true
     tty: true
     restart: 'unless-stopped'
+    cap_drop: ['ALL']
+    cap_add: ['CHOWN', 'SETUID', 'SETGID']
     networks:
       - 'cache'
       - 'database'
@@ -126,6 +128,8 @@ services:
     entrypoint: ['/bin/sh', '/secrets-exec.sh', 'sidekiq-entrypoint.sh']
     command: ['sidekiq']
     restart: unless-stopped
+    cap_drop: ['ALL']
+    cap_add: ['CHOWN', 'SETUID', 'SETGID']
     environment:
       ### To run under a non-root user, set PUID/PGID here (do NOT use `user:`).
       PUID: '1000'
@@ -171,6 +175,8 @@ services:
   photon:
     image: 'rtuszik/photon-docker:2.4.0'
     restart: 'unless-stopped'
+    cap_drop: ['ALL']
+    cap_add: ['CHOWN', 'SETUID', 'SETGID']
     networks:
       - 'default'
     environment:

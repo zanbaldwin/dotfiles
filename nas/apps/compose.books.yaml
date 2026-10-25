@@ -3,6 +3,8 @@ services:
     web:
         image: 'linuxserver/calibre-web:0.6.27'
         restart: 'unless-stopped'
+        cap_drop: ['ALL']
+        cap_add: ['CHOWN', 'DAC_OVERRIDE', 'FOWNER', 'SETUID', 'SETGID', 'KILL']
         environment:
             TZ: 'Europe/Amsterdam'
             DOCKER_MODS: 'linuxserver/mods:universal-calibre'

@@ -11,6 +11,7 @@ services:
     server:
         image: 'ghcr.io/immich-app/immich-server:v3.2.2'
         restart: 'unless-stopped'
+        cap_drop: ['ALL']
         deploy:
             resources:
                 limits:

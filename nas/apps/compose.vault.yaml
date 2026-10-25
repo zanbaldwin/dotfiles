@@ -9,6 +9,7 @@ services:
     server:
         image: 'vaultwarden/server:1.37.3-alpine'
         restart: 'unless-stopped'
+        cap_drop: ['ALL']
         networks:
             - 'database'
         environment:

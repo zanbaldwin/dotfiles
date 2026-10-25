@@ -3,6 +3,7 @@ services:
     openwebui:
         image: 'ghcr.io/open-webui/open-webui:v0.10.2'
         restart: 'unless-stopped'
+        cap_drop: ['ALL']
         environment:
             OLLAMA_BASE_URL: 'http://desktop.lan.zanbaldwin.com:11434'
         ports:

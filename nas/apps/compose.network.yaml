@@ -33,9 +33,8 @@ services:
               read_only: false
         devices:
             - '/dev/net/tun:/dev/net/tun'
-        cap_add:
-            - 'net_admin'
-            - 'sys_module'
+        cap_drop: ['ALL']
+        cap_add: ['NET_ADMIN', 'NET_RAW', 'SYS_MODULE']
 
 secrets:
     authkey:

@@ -5,6 +5,8 @@ services:
     code:
         image: 'lscr.io/linuxserver/code-server:4.138.0'
         restart: 'unless-stopped'
+        cap_drop: ['ALL']
+        cap_add: ['CHOWN', 'DAC_OVERRIDE', 'FOWNER', 'SETUID', 'SETGID', 'KILL', 'AUDIT_WRITE']
         deploy:
             resources:
                 limits:

@@ -3,6 +3,8 @@ services:
     manager:
         image: 'jc21/nginx-proxy-manager:2.15.1'
         restart: 'unless-stopped'
+        cap_drop: ['ALL']
+        cap_add: ['NET_BIND_SERVICE', 'SETUID', 'SETGID']
         # Don't bother with extra_hosts, Nginx does not use it. Use host network instead.
         network_mode: 'host'
         healthcheck:

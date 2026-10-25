@@ -4,6 +4,7 @@ services:
         image: 'deluan/navidrome:0.64.0'
         restart: 'unless-stopped'
         user: '1000:1000'
+        cap_drop: ['ALL']
         environment:
             TZ: 'Europe/Amsterdam'
             # Environment variables have a higher priority than configuration files.
@@ -44,6 +45,7 @@ services:
         image: 'ghcr.io/xmorose/spindle:0.3.2'
         restart: 'unless-stopped'
         user: '1000:1000'
+        cap_drop: ['ALL']
         environment:
             WEB_DIR: '/app/web'
             STATS_DB_PATH: '/app/data/stats.db'

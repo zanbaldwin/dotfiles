@@ -3,6 +3,8 @@ services:
     web:
         image: 'nginx:1.31.6-alpine'
         restart: 'unless-stopped'
+        cap_drop: ['ALL']
+        cap_add: ['CHOWN', 'SETUID', 'SETGID']
         environment:
             TZ: 'Europe/Amsterdam'
         ports:
@@ -22,6 +24,8 @@ services:
     public:
         image: 'nginx:1.31.6-alpine'
         restart: 'unless-stopped'
+        cap_drop: ['ALL']
+        cap_add: ['CHOWN', 'SETUID', 'SETGID']
         environment:
             TZ: 'Europe/Amsterdam'
         configs:
@@ -36,6 +40,7 @@ services:
     tunnel:
         image: 'cloudflare/cloudflared:2026.9.1'
         restart: 'unless-stopped'
+        cap_drop: ['ALL']
         depends_on: ['public']
         environment:
             TZ: 'Europe/Amsterdam'

@@ -126,7 +126,7 @@ services:
       - '/etc/forgejo/runner.yaml'
 
   dind:
-    image: 'docker:29.8.1-dind@sha256:3f3c01aaaebf7cce837356b688b7c059a4749f10bd7660dec7c58fc454a283f0'
+    image: 'docker:29.9.2-dind@sha256:9e79b879b177fbd72c34376a3dd3d91747da5db49e1f560f76aea59561471977'
     restart: 'unless-stopped'
     privileged: true
     environment:

@@ -1,0 +1,72 @@
+{
+    "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+    "extends": [
+        "config:recommended"
+    ],
+    "timezone": "Europe/Amsterdam",
+    "includePaths": [
+        "nas/apps/**"
+    ],
+    "pinDigests": false,
+    "packageRules": [
+        {
+            "description": "Floating tags have no version to compare.",
+            "matchDatasources": [
+                "docker"
+            ],
+            "matchCurrentValue": "/(^|-)latest$/",
+            "enabled": false
+        },
+        {
+            "description": "Major updates wait for approval on the Dependency Dashboard.",
+            "matchUpdateTypes": [
+                "major"
+            ],
+            "dependencyDashboardApproval": true
+        },
+        {
+            "matchPackageNames": [
+                "tensorchord/vchord-postgres"
+            ],
+            "versioning": "regex:^pg(?<compatibility>\\d+)-v(?<major>\\d+)\\.(?<minor>\\d+)\\.(?<patch>\\d+)$"
+        }
+    ],
+    "customManagers": [
+        {
+            "description": "FROM lines inside dockerfile_inline blocks.",
+            "customType": "regex",
+            "managerFilePatterns": [
+                "/(^|/)compose\\.[^/]+\\.ya?ml$/"
+            ],
+            "matchStrings": [
+                "\\n\\s+FROM\\s+(?<depName>[^\\s:@]+):(?<currentValue>[^\\s@]+)(?:@(?<currentDigest>sha256:[a-f0-9]+))?\\s"
+            ],
+            "datasourceTemplate": "docker"
+        },
+        {
+            "description": "Local Postgres tag, kept in step with its FROM line.",
+            "customType": "regex",
+            "managerFilePatterns": [
+                "/(^|/)compose\\.data\\.yaml$/"
+            ],
+            "matchStrings": [
+                "image:\\s*'vchord-postgis:(?<currentValue>[^'@]+)'"
+            ],
+            "depNameTemplate": "tensorchord/vchord-postgres",
+            "datasourceTemplate": "docker"
+        },
+        {
+            "description": "Anki sync server: pip pin and local tag.",
+            "customType": "regex",
+            "managerFilePatterns": [
+                "/(^|/)compose\\.anki\\.yaml$/"
+            ],
+            "matchStrings": [
+                "'anki==(?<currentValue>[^']+)'",
+                "image:\\s*'local/anki-sync-server:(?<currentValue>[^'@]+)'"
+            ],
+            "depNameTemplate": "anki",
+            "datasourceTemplate": "pypi"
+        }
+    ]
+}

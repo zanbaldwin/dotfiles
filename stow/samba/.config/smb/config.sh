@@ -11,7 +11,7 @@
 
 SERVER='nas.lan.zanbaldwin.com'     # SMB server hostname
 SERVER_PORT='445'                   # TCP port smb-mount probes to detect on-LAN
-MOUNT_OPTS='rw,vers=3.1.1,seal,mfsymlinks,nobrl'  # options passed to mount -o (uid/gid/credentials are appended)
+MOUNT_OPTS='rw,vers=3.1.1,seal,mfsymlinks,nobrl,actimeo=30'  # options passed to mount -o (uid/gid/credentials are appended)
 CONTAINER='network-tailscale-1'     # Tailscale container to bring up when off-LAN
 HEALTH_TIMEOUT='30'                 # seconds to wait for it to report healthy
 

@@ -121,6 +121,55 @@ services:
         target: '/meili_data'
         read_only: false
 
+  # Bichon, on trial as a replacement for Open Archiver.
+  #
+  # Setup:
+  #   openssl rand -hex 32 | tr -d '\n' > /mnt/tank4/secrets/bichon/encrypt_password
+  #   chown -R 1000:1000 /mnt/fast/apps/bichon /mnt/tank4/mail/bichon
+  #
+  # Losing `encrypt_password` loses the stored credentials of every account.
+  # The default login is `admin` / `admin@bichon`: change it straight away.
+  # The image ships its own HEALTHCHECK against /api/status, so none is declared.
+  bichon:
+    image: 'rustmailer/bichon:2.2.0@sha256:ffa31d3225e084d2859d24b644fdf9b7931fd6e99f037f7abd20d1bd15a0556a'
+    restart: 'unless-stopped'
+    user: '1000:1000'
+    cap_drop: ['ALL']
+    deploy:
+      resources:
+        limits:
+          memory: '1G'
+    environment:
+      TZ: 'Europe/Amsterdam'
+      BICHON_ROOT_DIR: '/data'
+      BICHON_DATA_DIR: '/storage'
+      BICHON_ENCRYPT_PASSWORD_FILE: '/run/secrets/encrypt_password'
+      BICHON_PUBLIC_URL: 'https://bichon.lan.zanbaldwin.com'
+      BICHON_CORS_ORIGINS: 'https://bichon.lan.zanbaldwin.com'
+      BICHON_ANSI_LOGS: 'false'
+    secrets:
+      - 'encrypt_password'
+    ports:
+      - target: 15630
+        published: 2424
+        host_ip: '127.0.0.1'
+        protocol: 'tcp'
+    volumes:
+      # Metadata and the full-text index.
+      - type: 'bind'
+        source: '/mnt/fast/apps/bichon'
+        target: '/data'
+        read_only: false
+      # Raw message blobs.
+      - type: 'bind'
+        source: '/mnt/tank4/mail/bichon'
+        target: '/storage'
+        read_only: false
+      - type: 'bind'
+        source: '/mnt/tank4/mail/imports'
+        target: '/imports'
+        read_only: true
+
 networks:
   default: {}
   cache:
@@ -137,6 +186,8 @@ secrets:
     file: '/mnt/tank4/secrets/openarchiver/jwt_secret'
   meili_master_key:
     file: '/mnt/tank4/secrets/openarchiver/meili_master_key'
+  encrypt_password:
+    file: '/mnt/tank4/secrets/bichon/encrypt_password'
 
 configs:
   secretsexec:

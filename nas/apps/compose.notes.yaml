@@ -29,8 +29,11 @@ services:
             # Standard Notes only supports MySQL or SQLite, no Postgres :(
             DB_TYPE: 'sqlite'
             DB_SQLITE_DATABASE_PATH: '/opt/server/data/standardnotes.db'
+            # The entrypoint still requires REDIS_HOST and REDIS_PORT, but a
+            # preset REDIS_URL takes precedence (and selects the database).
             REDIS_HOST: 'valkey'
             REDIS_PORT: '6379'
+            REDIS_URL: 'redis://valkey:6379/6'
             CACHE_TYPE: 'redis'
             AUTH_JWT_SECRET_FILE: '/run/secrets/jwt'
             AUTH_SERVER_ENCRYPTION_SERVER_KEY_FILE: '/run/secrets/authserver'

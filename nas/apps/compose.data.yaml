@@ -59,6 +59,13 @@ services:
               read_only: false
         command: ['postgres', '-c', 'config_file=/etc/postgresql/postgresql.conf']
 
+    # Holds job queues (BullMQ, Sidekiq), so it runs `noeviction`: a full
+    # instance rejects writes instead of silently dropping queued jobs.
+    # Database allocation:
+    #   0    Open Archiver (cannot be changed)
+    #   1    Immich
+    #   2-5  Dawarich (cache, Sidekiq, Action Cable, Rack::Attack)
+    #   6    Standard Notes
     valkey:
         image: 'valkey/valkey:9.2-alpine'
         restart: 'unless-stopped'
@@ -67,7 +74,9 @@ services:
         deploy:
             resources:
                 limits:
-                    memory: '256M'
+                    # Headroom above `maxmemory` for copy-on-write during AOF
+                    # rewrites and RDB saves.
+                    memory: '512M'
         networks:
             cache:
                 aliases: ['cache']
@@ -251,8 +260,8 @@ configs:
             auto-aof-rewrite-percentage 100
             auto-aof-rewrite-min-size 32mb
             save 60 100
-            maxmemory 180mb
-            maxmemory-policy allkeys-lru
+            maxmemory 386mb
+            maxmemory-policy noeviction
     s3config:
         content: |
             # Single-node Garage config.

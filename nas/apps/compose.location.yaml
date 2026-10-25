@@ -204,6 +204,63 @@ services:
         max-size: '100m'
         max-file: 5
 
+  # Protomaps vector tiles. Every `<name>.pmtiles` in the directory is served at
+  # `/<name>/{z}/{x}/{y}.mvt`, with TileJSON at `/<name>.json`. The `basemap`
+  # service publishes them; this one is not exposed directly.
+  #
+  # Archives: `nl` (z0-15), `regions` (England and British Columbia, z0-15) and
+  # `world` (z0-10). Created and refreshed by `nas/cron/update-map-tiles.sh`.
+  tiles:
+    image: 'protomaps/go-pmtiles:v1.31.2'
+    restart: 'unless-stopped'
+    user: '1000:1000'
+    cap_drop: ['ALL']
+    deploy:
+      resources:
+        limits:
+          memory: '256M'
+    # No healthcheck: the image is distroless with no shell, so a CMD
+    # healthcheck cannot run.
+    command:
+      - 'serve'
+      - '/data'
+      - '--port=8080'
+      - '--cors=https://location.lan.zanbaldwin.com'
+      - '--public-url=https://maps.lan.zanbaldwin.com'
+    volumes:
+      - type: 'bind'
+        source: '/mnt/fast/apps/dawarich/tiles'
+        target: '/data'
+        read_only: true
+
+  # Combines the tile archives behind one URL: `/{z}/{x}/{y}.mvt` tries `nl`,
+  # then `regions`, then `world`, moving on when an archive has no tile (204).
+  # Every other path passes through to `tiles` unchanged.
+  #
+  # Dawarich: Map settings > Custom basemap URL
+  #   https://maps.lan.zanbaldwin.com/{z}/{x}/{y}.mvt
+  basemap:
+    image: 'caddy:2.11.6-alpine'
+    restart: 'unless-stopped'
+    user: '1000:1000'
+    cap_drop: ['ALL']
+    # The caddy binary has a file capability; exec fails without this.
+    cap_add: ['NET_BIND_SERVICE']
+    deploy:
+      resources:
+        limits:
+          memory: '64M'
+    configs:
+      - source: 'basemap'
+        target: '/etc/caddy/Caddyfile'
+    ports:
+      - target: 8080
+        published: 6277
+        host_ip: '127.0.0.1'
+        protocol: 'tcp'
+    depends_on:
+      - 'tiles'
+
 networks:
   default: {}
   cache:
@@ -229,3 +286,33 @@ configs:
           export "$$(basename "$${file}")=$$(cat "$${file}")"
       done
       exec "$$@"
+  basemap:
+    content: |
+      {
+        admin off
+        auto_https off
+        persist_config off
+      }
+
+      :8080 {
+        @tile path_regexp tile ^/(\d+/\d+/\d+\.mvt)$$
+        handle @tile {
+          rewrite * /nl/{re.tile.1}
+          reverse_proxy tiles:8080 {
+            @empty status 204
+            handle_response @empty {
+              rewrite * /regions/{re.tile.1}
+              reverse_proxy tiles:8080 {
+                @empty status 204
+                handle_response @empty {
+                  rewrite * /world/{re.tile.1}
+                  reverse_proxy tiles:8080
+                }
+              }
+            }
+          }
+        }
+        handle {
+          reverse_proxy tiles:8080
+        }
+      }

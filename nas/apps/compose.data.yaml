@@ -67,7 +67,7 @@ services:
   #   2-5  Dawarich (cache, Sidekiq, Action Cable, Rack::Attack)
   #   6    Standard Notes
   valkey:
-    image: 'valkey/valkey:9.2-alpine'
+    image: 'valkey/valkey:9.2-alpine@sha256:cdcb7b1c7b6f1c9cb9442c71ac6275e78184657448407b2c1fdde7ee8024f4fb'
     restart: 'unless-stopped'
     cap_drop: ['ALL']
     cap_add: ['CHOWN', 'DAC_READ_SEARCH', 'SETUID', 'SETGID']
@@ -94,7 +94,7 @@ services:
     command: ['valkey-server', '/etc/valkey/valkey.conf']
 
   garage:
-    image: 'dxflrs/garage:v2.4.1'
+    image: 'dxflrs/garage:v2.4.1@sha256:9c96caa2612d3411acc5b0e6701fb238dbfba33e533a6d7d3d811a4b12d0d020'
     restart: 'unless-stopped'
     cap_drop: ['ALL']
     cap_add: ['DAC_READ_SEARCH']
@@ -138,7 +138,7 @@ services:
       retries: 3
       start_period: '10s'
   webui:
-    image: 'noooste/garage-ui:v0.12.1'
+    image: 'noooste/garage-ui:v0.12.1@sha256:0b68a9237da67a705f9bdb9127c8d56f38df7810f844bd6c25c3cd0d19d89795'
     restart: 'unless-stopped'
     cap_drop: ['ALL']
     depends_on:

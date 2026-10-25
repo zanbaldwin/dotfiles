@@ -1,7 +1,8 @@
 name: 'sites'
 services:
+
   web:
-    image: 'nginx:1.31.6-alpine'
+    image: 'nginx:1.31.6-alpine@sha256:df221db836e1754089190208cee7eeda94f233197056426eda74a43ab1abeac2'
     restart: 'unless-stopped'
     cap_drop: ['ALL']
     cap_add: ['CHOWN', 'SETUID', 'SETGID']
@@ -22,7 +23,7 @@ services:
         read_only: true
 
   public:
-    image: 'nginx:1.31.6-alpine'
+    image: 'nginx:1.31.6-alpine@sha256:df221db836e1754089190208cee7eeda94f233197056426eda74a43ab1abeac2'
     restart: 'unless-stopped'
     cap_drop: ['ALL']
     cap_add: ['CHOWN', 'SETUID', 'SETGID']
@@ -38,7 +39,7 @@ services:
         read_only: true
 
   tunnel:
-    image: 'cloudflare/cloudflared:2026.9.1'
+    image: 'cloudflare/cloudflared:2026.9.1@sha256:b269e8abd07a5bf6f3f4be65d5050b2174eca89c56a0241a8ff32a16aec454e4'
     restart: 'unless-stopped'
     cap_drop: ['ALL']
     depends_on: ['public']
@@ -95,18 +96,18 @@ configs:
   nginx:
     content: |
       server {
-          listen 80 default_server;
-          server_name _;
-          root /var/www/html;
-          server_tokens off;
-          charset utf-8;
-          location / {
-              index index.html;
-              autoindex on;
-              autoindex_exact_size off;
-              autoindex_localtime on;
-              try_files $$uri $$uri/ =404;
-          }
+        listen 80 default_server;
+        server_name _;
+        root /var/www/html;
+        server_tokens off;
+        charset utf-8;
+        location / {
+          index index.html;
+          autoindex on;
+          autoindex_exact_size off;
+          autoindex_localtime on;
+          try_files $$uri $$uri/ =404;
+        }
       }
   sshd:
     content: |

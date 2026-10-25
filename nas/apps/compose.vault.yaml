@@ -7,7 +7,7 @@ services:
   #   \c immich
   #   ALTER DATABASE immich OWNER TO immich;
   server:
-    image: 'vaultwarden/server:1.37.3-alpine'
+    image: 'vaultwarden/server:1.37.3-alpine@sha256:9a905c5cf5df61bb827da3805e160170741c0b53b0c63bb07e1afd3d2e21b1c8'
     restart: 'unless-stopped'
     cap_drop: ['ALL']
     networks:
@@ -42,17 +42,17 @@ configs:
   vaultwarden:
     content: |
       {
-          "domain": "https://vault.lan.zanbaldwin.com",
-          "signups_allowed": false,
-          "sends_allowed": false,
-          "invitations_allowed": true,
-          "emergency_access_allowed": true,
-          "email_change_allowed": true,
-          "password_hints_allowed": false,
-          "show_password_hint": false,
-          "sso_enabled": false,
-          "sso_only": false,
-          "_enable_yubico": false,
-          "_enable_duo": false,
-          "_enable_smtp": false
+        "domain": "https://vault.lan.zanbaldwin.com",
+        "signups_allowed": false,
+        "sends_allowed": false,
+        "invitations_allowed": true,
+        "emergency_access_allowed": true,
+        "email_change_allowed": true,
+        "password_hints_allowed": false,
+        "show_password_hint": false,
+        "sso_enabled": false,
+        "sso_only": false,
+        "_enable_yubico": false,
+        "_enable_duo": false,
+        "_enable_smtp": false
       }

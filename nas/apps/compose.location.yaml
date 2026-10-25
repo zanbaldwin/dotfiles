@@ -240,7 +240,7 @@ services:
   # Dawarich: Map settings > Custom basemap URL
   #   https://maps.lan.zanbaldwin.com/{z}/{x}/{y}.mvt
   basemap:
-    image: 'caddy:2.11.6-alpine'
+    image: 'caddy:2.11.7-alpine@sha256:eb4d35b7452d1ab6171fbdbe8d9275b2301dad6dad92115d91e19fb9b24d510f'
     restart: 'unless-stopped'
     user: '1000:1000'
     cap_drop: ['ALL']

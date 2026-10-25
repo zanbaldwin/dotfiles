@@ -31,6 +31,7 @@ services:
             DB_STORAGE_TYPE: 'HDD'
             DB_POOL_SIZE: '25'
             REDIS_HOSTNAME: 'valkey'
+            REDIS_DBINDEX: '1'
             # IMMICH_CONFIG_FILE: '/etc/immich/config.json'
         secrets:
             - 'dbpass'

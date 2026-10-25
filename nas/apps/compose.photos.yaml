@@ -9,7 +9,7 @@ services:
   #   CREATE EXTENSION vchord CASCADE;
   #   CREATE EXTENSION earthdistance CASCADE;
   server:
-    image: 'ghcr.io/immich-app/immich-server:v3.2.2@sha256:79cc1623323d5894922686d8743b4780181428f98eecbfb58ce12c41ef02d1ea'
+    image: 'ghcr.io/immich-app/immich-server:v3.3.5@sha256:485d546a2e31d6a8b4db8423fcba5c109de8c218d93410af115fd1ccfc4352a6'
     restart: 'unless-stopped'
     cap_drop: ['ALL']
     deploy:

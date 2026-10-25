@@ -24,3 +24,35 @@ services:
         source: '/mnt/fast/apps/calibre'
         target: '/config'
         read_only: false
+
+  audiobookshelf:
+    image: 'ghcr.io/advplyr/audiobookshelf:2.37.2@sha256:b897c33f05972fb1bf484f7487bc878fa91ec8691335c1db6e2929c3a7658efa'
+    restart: 'unless-stopped'
+    user: '1000:1000'
+    cap_drop: ['ALL']
+    environment:
+      TZ: 'Europe/Amsterdam'
+    healthcheck:
+      test: ['CMD', 'wget', '-qO-', 'http://127.0.0.1:80/healthcheck']
+      interval: '60s'
+      timeout: '5s'
+      retries: 3
+      start_period: '30s'
+    ports:
+      - target: 80
+        published: 2834
+        host_ip: '127.0.0.1'
+        protocol: 'tcp'
+    volumes:
+      - type: 'bind'
+        source: '/mnt/tank4/books/Audible'
+        target: '/audiobooks'
+        read_only: true
+      - type: 'bind'
+        source: '/mnt/fast/apps/audiobookshelf/config'
+        target: '/config'
+        read_only: false
+      - type: 'bind'
+        source: '/mnt/fast/apps/audiobookshelf/metadata'
+        target: '/metadata'
+        read_only: false

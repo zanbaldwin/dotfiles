@@ -4,7 +4,7 @@ services:
   # Should be equivalent to:
   # docker run -d --gpus=all -v ollama:/root/.ollama -p 11434:11434 --name ollama ollama/ollama
   ollama:
-    image: 'ollama/ollama:0.32.2'
+    image: 'ollama/ollama:0.32.2@sha256:c3886c198155aa7d45a29851100cc16f5d6ea6777d635ddd0597fe95874161af'
     restart: 'unless-stopped'
     deploy:
       resources:

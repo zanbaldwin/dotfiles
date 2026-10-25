@@ -27,8 +27,8 @@ services:
       - host_ip: '127.0.0.1'
         mode: 'host'
         protocol: 'tcp'
-        published: '7688'
-        target: '7688'
+        published: 7688
+        target: 7688
     volumes:
       - read_only: false
         source: '/mnt/fast/apps/rotter'

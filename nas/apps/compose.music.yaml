@@ -1,7 +1,7 @@
 name: 'music'
 services:
   navidrome:
-    image: 'deluan/navidrome:0.64.2'
+    image: 'deluan/navidrome:0.64.2@sha256:a384948b81bd1529986c5960169e7fc4fa00f46bde6bd517971a4c36671db2af'
     restart: 'unless-stopped'
     user: '1000:1000'
     cap_drop: ['ALL']
@@ -42,7 +42,7 @@ services:
         read_only: true
 
   spindle:
-    image: 'ghcr.io/xmorose/spindle:0.3.2'
+    image: 'ghcr.io/xmorose/spindle:0.3.2@sha256:dae16a514e3fd34a3c3608391fbd3a37170dc7d08097e4715faca1809ee38d63'
     restart: 'unless-stopped'
     user: '1000:1000'
     cap_drop: ['ALL']
@@ -96,8 +96,8 @@ configs:
       #!/bin/sh
       set -eu
       for file in /run/secrets/*; do
-          [ -f "$${file}" ] || continue
-          export "$$(basename "$${file}")=$$(cat "$${file}")"
+        [ -f "$${file}" ] || continue
+        export "$$(basename "$${file}")=$$(cat "$${file}")"
       done
       exec "$$@"
   navidrome:

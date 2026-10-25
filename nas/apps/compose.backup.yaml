@@ -1,7 +1,7 @@
 name: 'backup'
 services:
   backrest:
-    image: 'garethgeorge/backrest:v1.14.1-alpine'
+    image: 'garethgeorge/backrest:v1.14.1-alpine@sha256:b852979754281026230cc69fb11428e6d57c9a97784ab4a444ffc7934c53a215'
     restart: 'unless-stopped'
     cap_drop: ['ALL']
     cap_add: ['DAC_READ_SEARCH']

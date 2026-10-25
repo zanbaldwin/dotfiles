@@ -9,7 +9,7 @@ services:
   #   ALTER SCHEMA public OWNER TO forgejo;
   #   GRANT USAGE, CREATE ON SCHEMA public TO forgejo;
   forgejo:
-    image: 'codeberg.org/forgejo/forgejo:15.0.10'
+    image: 'codeberg.org/forgejo/forgejo:15.0.10@sha256:7b2f61163ff1d19f2aaf62d37ae4e805e822c2f86d6628b2bd468470929beacb'
     restart: 'unless-stopped'
     cap_drop: ['ALL']
     cap_add: ['CHOWN', 'DAC_OVERRIDE', 'FOWNER', 'SETUID', 'SETGID', 'KILL', 'SYS_CHROOT']
@@ -80,7 +80,7 @@ services:
   # - Update `server.connections.forgejo.uuid` setting in the runner config below, and
   # - Write the token to the filesystem as a secret.
   runner:
-    image: 'code.forgejo.org/forgejo/runner:13.1.0'
+    image: 'code.forgejo.org/forgejo/runner:13.1.0@sha256:c4af85fd9f0dd03788676a534781a87c71aa2c6a37737143e017eb94d4312952'
     restart: 'unless-stopped'
     cap_drop: ['ALL']
     # The image already defaults to USER 1000:1000 (HOME=/data) and has no
@@ -126,7 +126,7 @@ services:
       - '/etc/forgejo/runner.yaml'
 
   dind:
-    image: 'docker:29.8.1-dind'
+    image: 'docker:29.8.1-dind@sha256:3f3c01aaaebf7cce837356b688b7c059a4749f10bd7660dec7c58fc454a283f0'
     restart: 'unless-stopped'
     privileged: true
     environment:

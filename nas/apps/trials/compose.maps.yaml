@@ -13,7 +13,7 @@ services:
   # Dawarich: Map settings > Custom basemap URL
   #   https://maps.lan.zanbaldwin.com/nl/{z}/{x}/{y}.mvt
   tiles:
-    image: 'protomaps/go-pmtiles:v1.31.2'
+    image: 'protomaps/go-pmtiles:v1.31.2@sha256:06574f01f55a78f78f887bc7ebf729a5c093c0d6e17d9876300cfcb0758b59d3'
     restart: 'unless-stopped'
     user: '1000:1000'
     cap_drop: ['ALL']
@@ -46,7 +46,7 @@ services:
   #
   # Setup: `chown -R 1000:1000 /mnt/fast/apps/valhalla`.
   routing:
-    image: 'ghcr.io/valhalla/valhalla-scripted:3.9.1'
+    image: 'ghcr.io/valhalla/valhalla-scripted:3.9.1@sha256:6238809f9dc3057743d70a20efd3911ec38e458bfa13a0601909b58f68dfd956'
     restart: 'unless-stopped'
     user: '1000:1000'
     cap_drop: ['ALL']

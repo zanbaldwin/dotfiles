@@ -1,18 +1,19 @@
 name: 'rotter'
 services:
+
   rotter:
-    image: 'alpine:3.24'
+    image: 'alpine:3.24@sha256:be2656061b536c1883c4034790e21d0a09c5aaaf51968b89368a3c0371ea2c9a'
     restart: 'no'
     user: '1000:1000'
     deploy:
       resources:
         limits:
-          memory: 192M
+          memory: '192M'
     stop_grace_period: '20m'
     command: ['/rotter/bin/rotter', 'process']
     secrets:
-      - credentials
-      - serve_token
+      - 'credentials'
+      - 'serve_token'
     environment:
       TZ: 'Europe/Amsterdam'
       ROTTER_CREDENTIALS_FILE: '/run/secrets/credentials'
@@ -23,26 +24,26 @@ services:
       ROTTER_SERVE: '0.0.0.0:7688'
       ROTTER_SERVE_TOKEN_FILE: '/run/secrets/serve_token'
     ports:
-      - host_ip: 127.0.0.1
-        mode: host
-        protocol: tcp
+      - host_ip: '127.0.0.1'
+        mode: 'host'
+        protocol: 'tcp'
         published: '7688'
         target: '7688'
     volumes:
       - read_only: false
-        source: /mnt/fast/apps/rotter
-        target: /rotter
-        type: bind
+        source: '/mnt/fast/apps/rotter'
+        target: '/rotter'
+        type: 'bind'
       - read_only: false
-        source: /mnt/tank4/music/modern
-        target: /music
-        type: bind
+        source: '/mnt/tank4/music/modern'
+        target: '/music'
+        type: 'bind'
 
 secrets:
   credentials:
-    file: /mnt/tank4/secrets/rotter/credentials.json
+    file: '/mnt/tank4/secrets/rotter/credentials.json'
   serve_token:
-    file: /mnt/tank4/secrets/rotter/serve_token
+    file: '/mnt/tank4/secrets/rotter/serve_token'
 
 configs:
   secretsexec:

@@ -45,7 +45,7 @@ services:
         protocol: 'tcp'
     volumes:
       - type: 'bind'
-        source: '/mnt/tank4/books/Audible'
+        source: '/mnt/tank4/books/Audiobooks'
         target: '/audiobooks'
         read_only: true
       - type: 'bind'

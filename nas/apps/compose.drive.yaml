@@ -81,9 +81,10 @@ configs:
   # run, not declared in config, so this is safe to keep in git.
   filebrowser:
     content: |
-      server:
+      http:
         port: 80
         baseURL: '/'
+      server:
         logging:
           - levels: 'info'
         sources:

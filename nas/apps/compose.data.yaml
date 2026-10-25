@@ -204,7 +204,7 @@ configs:
       wal_compression = on
       autovacuum_vacuum_cost_limit = 1000
       ## Zan's "Not On My Machine" Settings
-      max_connections = 35
+      max_connections = 60
       shared_buffers = 256MB
       effective_cache_size = 768MB
       work_mem = 2MB

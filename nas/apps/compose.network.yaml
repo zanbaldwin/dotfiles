@@ -41,7 +41,7 @@ services:
     image: 'jc21/nginx-proxy-manager:2.16.0@sha256:4393e642e233e5efd5adeb7f10918d4aaea71c9ed875b94190273fc8e87f9594'
     restart: 'unless-stopped'
     cap_drop: ['ALL']
-    cap_add: ['NET_BIND_SERVICE', 'SETUID', 'SETGID']
+    cap_add: ['CHOWN', 'NET_BIND_SERVICE', 'SETUID', 'SETGID']
     # Don't bother with extra_hosts, Nginx does not use it. Use host network instead.
     network_mode: 'host'
     healthcheck:
@@ -81,7 +81,7 @@ services:
   #   ALTER SCHEMA public OWNER TO pocketid;
   #
   # Secrets:
-  #   printf 'postgres://pocketid:<password>@postgres:5432/pocketid' > /mnt/tank4/secrets/pocketid/dsn
+  #   printf 'postgres://pocketid:<password>@postgres:5432/pocketid?sslmode=disable' > /mnt/tank4/secrets/pocketid/dsn
   #   openssl rand -base64 32 | tr -d '\n' > /mnt/tank4/secrets/pocketid/encryption_key
   #
   # Losing `encryption_key` makes the stored signing keys unreadable.

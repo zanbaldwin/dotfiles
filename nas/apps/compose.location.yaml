@@ -211,7 +211,7 @@ services:
   # Archives: `nl` (z0-15), `regions` (England and British Columbia, z0-15) and
   # `world` (z0-10). Created and refreshed by `nas/cron/update-map-tiles.sh`.
   tiles:
-    image: 'protomaps/go-pmtiles:v1.31.2'
+    image: 'protomaps/go-pmtiles:v1.31.2@sha256:06574f01f55a78f78f887bc7ebf729a5c093c0d6e17d9876300cfcb0758b59d3'
     restart: 'unless-stopped'
     user: '1000:1000'
     cap_drop: ['ALL']

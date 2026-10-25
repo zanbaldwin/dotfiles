@@ -90,7 +90,7 @@ services:
   search:
     # Pinned to the version Open Archiver ships with. A Meilisearch upgrade
     # needs a dump and re-import.
-    image: 'getmeili/meilisearch:v1.38@sha256:448a5b1b3e9303fabf39b84a2672f184295f665b1cb8eaffb11c738273430e5e'
+    image: 'getmeili/meilisearch:v1.55@sha256:ff546679970126f8822e15d1b6a06bfbff1f2ce2e43f810cfb5258012f92de5c'
     restart: 'unless-stopped'
     cap_drop: ['ALL']
     deploy:

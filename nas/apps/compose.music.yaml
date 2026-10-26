@@ -42,7 +42,7 @@ services:
         read_only: true
 
   spindle:
-    image: 'ghcr.io/xmorose/spindle:0.4.0@sha256:7f2e4a7c853cc2a6c5675b81522c04aa03150a96d61082f125c3be7d2f191b19'
+    image: 'ghcr.io/xmorose/spindle:0.4.1@sha256:fd7952e77fdf8287196bb021146e756558580318e49e802625a2736c392bba05'
     restart: 'unless-stopped'
     user: '1000:1000'
     cap_drop: ['ALL']

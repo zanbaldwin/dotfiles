@@ -62,7 +62,8 @@ Your scarce resource is your own token budget; spend it on ideation and analysis
   catalogue entries from your raw output, summarising scan results, formatting.
 - **Haiku 4.5:** fetching and lookups — "does this already exist well on crates.io / Packagist / GitHub," mechanical
   adjacency scans against the user's repos, link-gathering. Minimal reasoning.
-  Be liberal with subagents and conservative about what deserves _you_.
+
+Be liberal with subagents and conservative about what deserves _you_.
 
 ## Notes about this system
 

@@ -216,6 +216,19 @@ RUN cp '/usr/etc/yum.repos.d/pritunl.repo' '/etc/yum.repos.d/pritunl.repo' \
  && systemctl enable 'pritunl-client.service' \
  && rm -rf /tmp/* /var/*
 
+# Proton VPN (GUI and CLI).
+RUN rpm-ostree install --idempotent --allow-inactive \
+        "https://repo.protonvpn.com/fedora-${FEDORA_VERSION}-stable/protonvpn-stable-release/protonvpn-stable-release-1.0.4-1.noarch.rpm" \
+ && rpm-ostree install --idempotent --allow-inactive --releasever="${FEDORA_VERSION}" proton-vpn-gnome-desktop \
+ && rm -rf /tmp/* /var/*
+
+# Apple Photos (HEIF)
+RUN rpm-ostree install --idempotent --allow-inactive \
+        "https://mirrors.rpmfusion.org/free/fedora/rpmfusion-free-release-${FEDORA_VERSION}.noarch.rpm" \
+ && rpm-ostree install --idempotent --allow-inactive --releasever="${FEDORA_VERSION}" \
+        libde265 libheif-freeworld ImageMagick-heic libheif-tools \
+ && rm -rf /tmp/* /var/*
+
 # Korean input method (Fcitx5 + Hangul) with GTK/Qt IM modules.
 RUN rpm-ostree install --idempotent --allow-inactive --releasever="${FEDORA_VERSION}" \
         fcitx5 fcitx5-hangul fcitx5-configtool fcitx5-gtk3 fcitx5-gtk4 fcitx5-qt5 fcitx5-qt6 \

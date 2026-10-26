@@ -11,6 +11,7 @@ services:
       RAWR__LIBRARY__CACHE: '/opt/rawr/cache.db'
       # Override the path configured for Desktop use.
       RAWR__TARGETS__NFS__DIRECTORY: '/library'
+      RAWR__LIBRARY__STYLES__EPUB: '["builtin:epub.css"]'
     volumes:
       - type: 'bind'
         source: '/mnt/fast/apps/rawr'

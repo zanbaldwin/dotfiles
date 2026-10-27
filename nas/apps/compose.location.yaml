@@ -8,7 +8,7 @@ services:
   #   ALTER DATABASE dawarich OWNER TO dawarich;
   #   CREATE EXTENSION postgis CASCADE;
   dawarich:
-    image: 'freikin/dawarich:1.17.0@sha256:207dc86f8baa8fcf5b585f31186bf81b55added9c102a96f308d640e964ea60f'
+    image: 'freikin/dawarich:1.18.1@sha256:a2b93286a973b2e4b55d6a1ebd8009a65b8624639687ca95e909d0aac27324f5'
     stdin_open: true
     tty: true
     restart: 'unless-stopped'
@@ -100,7 +100,7 @@ services:
           memory: '4G'
 
   dawarich_sidekiq:
-    image: 'freikin/dawarich:1.17.0@sha256:207dc86f8baa8fcf5b585f31186bf81b55added9c102a96f308d640e964ea60f'
+    image: 'freikin/dawarich:1.18.1@sha256:a2b93286a973b2e4b55d6a1ebd8009a65b8624639687ca95e909d0aac27324f5'
     volumes:
       - type: 'bind'
         source: '/mnt/fast/apps/dawarich/public'

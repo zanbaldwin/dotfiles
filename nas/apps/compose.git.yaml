@@ -9,7 +9,7 @@ services:
   #   ALTER SCHEMA public OWNER TO forgejo;
   #   GRANT USAGE, CREATE ON SCHEMA public TO forgejo;
   forgejo:
-    image: 'codeberg.org/forgejo/forgejo:15.0.10@sha256:7b2f61163ff1d19f2aaf62d37ae4e805e822c2f86d6628b2bd468470929beacb'
+    image: 'codeberg.org/forgejo/forgejo:15.0.11@sha256:5d050e6d623e540923ff54b1c0c7acf41c3f9174a6c7ad515cc0c63d703fcd22'
     restart: 'unless-stopped'
     cap_drop: ['ALL']
     cap_add: ['CHOWN', 'DAC_OVERRIDE', 'FOWNER', 'SETUID', 'SETGID', 'KILL', 'SYS_CHROOT']

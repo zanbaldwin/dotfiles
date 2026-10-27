@@ -67,6 +67,7 @@ services:
       # OTP_ENCRYPTION_KEY_DERIVATION_SALT: ''
       ### Upgrading to v1.18.x
       SKIP_VISITS_FLEET_REDETECT: '1'
+      MALLOC_ARENA_MAX: '2'
     volumes:
       - type: 'bind'
         source: '/mnt/fast/apps/dawarich/public'
@@ -168,6 +169,7 @@ services:
       # OTP_ENCRYPTION_KEY_DERIVATION_SALT: ''
       ### Upgrading to v1.18.x
       SKIP_VISITS_FLEET_REDETECT: '1'
+      MALLOC_ARENA_MAX: '2'
     logging:
       driver: 'json-file'
       options:

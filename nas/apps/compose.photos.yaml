@@ -29,7 +29,7 @@ services:
       DB_DATABASE_NAME: 'immich'
       DB_VECTOR_EXTENSION: 'vectorchord'
       DB_STORAGE_TYPE: 'HDD'
-      DB_POOL_SIZE: '25'
+      DB_POOL_SIZE: '15'
       REDIS_HOSTNAME: 'valkey'
       REDIS_DBINDEX: '1'
       # IMMICH_CONFIG_FILE: '/etc/immich/config.json'

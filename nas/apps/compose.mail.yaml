@@ -10,7 +10,7 @@ services:
   # The default login is `admin` / `admin@bichon`: change it straight away.
   # The image ships its own HEALTHCHECK against /api/status, so none is declared.
   bichon:
-    image: 'rustmailer/bichon:2.2.0@sha256:ffa31d3225e084d2859d24b644fdf9b7931fd6e99f037f7abd20d1bd15a0556a'
+    image: 'rustmailer/bichon:2.3.0@sha256:2261954db129a02f3f61c8f488cb365cac4a3b4a87890b7387f4e1530a840da9'
     restart: 'unless-stopped'
     user: '1000:1000'
     cap_drop: ['ALL']

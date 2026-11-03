@@ -87,7 +87,7 @@ services:
   # Losing `encryption_key` makes the stored signing keys unreadable.
   # Visit /setup straight away to register the admin passkey.
   pocketid:
-    image: 'ghcr.io/pocket-id/pocket-id:v2.19.1-distroless@sha256:d035c9c229304cfd25f97a79b2da00bde9cf942abbd70430d452a95420e2836b'
+    image: 'ghcr.io/pocket-id/pocket-id:v2.19.2-distroless@sha256:a21166a4eb513d2ffcbf815398480998d996a9e719cfba029395517658626f9e'
     restart: 'unless-stopped'
     user: '1000:1000'
     cap_drop: ['ALL']

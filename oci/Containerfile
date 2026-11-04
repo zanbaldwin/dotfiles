@@ -133,7 +133,11 @@ RUN echo "Installing nVidia drivers for kernel version: $(cat '/kver.txt')" \
         xorg-x11-drv-nvidia xorg-x11-drv-nvidia-libs \
         xorg-x11-drv-nvidia-cuda xorg-x11-drv-nvidia-cuda-libs \
         xorg-x11-drv-nvidia-power \
-        nvidia-modprobe nvidia-settings nvidia-persistenced
+        nvidia-modprobe nvidia-settings nvidia-persistenced \
+ && dnf install --assumeyes rpm-sign \
+ && gpg --batch --passphrase '' --quick-gen-key 'akmods (container build)' default default never \
+ && rpm --define '_gpg_name akmods (container build)' --addsign /opt/nvidia/kmod-nvidia-*.rpm \
+ && gpg --export --armor 'akmods (container build)' >'/opt/nvidia/kmod-nvidia.asc'
 
 
 # =============================== #
@@ -189,15 +193,12 @@ RUN curl -fsSL -o '/etc/yum.repos.d/docker-ce.repo' 'https://download.docker.com
 RUN rpm-ostree install --idempotent --allow-inactive --releasever="${FEDORA_VERSION}" gettext libadwaita gtk4-layer-shell \
  && rm -rf /tmp/* /var/*
 
-# OpenH264 (non-free video codec from Cisco). The repo ships disabled in the base
-# image; `dnf config-manager --set-enabled` simply flips `enabled=0` to `enabled=1`
-# in the repo file, which we replicate with `sed` (DNF is unavailable on ostree).
-# The base image ships the `noopenh264` stub (it provides `openh264` without the
+# OpenH264 (non-free video codec from Cisco). The repo ships enabled in the base
+# image. The base image ships the `noopenh264` stub (it provides `openh264` without the
 # patent-encumbered codec); the real `openh264` obsoletes it, so we must drop the
 # stub and install the codec in one transaction — `rpm-ostree install` alone won't
 # replace a base-layer package.
-RUN sed -i '0,/^enabled=0/s//enabled=1/' '/etc/yum.repos.d/fedora-cisco-openh264.repo' \
- && rpm-ostree override remove noopenh264 \
+RUN rpm-ostree override remove noopenh264 \
        --install openh264 \
        --install gstreamer1-plugin-openh264 \
        --install mozilla-openh264 \
@@ -217,16 +218,18 @@ RUN cp '/usr/etc/yum.repos.d/pritunl.repo' '/etc/yum.repos.d/pritunl.repo' \
  && rm -rf /tmp/* /var/*
 
 # Proton VPN (GUI and CLI).
-RUN rpm-ostree install --idempotent --allow-inactive \
-        "https://repo.protonvpn.com/fedora-${FEDORA_VERSION}-stable/protonvpn-stable-release/protonvpn-stable-release-1.0.4-1.noarch.rpm" \
+RUN rpm --import "https://repo.protonvpn.com/fedora-${FEDORA_VERSION}-stable/public_key.asc" \
+ && rpm-ostree install --idempotent --allow-inactive \
+        "https://repo.protonvpn.com/fedora-${FEDORA_VERSION}-stable/protonvpn-stable-release/protonvpn-stable-release-1.0.5-1.noarch.rpm" \
  && rpm-ostree install --idempotent --allow-inactive --releasever="${FEDORA_VERSION}" proton-vpn-gnome-desktop \
  && rm -rf /tmp/* /var/*
 
 # Apple Photos (HEIF)
-RUN rpm-ostree install --idempotent --allow-inactive \
+RUN rpm --import 'https://download1.rpmfusion.org/free/fedora/RPM-GPG-KEY-rpmfusion-free-fedora-2020' \
+ && rpm-ostree install --idempotent --allow-inactive \
         "https://mirrors.rpmfusion.org/free/fedora/rpmfusion-free-release-${FEDORA_VERSION}.noarch.rpm" \
  && rpm-ostree install --idempotent --allow-inactive --releasever="${FEDORA_VERSION}" \
-        libde265 libheif-freeworld ImageMagick-heic libheif-tools \
+        libde265 ImageMagick-heic libheif-tools \
  && rm -rf /tmp/* /var/*
 
 # Korean input method (Fcitx5 + Hangul) with GTK/Qt IM modules.
@@ -288,6 +291,8 @@ RUN mkdir -p '/usr/lib/bootc/kargs.d' \
 # `override remove` needed); just rebuild the initramfs for the stock kernel with
 # the nVidia drivers baked in.
 RUN KVER="$(rpm --query --queryformat '%{VERSION}-%{RELEASE}.%{ARCH}\n' 'kernel-core' | tail -n1)" \
+ && rpm --import 'https://download1.rpmfusion.org/nonfree/fedora/RPM-GPG-KEY-rpmfusion-nonfree-fedora-2020' \
+ && rpm --import '/opt/nvidia/kmod-nvidia.asc' \
  && rpm-ostree install /opt/nvidia/*.rpm \
  && dracut --force --no-hostonly --reproducible --add ostree --kver "${KVER}" \
         "/usr/lib/modules/${KVER}/initramfs.img" \

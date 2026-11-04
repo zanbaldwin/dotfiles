@@ -24,7 +24,7 @@ services:
   #
   # The image ships its own HEALTHCHECK against /healthz/live, so none is declared.
   stalwart:
-    image: 'stalwartlabs/stalwart:v1.0.1-alpine@sha256:7d95d155f1561471a13be9739ca4712c549efce0124322d92dacaef12fcb2080'
+    image: 'stalwartlabs/stalwart:v1.0.2-alpine@sha256:8446a6b1b1823c3eb5ca33de7c1e728dd9b26ae81160766c93d076df64ffaf6c'
     restart: 'unless-stopped'
     user: '1000:1000'
     networks: ['default', 'cache']

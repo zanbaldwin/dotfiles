@@ -10,8 +10,8 @@ services:
     build:
       dockerfile_inline: |
         FROM python:3.15-slim-trixie
-        RUN pip install --no-cache-dir 'anki==26.9.3'
-    image: 'lan.zanbaldwin.com/anki-sync-server:26.9.3'
+        RUN pip install --no-cache-dir 'anki==26.9.4'
+    image: 'lan.zanbaldwin.com/anki-sync-server:26.9.4'
     restart: 'unless-stopped'
     user: '1000:1000'
     cap_drop: ['ALL']

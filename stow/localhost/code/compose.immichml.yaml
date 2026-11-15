@@ -2,7 +2,7 @@ name: 'immich'
 services:
 
   machine-learning:
-    image: 'ghcr.io/immich-app/immich-machine-learning:v3.3.5-cuda@sha256:ba820b5b2ce199ef085bd5a42f092218f16994149019c5ab252bf387c22a99b4'
+    image: 'ghcr.io/immich-app/immich-machine-learning:v3.4.1-cuda@sha256:aaa7eb0f47e3815a1c575790085474e01c129df7c47ffbbcbfd80947d4c41339'
     restart: 'unless-stopped'
     deploy:
       resources:

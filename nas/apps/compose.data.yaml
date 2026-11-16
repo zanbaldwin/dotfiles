@@ -151,9 +151,23 @@ services:
       GARAGE_UI_GARAGE_ADMIN_TOKEN_FILE: '/run/secrets/garage_admin_token'
       GARAGE_UI_AUTH_ADMIN_USERNAME: 'zan'
       GARAGE_UI_AUTH_ADMIN_PASSWORD_FILE: '/run/secrets/garage_ui_password'
+      GARAGE_UI_SERVER_ROOT_URL: 'https://garage.wan.zanbaldwin.com'
+      GARAGE_UI_AUTH_OIDC_ENABLED: 'true'
+      GARAGE_UI_AUTH_OIDC_PROVIDER_NAME: 'PocketID'
+      GARAGE_UI_AUTH_OIDC_ISSUER_URL: 'https://auth.wan.zanbaldwin.com'
+      GARAGE_UI_AUTH_OIDC_SCOPES: 'openid,email,profile,groups'
+      GARAGE_UI_AUTH_OIDC_EMAIL_ATTRIBUTE: 'email'
+      GARAGE_UI_AUTH_OIDC_USERNAME_ATTRIBUTE: 'preferred_username'
+      GARAGE_UI_AUTH_OIDC_NAME_ATTRIBUTE: 'name'
+      GARAGE_UI_AUTH_OIDC_ROLE_ATTRIBUTE_PATH: 'groups'
+      GARAGE_UI_AUTH_OIDC_ADMIN_ROLE: 'zan'
+      GARAGE_UI_AUTH_OIDC_CLIENT_ID_FILE: '/run/secrets/garage_ui_client_id'
+      GARAGE_UI_AUTH_OIDC_CLIENT_SECRET_FILE: '/run/secrets/garage_ui_client_secret'
     secrets:
       - 'garage_admin_token'
       - 'garage_ui_password'
+      - 'garage_ui_client_id'
+      - 'garage_ui_client_secret'
     ports:
       - target: 8080
         published: 3909
@@ -189,6 +203,10 @@ secrets:
     file: '/mnt/tank4/secrets/garage/metrics_token'
   garage_ui_password:
     file: '/mnt/tank4/secrets/garage/ui_password'
+  garage_ui_client_id:
+    file: '/mnt/tank4/secrets/garage/ui_client_id'
+  garage_ui_client_secret:
+    file: '/mnt/tank4/secrets/garage/ui_client_secret'
 
 configs:
   initdb:

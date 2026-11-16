@@ -30,7 +30,7 @@ services:
       CORS_ORIGIN: 'https://keep.wan.zanbaldwin.com,https://keep.lan.zanbaldwin.com'
       PG_HOST: 'postgres'
       OIDC_ENABLED: 'true'
-      OIDC_PROVIDER_NAME: 'Pocket ID'
+      OIDC_PROVIDER_NAME: 'PocketID'
       OIDC_ISSUER_URL: 'https://auth.wan.zanbaldwin.com'
     ports:
       - target: 3000

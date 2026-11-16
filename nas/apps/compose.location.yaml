@@ -28,6 +28,10 @@ services:
         target: 'DATABASE_PASSWORD'
       - source: 'secretkey'
         target: 'SECRET_KEY_BASE'
+      - source: 'client_id'
+        target: 'OIDC_CLIENT_ID'
+      - source: 'client_secret'
+        target: 'OIDC_CLIENT_SECRET'
     configs:
       - source: 'secretsexec'
         target: '/secrets-exec.sh'
@@ -58,6 +62,10 @@ services:
       STORE_GEODATA: 'true'
       PHOTON_API_HOST: 'photon:2322'
       PHOTON_API_USE_HTTPS: 'false'
+      OIDC_PROVIDER_NAME: 'PocketID'
+      OIDC_ISSUER: 'https://auth.wan.zanbaldwin.com'
+      OIDC_PKCE_ENABLED: 'true'
+      OIDC_REDIRECT_URI: 'https://location.wan.zanbaldwin.com/users/auth/openid_connect/callback'
       # One preloaded Puma worker is plenty for a household instance and
       # halves idle memory. Raise for busier instances.
       WEB_CONCURRENCY: '1'
@@ -279,6 +287,10 @@ secrets:
     file: '/mnt/tank4/secrets/dawarich/dbpass'
   secretkey:
     file: '/mnt/tank4/secrets/dawarich/secretkey'
+  client_id:
+    file: '/mnt/tank4/secrets/dawarich/client_id'
+  client_secret:
+    file: '/mnt/tank4/secrets/dawarich/client_secret'
 
 configs:
   secretsexec:

@@ -51,9 +51,17 @@ services:
       resources:
         limits:
           memory: '512M'
+    entrypoint: ['/bin/sh', '/secrets-exec.sh', './filebrowser']
     configs:
       - source: 'filebrowser'
         target: '/config.yaml'
+      - source: 'secretsexec'
+        target: '/secrets-exec.sh'
+    secrets:
+      - source: 'client_id'
+        target: 'FILEBROWSER_OIDC_CLIENT_ID'
+      - source: 'client_secret'
+        target: 'FILEBROWSER_OIDC_CLIENT_SECRET'
     environment:
       TZ: 'Europe/Amsterdam'
       # Defaults to /home/filebrowser/data/config.yaml, i.e. inside the state
@@ -76,7 +84,24 @@ services:
         host_ip: '127.0.0.1'
         protocol: 'tcp'
 
+secrets:
+  client_id:
+    file: '/mnt/tank4/secrets/filebrowser/client_id'
+  client_secret:
+    file: '/mnt/tank4/secrets/filebrowser/client_secret'
+
 configs:
+  secretsexec:
+    # Exports every mounted secret as an env var named after its file (the
+    # service-level `target:` name), then hands off to the real entrypoint.
+    content: |
+      #!/bin/sh
+      set -eu
+      for file in /run/secrets/*; do
+          [ -f "$${file}" ] || continue
+          export "$$(basename "$${file}")=$$(cat "$${file}")"
+      done
+      exec "$$@"
   # No credentials here: the initial admin is created by the binary on first
   # run, not declared in config, so this is safe to keep in git.
   filebrowser:
@@ -84,6 +109,7 @@ configs:
       http:
         port: 80
         baseURL: '/'
+        trustProxyHeaders: true
       server:
         logging:
           - levels: 'info'
@@ -104,3 +130,6 @@ configs:
             signup: false
           passkey:
             enabled: false
+          oidc:
+            enabled: true
+            issuerUrl: 'https://auth.wan.zanbaldwin.com'

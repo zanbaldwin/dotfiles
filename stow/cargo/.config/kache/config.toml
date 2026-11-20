@@ -1,10 +1,14 @@
 [cache]
 local_max_size = "100"
 clean_incremental = true
+s3_concurrency = 4
+remote_upload_timeout_secs = 300
+remote_restore_timeout_secs = 300
+remote_upload_max_attempts = 5
 
 [cache.remote]
 type = "s3"
 bucket = "kache"
-endpoint = "https://s3.lan.zanbaldwin.com"
+endpoint = "https://s3.wan.zanbaldwin.com"
 region = "garage"
 profile = "kache"

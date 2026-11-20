@@ -10,6 +10,10 @@ fi
 # Alias-inception
 alias st='git st'
 
+command -v 'koji' >'/dev/null' 2>&1 && {
+    alias koji='koji --stdout';
+}
+
 # `git <arg>` runs `git <arg>`
 # `git` (in a Git repository) runs `gitui`
 # `git` (not in a Git repository) runs `git --help`

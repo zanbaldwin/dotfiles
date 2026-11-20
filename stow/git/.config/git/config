@@ -90,7 +90,7 @@
     rebase = true
 [fetch]
     prune = true
-    pruneTags = true
+    pruneTags = false
     all = true
     writeCommitGraph = true
 [rebase]

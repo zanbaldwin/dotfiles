@@ -67,7 +67,7 @@ services:
   #   2-5  Dawarich (cache, Sidekiq, Action Cable, Rack::Attack)
   #   6    Standard Notes
   valkey:
-    image: 'valkey/valkey:9.2-alpine@sha256:cdcb7b1c7b6f1c9cb9442c71ac6275e78184657448407b2c1fdde7ee8024f4fb'
+    image: 'valkey/valkey:9.2-alpine@sha256:c8e2d17498838af5d91e12eb7c11220b3434a7b7131a333e3af52ad5e0b80882'
     restart: 'unless-stopped'
     cap_drop: ['ALL']
     cap_add: ['CHOWN', 'DAC_READ_SEARCH', 'SETUID', 'SETGID']

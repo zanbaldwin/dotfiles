@@ -3,7 +3,7 @@ services:
   # printf '%s' '<argon2-hash>' | tr -d '\n' | sudo tee '/mnt/tank4/secrets/dev/password' >'/dev/null'
   # openssl passwd -6 | tr -d '\n' | sudo tee '/mnt/tank4/secrets/code/sudo' >'/dev/null'
   code:
-    image: 'ghcr.io/linuxserver/code-server:4.143.1@sha256:4524d0b00478e41264f42e0e660c1819e3b7d0c460f78ce73e44fa39b2b55134'
+    image: 'ghcr.io/linuxserver/code-server:4.146.0@sha256:027b1da4cece4b7ae987aad0fbc50955d8c66f48583b55fe51e3385576be8cf1'
     restart: 'unless-stopped'
     cap_drop: ['ALL']
     cap_add: ['CHOWN', 'DAC_OVERRIDE', 'FOWNER', 'SETUID', 'SETGID', 'KILL', 'AUDIT_WRITE']

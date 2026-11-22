@@ -38,7 +38,7 @@ services:
     cap_add: ['NET_ADMIN', 'NET_RAW', 'SYS_MODULE']
 
   manager:
-    image: 'jc21/nginx-proxy-manager:2.17.0@sha256:91277490a919c792aa73b8d291af1ca84d32be74df988e543137976515763534'
+    image: 'jc21/nginx-proxy-manager:2.17.1@sha256:04a9d0835560b9719ab577275f84fe1f713298a1c1e2bdefa034b87f10e062e1'
     restart: 'unless-stopped'
     cap_drop: ['ALL']
     cap_add: ['CHOWN', 'NET_BIND_SERVICE', 'SETUID', 'SETGID']

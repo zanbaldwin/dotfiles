@@ -1,7 +1,7 @@
 name: 'ai'
 services:
   openwebui:
-    image: 'ghcr.io/open-webui/open-webui:v0.12.4@sha256:a5b9e403d19154796850679c8c5d1295301cee954be8b84ddd62af92426558f7'
+    image: 'ghcr.io/open-webui/open-webui:v0.13.5@sha256:e0dc5a8bf5c71cadf339d1e7b9408b357da75fb2854f82cad57a1609fadf2a22'
     restart: 'unless-stopped'
     cap_drop: ['ALL']
     entrypoint: ['/bin/sh', '/secrets-exec.sh']

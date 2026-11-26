@@ -2,7 +2,7 @@ name: 'komodo'
 services:
 
   mongo:
-    image: 'mongo:8.0'
+    image: 'mongo:8.0@sha256:479e85ced54ffb8a40dade1dcde2da2a9ae858515b9415e9cc54bfb8f0575d01'
     restart: 'unless-stopped'
     labels:
       komodo.skip: ''
@@ -18,7 +18,7 @@ services:
         read_only: false
 
   core:
-    image: 'ghcr.io/moghtech/komodo-core:2.3.4'
+    image: 'ghcr.io/moghtech/komodo-core:2.3.4@sha256:91b2afd7b3bb2abea0ebd3046d65ec457eb1f3d505868d1d60cb0f8562490ef9'
     restart: 'unless-stopped'
     init: true
     depends_on: ['mongo']
@@ -60,7 +60,7 @@ services:
         read_only: false
 
   periphery:
-    image: 'ghcr.io/moghtech/komodo-periphery:2.3.4'
+    image: 'ghcr.io/moghtech/komodo-periphery:2.3.4@sha256:fb4b52961fcce7a31e3776930e422967b6640f653de876f59f26dea243e29beb'
     restart: 'unless-stopped'
     init: true
     depends_on: ['core']

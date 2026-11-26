@@ -35,7 +35,7 @@ services:
       PGID: '${PGID:-1000}'
       NODE_ENV: 'production'
       PORT: '3000'
-      APP_URL: 'https://bookorbit.wan.zanbaldwin.com'
+      APP_URL: 'https://books.wan.zanbaldwin.com'
       POSTGRES_HOST: 'postgres'
       POSTGRES_PORT: '5432'
       POSTGRES_USER: 'bookorbit'

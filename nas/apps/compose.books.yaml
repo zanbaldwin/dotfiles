@@ -1,17 +1,61 @@
 name: 'books'
 services:
-  calibre:
-    image: 'ghcr.io/linuxserver/calibre-web:0.6.27@sha256:18b65a754ec18f119af36ad672b5f1e64543c89648febd6df6edf64f5ec4c5b8'
+
+  # Database Setup
+  # ==============
+  #   CREATE USER bookorbit WITH ENCRYPTED PASSWORD '<password>';
+  #   CREATE DATABASE bookorbit;
+  #   \c bookorbit
+  #   ALTER DATABASE bookorbit OWNER TO bookorbit;
+  #   ALTER SCHEMA public OWNER TO bookorbit;
+  #   GRANT USAGE, CREATE ON SCHEMA public TO bookorbit;
+  #   CREATE EXTENSION IF NOT EXISTS vector;
+  #   CREATE EXTENSION IF NOT EXISTS pg_trgm;
+  #   CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
+  #
+  # Secrets: `openssl rand -hex 32 | tr -d '\n' | sudo tee '/mnt/tank4/secrets/bookorbit/<name>' >'/dev/null'`
+  # for both `jwt_secret` and `setup_token`.
+  bookorbit:
+    image: 'ghcr.io/bookorbit/bookorbit:3.10.0@sha256:507a84c08c100244c27bce68ce59670da5dc8c3bc9054dd4aea3630977c42885'
     restart: 'unless-stopped'
     cap_drop: ['ALL']
-    cap_add: ['CHOWN', 'DAC_OVERRIDE', 'FOWNER', 'SETUID', 'SETGID', 'KILL']
+    cap_add: ['CHOWN', 'DAC_OVERRIDE', 'FOWNER', 'SETUID', 'SETGID']
+    security_opt: ['no-new-privileges:true']
+    read_only: true
+    deploy:
+      resources:
+        limits:
+          memory: '1G'
+    networks:
+      - 'default'
+      - 'database'
     environment:
       TZ: 'Europe/Amsterdam'
       PUID: '${PUID:-1000}'
       PGID: '${PGID:-1000}'
+      NODE_ENV: 'production'
+      PORT: '3000'
+      APP_URL: 'https://bookorbit.wan.zanbaldwin.com'
+      POSTGRES_HOST: 'postgres'
+      POSTGRES_PORT: '5432'
+      POSTGRES_USER: 'bookorbit'
+      POSTGRES_DB: 'bookorbit'
+      POSTGRES_PASSWORD_FILE: '/run/secrets/dbpass'
+      JWT_SECRET_FILE: '/run/secrets/jwt_secret'
+      SETUP_BOOTSTRAP_TOKEN_FILE: '/run/secrets/setup_token'
+      # The OIDC provider itself is configured in the web UI and stored in the
+      # database. PocketID resolves to a Tailscale (100.64.0.0/10) address, which
+      # BookOrbit rejects as an OIDC issuer unless this is enabled.
+      OIDC_ALLOW_LOCAL_ISSUERS: 'true'
+      AI_ENCRYPTION_KEY_FILE: '/run/secrets/encryption_key'
+    secrets:
+      - 'dbpass'
+      - 'jwt_secret'
+      - 'setup_token'
+      - 'encryption_key'
     ports:
-      - target: 8083
-        published: 8083
+      - target: 3000
+        published: 2665
         host_ip: '127.0.0.1'
         protocol: 'tcp'
     volumes:
@@ -20,38 +64,28 @@ services:
         target: '/books'
         read_only: true
       - type: 'bind'
-        source: '/mnt/fast/apps/calibre'
-        target: '/config'
-        read_only: false
-
-  audiobookshelf:
-    image: 'ghcr.io/advplyr/audiobookshelf:2.38.0@sha256:60064c23f32fd9099fd39e82c5132c51701d1221135bbca04cd099b589e1edc3'
-    restart: 'unless-stopped'
-    user: '1000:1000'
-    cap_drop: ['ALL']
-    environment:
-      TZ: 'Europe/Amsterdam'
-    healthcheck:
-      test: ['CMD', 'wget', '-qO-', 'http://127.0.0.1:80/healthcheck']
-      interval: '60s'
-      timeout: '5s'
-      retries: 3
-      start_period: '30s'
-    ports:
-      - target: 80
-        published: 2834
-        host_ip: '127.0.0.1'
-        protocol: 'tcp'
-    volumes:
-      - type: 'bind'
         source: '/mnt/tank4/books/Audiobooks'
         target: '/audiobooks'
         read_only: true
       - type: 'bind'
-        source: '/mnt/fast/apps/audiobookshelf/config'
-        target: '/config'
+        source: '/mnt/fast/apps/bookorbit'
+        target: '/data'
         read_only: false
-      - type: 'bind'
-        source: '/mnt/fast/apps/audiobookshelf/metadata'
-        target: '/metadata'
+      - type: 'tmpfs'
+        target: '/tmp'
         read_only: false
+
+networks:
+  default: {}
+  database:
+    external: true
+
+secrets:
+  dbpass:
+    file: '/mnt/tank4/secrets/postgres/bookorbit'
+  jwt_secret:
+    file: '/mnt/tank4/secrets/bookorbit/jwt_secret'
+  setup_token:
+    file: '/mnt/tank4/secrets/bookorbit/setup_token'
+  encryption_key:
+    file: '/mnt/tank4/secrets/bookorbit/encryption_key'

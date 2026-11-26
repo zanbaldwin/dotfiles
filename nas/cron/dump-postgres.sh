@@ -11,7 +11,7 @@ trap 'rm -rf "${TEMP_EXPORT_DIR}"' EXIT
 
 export APP_NAME="data"
 export SERVICE_NAME="postgres"
-export CONTAINER_NAME="ix-${APP_NAME}-${SERVICE_NAME}-1"
+export CONTAINER_NAME="${APP_NAME}-${SERVICE_NAME}-1"
 
 pgexec() {
     docker exec "${CONTAINER_NAME}" psql \

@@ -1,40 +1,5 @@
 name: 'drive'
 services:
-  # Minimal Basic-auth-only WebDAV for iPad note apps. OpenCloud advertises a
-  # Bearer challenge before Basic, which CFNetwork clients (Noteshelf 3) cannot
-  # negotiate - they give up without ever sending credentials, so they can never
-  # authenticate against the opencloud service above.
-  webdav:
-    image: 'ghcr.io/hacdias/webdav:v5.17.3@sha256:3b70d2a3afd5bb2f8b3aadb621baa3788c2248b30da3a4698352fc96fef0de40'
-    restart: 'unless-stopped'
-    cap_drop: ['ALL']
-    # Must match OpenCloud's uid so its posix driver can assimilate new files.
-    user: '1000:1000'
-    deploy:
-      resources:
-        limits:
-          memory: '128M'
-    # No healthcheck: the image is a single static binary with no shell, so a
-    # CMD healthcheck cannot run.
-    command: ['-c', '/config.yaml']
-    environment:
-      TZ: 'Europe/Amsterdam'
-    volumes:
-      # Holds the user list and their bcrypt passwords. Must exist before first
-      # start or the container exits immediately.
-      - type: 'bind'
-        source: '/mnt/tank4/secrets/webdav/config.yaml'
-        target: '/config.yaml'
-        read_only: true
-      - type: 'bind'
-        source: '/mnt/tank4/drive'
-        target: '/data'
-        read_only: false
-    ports:
-      - target: 6065
-        published: 6065
-        host_ip: '127.0.0.1'
-        protocol: 'tcp'
 
   # Web file manager, replacing the old read-only Next Explorer - it reuses that
   # service's port and domain. The '-stable-slim' tag drops ffmpeg (25MB vs

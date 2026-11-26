@@ -21,8 +21,8 @@ services:
     user: '1000:1000'
     cap_drop: ['ALL']
     networks: ['default', 'database', 'proxy']
-    # IMPORTANT! Must use only *ONE* domain for PocketID.
     labels:
+      # IMPORTANT! Must use only *ONE* domain for PocketID.
       caddy: 'auth.wan.zanbaldwin.com'
       caddy.import: 'app {{upstreams 1411}}'
     environment:

@@ -43,14 +43,13 @@ services:
         source: '/mnt/tank4/drive'
         target: '/drive'
         read_only: false
-    networks:
-      - 'default'
-      - 'proxy'
+    networks: ['default', 'proxy']
     labels:
       caddy: 'drive.wan.zanbaldwin.com, drive.lan.zanbaldwin.com, files.wan.zanbaldwin.com, files.lan.zanbaldwin.com'
       caddy.import: 'app {{upstreams 80}}'
 
 networks:
+  default: {}
   proxy:
     external: true
 

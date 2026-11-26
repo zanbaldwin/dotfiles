@@ -14,11 +14,7 @@ services:
     restart: 'unless-stopped'
     cap_drop: ['ALL']
     cap_add: ['CHOWN', 'SETUID', 'SETGID']
-    networks:
-      - 'cache'
-      - 'database'
-      - 'default'
-      - 'proxy'
+    networks: ['default', 'proxy', 'database', 'cache']
     labels:
       caddy: 'location.wan.zanbaldwin.com, location.lan.zanbaldwin.com'
       caddy.import: 'app {{upstreams 3000}}'
@@ -124,10 +120,7 @@ services:
         source: '/mnt/tank4/dawarich/storage'
         target: '/var/app/storage'
         read_only: false
-    networks:
-      - 'cache'
-      - 'database'
-      - 'default'
+    networks: ['default', 'database', 'cache']
     stdin_open: true
     tty: true
     secrets:
@@ -198,8 +191,7 @@ services:
     restart: 'unless-stopped'
     cap_drop: ['ALL']
     cap_add: ['CHOWN', 'SETUID', 'SETGID']
-    networks:
-      - 'default'
+    networks: ['default']
     environment:
       PUID: '1000'
       PGID: '1000'
@@ -266,9 +258,7 @@ services:
     configs:
       - source: 'basemap'
         target: '/etc/caddy/Caddyfile'
-    networks:
-      - 'default'
-      - 'proxy'
+    networks: ['default', 'proxy']
     labels:
       caddy: 'maps.wan.zanbaldwin.com, maps.lan.zanbaldwin.com, tiles.wan.zanbaldwin.com, tiles.lan.zanbaldwin.com'
       caddy.import: 'app {{upstreams 8080}}'

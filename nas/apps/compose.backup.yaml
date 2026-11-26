@@ -19,9 +19,7 @@ services:
       - 'backblaze_credentials'
       - 'tigris_credentials'
       - 'truenas_api_key'
-    networks:
-      - 'default'
-      - 'proxy'
+    networks: ['default', 'proxy']
     labels:
       caddy: 'backup.lan.zanbaldwin.com'
       caddy.import: 'app {{upstreams 9898}}'
@@ -50,6 +48,7 @@ services:
         read_only: true
 
 networks:
+  default: {}
   proxy:
     external: true
 

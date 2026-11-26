@@ -26,10 +26,7 @@ services:
       resources:
         limits:
           memory: '1G'
-    networks:
-      - 'default'
-      - 'database'
-      - 'proxy'
+    networks: ['default', 'database', 'proxy']
     environment:
       TZ: 'Europe/Amsterdam'
       PUID: '${PUID:-1000}'

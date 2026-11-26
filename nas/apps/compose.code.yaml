@@ -30,11 +30,10 @@ services:
       - source: 'sshconfig'
         target: '/config/.ssh/config'
         mode: 0600
-    ports:
-      - target: 8443
-        published: 2633
-        host_ip: '127.0.0.1'
-        protocol: 'tcp'
+    networks: ['default', 'proxy']
+    labels:
+      caddy: 'code.wan.zanbaldwin.com, code.lan.zanbaldwin.com'
+      caddy.import: 'app {{upstreams 8443}}'
     volumes:
       - type: 'bind'
         source: '/mnt/fast/apps/code'
@@ -48,6 +47,11 @@ services:
       options:
         max-size: '100m'
         max-file: 5
+
+networks:
+  default: {}
+  proxy:
+    external: true
 
 secrets:
   password:

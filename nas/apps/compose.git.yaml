@@ -13,10 +13,7 @@ services:
     restart: 'unless-stopped'
     cap_drop: ['ALL']
     cap_add: ['CHOWN', 'DAC_OVERRIDE', 'FOWNER', 'SETUID', 'SETGID', 'KILL', 'SYS_CHROOT']
-    networks:
-      - 'default'
-      - 'database'
-      - 'proxy'
+    networks: ['default', 'database', 'proxy']
     environment:
       TZ: 'Europe/Amsterdam'
       USER_UID: '${PUID:-1000}'

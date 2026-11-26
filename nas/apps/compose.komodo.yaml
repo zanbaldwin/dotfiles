@@ -46,9 +46,7 @@ services:
       KOMODO_OIDC_CLIENT_SECRET_FILE: '/run/secrets/client_secret'
       KOMODO_ENABLE_NEW_USERS: 'false'
     secrets: ['db_password', 'admin_password', 'webhook_secret', 'jwt_secret', 'client_id', 'client_secret']
-    networks:
-      - 'default'
-      - 'proxy'
+    networks: ['default', 'proxy']
     ports:
       - target: 9120
         published: 5666
@@ -98,6 +96,7 @@ services:
         read_only: false
 
 networks:
+  default: {}
   proxy:
     external: true
 

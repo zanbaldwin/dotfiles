@@ -28,9 +28,7 @@ services:
       BICHON_ANSI_LOGS: 'false'
     secrets:
       - 'encrypt_password'
-    networks:
-      - 'default'
-      - 'proxy'
+    networks: ['default', 'proxy']
     labels:
       caddy: 'mail.wan.zanbaldwin.com, mail.lan.zanbaldwin.com'
       caddy.import: 'app {{upstreams 15630}}'

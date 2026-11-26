@@ -23,9 +23,7 @@ services:
       ROTTER_ROOT: '/rotter'
       ROTTER_SERVE: '0.0.0.0:7688'
       ROTTER_SERVE_TOKEN_FILE: '/run/secrets/serve_token'
-    networks:
-      - 'default'
-      - 'proxy'
+    networks: ['default', 'proxy']
     labels:
       caddy: 'rotter.wan.zanbaldwin.com, rotter.lan.zanbaldwin.com'
       caddy.import: 'app {{upstreams 7688}}'
@@ -40,6 +38,7 @@ services:
         type: 'bind'
 
 networks:
+  default: {}
   proxy:
     external: true
 

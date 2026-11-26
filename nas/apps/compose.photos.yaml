@@ -19,6 +19,7 @@ services:
     networks:
       - 'cache'
       - 'database'
+      - 'proxy'
     environment:
       TZ: 'Europe/Amsterdam'
       IMMICH_ENV: 'production'
@@ -38,11 +39,9 @@ services:
     # configs:
     #   - source: 'immich'
     #     target: '/etc/immich/config.json'
-    ports:
-      - target: 2283
-        published: 2283
-        host_ip: '127.0.0.1'
-        protocol: 'tcp'
+    labels:
+      caddy: 'photos.wan.zanbaldwin.com, photos.lan.zanbaldwin.com'
+      caddy.import: 'app {{upstreams 2283}}'
     volumes:
       - type: 'bind'
         source: '/mnt/fast/apps/immich'
@@ -64,6 +63,8 @@ networks:
   cache:
     external: true
   database:
+    external: true
+  proxy:
     external: true
 
 secrets:

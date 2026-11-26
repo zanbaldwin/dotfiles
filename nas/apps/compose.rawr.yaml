@@ -21,12 +21,17 @@ services:
         source: '/mnt/tank4/books/AO3'
         target: '/library'
         read_only: false
-    ports:
-      - target: 7297
-        published: 7297
-        host_ip: '127.0.0.1'
-        protocol: 'tcp'
+    networks:
+      - 'default'
+      - 'proxy'
+    labels:
+      caddy: 'ao3.wan.zanbaldwin.com, ao3.lan.zanbaldwin.com, rawr.wan.zanbaldwin.com, rawr.lan.zanbaldwin.com'
+      caddy.import: 'app {{upstreams 7297}}'
     healthcheck:
       test: ['CMD', 'wget', '-qO-', 'http://127.0.0.1:7297/api/v1/health']
       interval: '60s'
       start_period: '10s'
+
+networks:
+  proxy:
+    external: true

@@ -18,11 +18,10 @@ services:
       - 'cache'
       - 'database'
       - 'default'
-    ports:
-      - target: 3000
-        published: 3562
-        host_ip: '127.0.0.1'
-        protocol: 'tcp'
+      - 'proxy'
+    labels:
+      caddy: 'location.wan.zanbaldwin.com, location.lan.zanbaldwin.com'
+      caddy.import: 'app {{upstreams 3000}}'
     secrets:
       - source: 'dbpass'
         target: 'DATABASE_PASSWORD'
@@ -267,11 +266,12 @@ services:
     configs:
       - source: 'basemap'
         target: '/etc/caddy/Caddyfile'
-    ports:
-      - target: 8080
-        published: 6277
-        host_ip: '127.0.0.1'
-        protocol: 'tcp'
+    networks:
+      - 'default'
+      - 'proxy'
+    labels:
+      caddy: 'maps.wan.zanbaldwin.com, maps.lan.zanbaldwin.com, tiles.wan.zanbaldwin.com, tiles.lan.zanbaldwin.com'
+      caddy.import: 'app {{upstreams 8080}}'
     depends_on:
       - 'tiles'
 
@@ -280,6 +280,8 @@ networks:
   cache:
     external: true
   database:
+    external: true
+  proxy:
     external: true
 
 secrets:

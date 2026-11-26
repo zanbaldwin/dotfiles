@@ -8,11 +8,12 @@ services:
     cap_add: ['CHOWN', 'SETUID', 'SETGID']
     environment:
       TZ: 'Europe/Amsterdam'
-    ports:
-      - target: 80
-        published: 7487
-        host_ip: '127.0.0.1'
-        protocol: 'tcp'
+    networks:
+      - 'default'
+      - 'proxy'
+    labels:
+      caddy: 'sites.wan.zanbaldwin.com, sites.lan.zanbaldwin.com'
+      caddy.import: 'app {{upstreams 80}}'
     configs:
       - source: 'nginx'
         target: '/etc/nginx/conf.d/default.conf'
@@ -85,6 +86,10 @@ services:
     pids_limit: 200
     mem_limit: '256m'
     cpus: 1.0
+
+networks:
+  proxy:
+    external: true
 
 secrets:
   authorized:

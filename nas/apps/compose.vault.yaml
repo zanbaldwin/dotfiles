@@ -10,17 +10,14 @@ services:
     image: 'vaultwarden/server:1.37.5-alpine@sha256:bbe684a02d6b0db54256ff88eac9754f4519284a7b26314afc241fd7d0918191'
     restart: 'unless-stopped'
     cap_drop: ['ALL']
-    networks:
-      - 'database'
+    networks: ['default', 'proxy', 'database']
     environment:
       DATABASE_URL_FILE: '/run/secrets/vaultdsn'
     secrets:
       - 'vaultdsn'
-    ports:
-      - target: 80
-        published: 2489
-        host_ip: '127.0.0.1'
-        protocol: 'tcp'
+    labels:
+      caddy: 'vault.wan.zanbaldwin.com, vault.lan.zanbaldwin.com'
+      caddy.import: 'app {{upstreams 80}}'
     configs:
       - source: 'vaultwarden'
         target: '/data/config.json'
@@ -31,7 +28,10 @@ services:
         read_only: false
 
 networks:
+  default: {}
   database:
+    external: true
+  proxy:
     external: true
 
 secrets:
@@ -42,7 +42,7 @@ configs:
   vaultwarden:
     content: |
       {
-        "domain": "https://vault.lan.zanbaldwin.com",
+        "domain": "https://vault.wan.zanbaldwin.com",
         "signups_allowed": false,
         "sends_allowed": false,
         "invitations_allowed": true,

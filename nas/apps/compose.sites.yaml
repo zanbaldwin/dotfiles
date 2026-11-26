@@ -8,9 +8,7 @@ services:
     cap_add: ['CHOWN', 'SETUID', 'SETGID']
     environment:
       TZ: 'Europe/Amsterdam'
-    networks:
-      - 'default'
-      - 'proxy'
+    networks: ['default', 'proxy']
     labels:
       caddy: 'sites.wan.zanbaldwin.com, sites.lan.zanbaldwin.com'
       caddy.import: 'app {{upstreams 80}}'
@@ -88,6 +86,7 @@ services:
     cpus: 1.0
 
 networks:
+  default: {}
   proxy:
     external: true
 

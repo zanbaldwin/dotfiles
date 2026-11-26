@@ -21,9 +21,7 @@ services:
         source: '/mnt/tank4/books/AO3'
         target: '/library'
         read_only: false
-    networks:
-      - 'default'
-      - 'proxy'
+    networks: ['default', 'proxy']
     labels:
       caddy: 'ao3.wan.zanbaldwin.com, ao3.lan.zanbaldwin.com, rawr.wan.zanbaldwin.com, rawr.lan.zanbaldwin.com'
       caddy.import: 'app {{upstreams 7297}}'
@@ -33,5 +31,6 @@ services:
       start_period: '10s'
 
 networks:
+  default: {}
   proxy:
     external: true

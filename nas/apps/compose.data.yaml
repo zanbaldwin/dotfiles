@@ -179,10 +179,12 @@ networks:
   cache:
     name: 'cache'
     driver: 'bridge'
+    internal: true
     attachable: true
   database:
     name: 'database'
     driver: 'bridge'
+    internal: true
     attachable: true
   s3:
     name: 's3'

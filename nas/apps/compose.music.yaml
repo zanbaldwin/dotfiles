@@ -22,9 +22,7 @@ services:
         target: 'ND_LASTFM_SECRET'
     entrypoint: ['/bin/sh', '/secrets-exec.sh']
     command: ['navidrome', '--configfile', '/data/navidrome.toml']
-    networks:
-      - 'default'
-      - 'proxy'
+    networks: ['default', 'proxy']
     labels:
       caddy: 'music.wan.zanbaldwin.com, music.lan.zanbaldwin.com'
       caddy.import: 'app {{upstreams 4533}}'
@@ -66,9 +64,7 @@ services:
         target: 'NAVIDROME_PASSWORD'
     entrypoint: ['/bin/sh', '/secrets-exec.sh']
     command: ['node', 'dist/server.js']
-    networks:
-      - 'default'
-      - 'proxy'
+    networks: ['default', 'proxy']
     labels:
       caddy: 'scrobble.wan.zanbaldwin.com, scrobble.lan.zanbaldwin.com'
       caddy.import: 'app {{upstreams 3590}}'
@@ -83,6 +79,7 @@ services:
         read_only: true
 
 networks:
+  default: {}
   proxy:
     external: true
 

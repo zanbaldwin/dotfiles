@@ -37,9 +37,7 @@ services:
       interval: '30s'
       timeout: '5s'
       retries: 3
-    networks:
-      - 'default'
-      - 'proxy'
+    networks: ['default', 'proxy']
     labels:
       caddy: 'anki.wan.zanbaldwin.com, anki.lan.zanbaldwin.com'
       caddy.import: 'app {{upstreams 8080}}'
@@ -52,6 +50,7 @@ services:
     command: ['python', '-m', 'anki.syncserver']
 
 networks:
+  default: {}
   proxy:
     external: true
 

@@ -16,10 +16,7 @@ services:
       resources:
         limits:
           memory: '2G'
-    networks:
-      - 'cache'
-      - 'database'
-      - 'proxy'
+    networks: ['default', 'proxy', 'database', 'cache']
     environment:
       TZ: 'Europe/Amsterdam'
       IMMICH_ENV: 'production'
@@ -60,6 +57,7 @@ services:
       - '/dev/dri:/dev/dri'
 
 networks:
+  default: {}
   cache:
     external: true
   database:

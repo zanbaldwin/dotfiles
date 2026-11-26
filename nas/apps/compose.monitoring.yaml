@@ -61,9 +61,7 @@ services:
       timeout: '5s'
       retries: 3
       start_period: '5s'
-    networks:
-      - 'default'
-      - 'proxy'
+    networks: ['default', 'proxy']
     labels:
       caddy: 'stats.wan.zanbaldwin.com, stats.lan.zanbaldwin.com'
       caddy.import: 'app {{upstreams 8090}}'
@@ -141,6 +139,7 @@ services:
         read_only: true
 
 networks:
+  default: {}
   proxy:
     external: true
 

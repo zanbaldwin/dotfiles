@@ -76,6 +76,33 @@ services:
         target: '/etc/letsencrypt'
         read_only: false
 
+  manager_new:
+    build:
+      context: '.'
+      dockerfile_inline: |
+        FROM caddy:2.11.9-builder-alpine AS builder
+        RUN xcaddy build --with github.com/caddy-dns/cloudflare
+        FROM caddy:2.11.9-alpine
+        COPY --from=builder /usr/bin/caddy /usr/bin/caddy
+    image: 'lan.zanbaldwin.com/caddy-cloudflare:2.11.9'
+    restart: 'unless-stopped'
+    network_mode: 'host'
+    cap_drop: ['ALL']
+    cap_add: ['NET_BIND_SERVICE']
+    secrets: [ 'cloudflare' ]
+    configs:
+      - source: 'caddyfile'
+        target: '/etc/caddy/Caddyfile'
+    volumes:
+      - type: 'bind'
+        source: '/mnt/fast/apps/caddy/data'
+        target: '/data'
+        read_only: false
+      - type: 'bind'
+        source: '/mnt/fast/apps/caddy/config'
+        target: '/config'
+        read_only: false
+
   # Database Setup
   # ==============
   #   CREATE USER pocketid WITH ENCRYPTED PASSWORD '<password>';
@@ -139,8 +166,108 @@ secrets:
     file: '/mnt/tank4/secrets/pocketid/encryption_key'
 
 configs:
+  caddyfile:
+    # Ports 9080/9443 while NPM still owns 80/443. Remove `http_port` and
+    # `https_port` when Caddy replaces NPM.
+    content: |
+      {
+        http_port 9080
+        https_port 9443
+        acme_dns cloudflare {file./run/secrets/cloudflare}
+      }
+
+      *.lan.zanbaldwin.com, *.wan.zanbaldwin.com {
+        respond "Unknown host" 404
+      }
+
+      (app) {
+        @outside {
+          host *.lan.zanbaldwin.com
+          not remote_ip private_ranges 100.64.0.0/10
+        }
+        respond @outside 403
+        reverse_proxy {args[:]}
+      }
+
+      # Pihole is only local
+      pihole.lan.zanbaldwin.com {
+        @outside not remote_ip private_ranges 100.64.0.0/10
+        respond @outside 403
+        reverse_proxy https://192.168.1.74 {
+          transport http {
+            tls_insecure_skip_verify
+          }
+        }
+      }
+
+      # IMPORTANT! Must use only *ONE* domain for PocketID.
+      auth.wan.zanbaldwin.com {
+        import app 127.0.0.1:2884
+      }
+
+      anki.wan.zanbaldwin.com, anki.lan.zanbaldwin.com {
+        import app 127.0.0.1:8770
+      }
+      ao3.wan.zanbaldwin.com, ao3.lan.zanbaldwin.com, rawr.wan.zanbaldwin.com, rawr.lan.zanbaldwin.com {
+        import app 127.0.0.1:7297
+      }
+      books.wan.zanbaldwin.com, books.lan.zanbaldwin.com {
+        import app 127.0.0.1:2665
+      }
+      keep.wan.zanbaldwin.com, keep.lan.zanbaldwin.com, notes.wan.zanbaldwin.com, notes.lan.zanbaldwin.com {
+        import app 127.0.0.1:4526
+      }
+      music.wan.zanbaldwin.com, music.lan.zanbaldwin.com {
+        import app 127.0.0.1:4533
+      }
+      rotter.wan.zanbaldwin.com, rotter.lan.zanbaldwin.com {
+        import app 127.0.0.1:7688
+      }
+      scrobble.wan.zanbaldwin.com, scrobble.lan.zanbaldwin.com {
+        import app 127.0.0.1:3590
+      }
+      photos.wan.zanbaldwin.com, photos.lan.zanbaldwin.com {
+        import app 127.0.0.1:2283
+      }
+      nas.wan.zanbaldwin.com, nas.lan.zanbaldwin.com {
+        import app 127.0.0.1:8080
+      }
+      backup.lan.zanbaldwin.com {
+        import app 127.0.0.1:9898
+      }
+      deploy.wan.zanbaldwin.com, deploy.lan.zanbaldwin.com {
+        import app 127.0.0.1:5666
+      }
+      stats.wan.zanbaldwin.com, stats.lan.zanbaldwin.com {
+        import app 127.0.0.1:2379
+      }
+      mail.wan.zanbaldwin.com, mail.lan.zanbaldwin.com {
+        import app 127.0.0.1:2424
+      }
+      garage.wan.zanbaldwin.com, garage.lan.zanbaldwin.com {
+        import app 127.0.0.1:3909
+      }
+      s3.wan.zanbaldwin.com, s3.lan.zanbaldwin.com, buckets.wan.zanbaldwin.com, buckets.lan.zanbaldwin.com {
+        import app 127.0.0.1:3900
+      }
+      drive.wan.zanbaldwin.com, drive.lan.zanbaldwin.com, files.wan.zanbaldwin.com, files.lan.zanbaldwin.com {
+        import app 127.0.0.1:3453
+      }
+      git.wan.zanbaldwin.com, git.lan.zanbaldwin.com {
+        import app 127.0.0.1:3645
+      }
+      location.wan.zanbaldwin.com, location.lan.zanbaldwin.com {
+        import app 127.0.0.1:3562
+      }
+      maps.wan.zanbaldwin.com, maps.lan.zanbaldwin.com, tiles.wan.zanbaldwin.com, tiles.lan.zanbaldwin.com {
+        import app 127.0.0.1:6277
+      }
+      sites.wan.zanbaldwin.com, sites.lan.zanbaldwin.com {
+        import app 127.0.0.1:7487
+      }
+
   serve:
-    # Funnel only Komodo's webhook listener. Port 10000, not 443: NPM already
+    # Funnel only Komodo's webhook listener. Port 10000, not 443: proxy already
     # listens on 443 on every interface. `$$` escapes Compose interpolation;
     # containerboot replaces ${TS_CERT_DOMAIN} with the node's ts.net name.
     content: |

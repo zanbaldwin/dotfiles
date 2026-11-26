@@ -97,7 +97,7 @@ name = "network"
 server = "nas"
 linked_repo = "dotfiles"
 file_paths = ["nas/apps/compose.network.yaml"]
-auto_pull = true
+auto_pull = false
 run_build = true
 
 [[stack]]

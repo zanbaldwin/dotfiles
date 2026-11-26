@@ -1,0 +1,107 @@
+name: 'komodo'
+services:
+
+  mongo:
+    image: 'mongo:8.0'
+    restart: 'unless-stopped'
+    labels:
+      komodo.skip: ''
+    command: ['--quiet', '--wiredTigerCacheSizeGB', '0.25']
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: 'komodo'
+      MONGO_INITDB_ROOT_PASSWORD_FILE: '/run/secrets/db_password'
+    secrets: ['db_password']
+    volumes:
+      - type: 'bind'
+        source: '/mnt/fast/apps/komodo/mongo'
+        target: '/data/db'
+        read_only: false
+
+  core:
+    image: 'ghcr.io/moghtech/komodo-core:2.3.4'
+    restart: 'unless-stopped'
+    init: true
+    depends_on: ['mongo']
+    labels:
+      komodo.skip: ''
+    environment:
+      TZ: 'Europe/Amsterdam'
+      KOMODO_HOST: 'https://deploy.wan.zanbaldwin.com'
+      KOMODO_TITLE: 'ZBNAS'
+      KOMODO_DATABASE_ADDRESS: 'mongo:27017'
+      KOMODO_DATABASE_USERNAME: 'komodo'
+      KOMODO_DATABASE_PASSWORD_FILE: '/run/secrets/db_password'
+      KOMODO_PERIPHERY_PUBLIC_KEY: 'file:/config/keys/periphery.pub'
+      KOMODO_FIRST_SERVER_NAME: 'nas'
+      KOMODO_LOCAL_AUTH: 'false'
+      KOMODO_INIT_ADMIN_USERNAME: 'zanbaldwin'
+      KOMODO_INIT_ADMIN_PASSWORD_FILE: '/run/secrets/admin_password'
+      KOMODO_WEBHOOK_SECRET_FILE: '/run/secrets/webhook_secret'
+      KOMODO_JWT_SECRET_FILE: '/run/secrets/jwt_secret'
+      KOMODO_OIDC_ENABLED: 'true'
+      KOMODO_OIDC_PROVIDER: 'https://auth.wan.zanbaldwin.com'
+      KOMODO_OIDC_CLIENT_ID_FILE: '/run/secrets/client_id'
+      KOMODO_OIDC_CLIENT_SECRET_FILE: '/run/secrets/client_secret'
+      KOMODO_ENABLE_NEW_USERS: 'false'
+    secrets: ['db_password', 'admin_password', 'webhook_secret', 'jwt_secret', 'client_id', 'client_secret']
+    ports:
+      - target: 9120
+        published: 5666
+        host_ip: '127.0.0.1'
+        protocol: 'tcp'
+    volumes:
+      - type: 'bind'
+        source: '/mnt/fast/apps/komodo/keys'
+        target: '/config/keys'
+        read_only: false
+      - type: 'bind'
+        source: '/mnt/fast/apps/komodo/backups'
+        target: '/backups'
+        read_only: false
+
+  periphery:
+    image: 'ghcr.io/moghtech/komodo-periphery:2.3.4'
+    restart: 'unless-stopped'
+    init: true
+    depends_on: ['core']
+    labels:
+      komodo.skip: ''
+    environment:
+      # Outbound mode: Periphery connects to Core. Periphery opens no port.
+      PERIPHERY_CORE_ADDRESS: 'ws://core:9120'
+      PERIPHERY_CONNECT_AS: 'nas'
+      PERIPHERY_CORE_PUBLIC_KEYS: 'file:/config/keys/core.pub'
+      # Must be the same path inside and outside the container.
+      PERIPHERY_ROOT_DIRECTORY: '/mnt/fast/apps/komodo/periphery'
+      PERIPHERY_INCLUDE_DISK_MOUNTS: '/etc/hostname'
+    volumes:
+      - type: 'bind'
+        source: '/mnt/fast/apps/komodo/keys'
+        target: '/config/keys'
+        read_only: false
+      - type: 'bind'
+        source: '/var/run/docker.sock'
+        target: '/var/run/docker.sock'
+        read_only: false
+      - type: 'bind'
+        source: '/proc'
+        target: '/proc'
+        read_only: false
+      - type: 'bind'
+        source: '/mnt/fast/apps/komodo/periphery'
+        target: '/mnt/fast/apps/komodo/periphery'
+        read_only: false
+
+secrets:
+  db_password:
+    file: '/mnt/tank4/secrets/komodo/db_password'
+  admin_password:
+    file: '/mnt/tank4/secrets/komodo/admin_password'
+  webhook_secret:
+    file: '/mnt/tank4/secrets/komodo/webhook_secret'
+  jwt_secret:
+    file: '/mnt/tank4/secrets/komodo/jwt_secret'
+  client_id:
+    file: '/mnt/tank4/secrets/komodo/client_id'
+  client_secret:
+    file: '/mnt/tank4/secrets/komodo/client_secret'

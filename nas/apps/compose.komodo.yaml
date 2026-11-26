@@ -2,7 +2,7 @@ name: 'komodo'
 services:
 
   mongo:
-    image: 'mongo:9.0@sha256:b0c835c26e5997413e985000f1013c275377cd9607761c1784d486f6dd620b7f'
+    image: 'mongo:9.0.8@sha256:b0c835c26e5997413e985000f1013c275377cd9607761c1784d486f6dd620b7f'
     restart: 'unless-stopped'
     labels:
       komodo.skip: ''

@@ -1,0 +1,141 @@
+name: 'monitoring'
+services:
+
+  # Beszel: host, container, ZFS and S.M.A.R.T. metrics with alerts.
+  # Docs: https://beszel.dev/guide/what-is-beszel
+  #
+  # TrueNAS Setup
+  # =============
+  # 1. Create the directories and empty secret files. The agent restarts in a
+  #    loop until step 4 fills the secrets; this is expected.
+  #      mkdir -p /mnt/fast/apps/beszel/hub /mnt/fast/apps/beszel/agent /mnt/fast/apps/beszel/socket /mnt/tank4/secrets/beszel
+  #      touch /mnt/tank4/secrets/beszel/agent_key /mnt/tank4/secrets/beszel/agent_token
+  # 2. Fill in the `devices:` list on the agent (see the S.M.A.R.T. note there),
+  #    then deploy this file: Apps > Discover Apps > Custom App > Install via YAML.
+  # 3. In Nginx Proxy Manager, add `beszel.lan.zanbaldwin.com` -> `127.0.0.1:2379`.
+  #    Open it and create the first user. Use your Pocket ID email address so
+  #    that OIDC login links to this user later.
+  # 4. Click "Add System". Name: `nas`. Host/IP: `/beszel_socket/beszel.sock`.
+  #    Copy the public key and the token from the dialog, then:
+  #      printf '%s' '<public key>' | tr -d '\n' | sudo tee '/mnt/tank4/secrets/beszel/agent_key' >'/dev/null'
+  #      printf '%s' '<token>' | tr -d '\n' | sudo tee '/mnt/tank4/secrets/beszel/agent_token' >'/dev/null'
+  #    Restart the app. The system turns green within a minute.
+  # 5. Check that the agent can read ZFS. The Alpine `zfs` userland must be
+  #    compatible with the TrueNAS kernel module:
+  #      docker exec "$(docker ps -qf name=monitoring-agent)" zpool list
+  #
+  # OIDC (Pocket ID)
+  # ================
+  # 1. In Pocket ID, add an OIDC client with the callback URL
+  #    `https://beszel.lan.zanbaldwin.com/api/oauth2-redirect`.
+  # 2. Open `https://beszel.lan.zanbaldwin.com/_/` (PocketBase superuser login):
+  #    - Settings: turn off "Hide collection create and edit controls".
+  #    - Collections > users > Options: enable OAuth2, add provider `oidc`.
+  #      Fill in the client ID, client secret, auth URL, token URL and user
+  #      info URL ("Fetch user info from"). Keep PKCE on.
+  #    - Settings: turn "Hide collection create and edit controls" back on.
+  #    The hub cannot read these values from files; PocketBase stores them in
+  #    its database.
+  # 3. After a successful OIDC login, set `DISABLE_PASSWORD_AUTH` to 'true'.
+  #
+  # Alerts
+  # ======
+  # - Settings > Notifications: add ntfy as `ntfy://:<access-token>@<host>/<topic>`.
+  # - Settings > Heartbeat: add a Healthchecks.io (or similar) URL. The hub pings
+  #   it every 60s, so you get an alert when the hub itself stops.
+  # - On each system, set alert thresholds (CPU, memory, disk, temperature).
+  #   ZFS pool health and S.M.A.R.T. failures alert automatically once a
+  #   notification channel exists.
+  hub:
+    image: 'henrygd/beszel:0.21.2@sha256:b0be90bd4aee2993fde763032a5098ce4386fba43cfe5031ec017b8d9e8c97a2'
+    restart: 'unless-stopped'
+    cap_drop: ['ALL']
+    environment:
+      APP_URL: 'https://beszel.lan.zanbaldwin.com'
+      USER_CREATION: 'false'
+      DISABLE_PASSWORD_AUTH: 'false'
+      CHECK_UPDATES: 'false'
+    healthcheck:
+      test: ['CMD', '/beszel', 'health', '--url', 'http://localhost:8090']
+      interval: '120s'
+      timeout: '5s'
+      retries: 3
+      start_period: '5s'
+    ports:
+      - target: 8090
+        published: 2379
+        host_ip: '127.0.0.1'
+        protocol: 'tcp'
+    volumes:
+      - type: 'bind'
+        source: '/mnt/fast/apps/beszel/hub'
+        target: '/beszel_data'
+        read_only: false
+      - type: 'bind'
+        source: '/mnt/fast/apps/beszel/socket'
+        target: '/beszel_socket'
+        read_only: false
+
+  # The `:alpine` variant is required: the default image has no `smartctl` or `zfs`.
+  # Host networking is required for host network interface stats. The agent
+  # listens on a unix socket shared with the hub, not on a TCP port.
+  agent:
+    image: 'henrygd/beszel-agent:0.21.2-alpine@sha256:2ea69d4c9a6690d07368d50762cf606281d96b447cdd411855c87ff4027465d9'
+    restart: 'unless-stopped'
+    network_mode: 'host'
+    depends_on:
+      hub:
+        condition: 'service_healthy'
+    cap_drop: ['ALL']
+    # SYS_RAWIO: S.M.A.R.T. data from SATA/SAS disks.
+    # SYS_ADMIN: S.M.A.R.T. data from NVMe disks.
+    cap_add: ['SYS_RAWIO', 'SYS_ADMIN']
+    environment:
+      LISTEN: '/beszel_socket/beszel.sock'
+      HUB_URL: 'http://127.0.0.1:2379'
+      KEY_FILE: '/run/secrets/agent_key'
+      TOKEN_FILE: '/run/secrets/agent_token'
+    secrets:
+      - 'agent_key'
+      - 'agent_token'
+    healthcheck:
+      test: ['CMD', '/agent', 'health']
+      interval: '120s'
+      timeout: '5s'
+      retries: 3
+      start_period: '10s'
+    # S.M.A.R.T.: map each disk's controller (not a partition) into the container.
+    # `sdX` names can change between boots, so use the stable `by-id` path on the
+    # host side. List them with: `ls -l /dev/disk/by-id/ | rg -v part`
+    #   - '/dev/disk/by-id/ata-<model>_<serial>:/dev/sda'
+    #   - '/dev/nvme0:/dev/nvme0'
+    # Some NVMe drives need the namespace mapped instead: '/dev/nvme0n1:/dev/nvme0'.
+    devices:
+      - '/dev/zfs:/dev/zfs'
+      # Boot SSD (boot-pool)
+      - '/dev/disk/by-id/ata-Vi550_S3_SSD_493515268373523:/dev/sdb'
+      # HDDs (tank4)
+      - '/dev/disk/by-id/ata-WDC_WD40EFPX-68C6CN0_WD-WX42D85H1FKY:/dev/sda'
+      - '/dev/disk/by-id/ata-WDC_WD40EFPX-68C6CN0_WD-WX32D855YUT0:/dev/sdc'
+      - '/dev/disk/by-id/ata-WDC_WD40EFPX-68C6CN0_WD-WX42D85H1XKV:/dev/sdd'
+      # NVMe (fast)
+      - '/dev/nvme0:/dev/nvme0'
+    volumes:
+      - type: 'bind'
+        source: '/mnt/fast/apps/beszel/agent'
+        target: '/var/lib/beszel-agent'
+        read_only: false
+      - type: 'bind'
+        source: '/mnt/fast/apps/beszel/socket'
+        target: '/beszel_socket'
+        read_only: false
+      - type: 'bind'
+        source: '/var/run/docker.sock'
+        target: '/var/run/docker.sock'
+        read_only: true
+
+secrets:
+  agent_key:
+    file: '/mnt/tank4/secrets/beszel/agent_key'
+  agent_token:
+    file: '/mnt/tank4/secrets/beszel/agent_token'

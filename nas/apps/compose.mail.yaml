@@ -28,11 +28,12 @@ services:
       BICHON_ANSI_LOGS: 'false'
     secrets:
       - 'encrypt_password'
-    ports:
-      - target: 15630
-        published: 2424
-        host_ip: '127.0.0.1'
-        protocol: 'tcp'
+    networks:
+      - 'default'
+      - 'proxy'
+    labels:
+      caddy: 'mail.wan.zanbaldwin.com, mail.lan.zanbaldwin.com'
+      caddy.import: 'app {{upstreams 15630}}'
     volumes:
       # Metadata and the full-text index.
       - type: 'bind'
@@ -54,6 +55,8 @@ networks:
   cache:
     external: true
   database:
+    external: true
+  proxy:
     external: true
 
 secrets:

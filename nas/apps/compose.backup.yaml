@@ -19,11 +19,12 @@ services:
       - 'backblaze_credentials'
       - 'tigris_credentials'
       - 'truenas_api_key'
-    ports:
-      - target: 9898
-        published: 9898
-        host_ip: '127.0.0.1'
-        protocol: 'tcp'
+    networks:
+      - 'default'
+      - 'proxy'
+    labels:
+      caddy: 'backup.lan.zanbaldwin.com'
+      caddy.import: 'app {{upstreams 9898}}'
     volumes:
       # Backrest application data
       - type: 'bind'
@@ -47,6 +48,10 @@ services:
         source: '/mnt/tank4'
         target: '/source'
         read_only: true
+
+networks:
+  proxy:
+    external: true
 
 secrets:
   backblaze_credentials:

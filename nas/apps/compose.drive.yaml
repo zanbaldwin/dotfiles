@@ -43,11 +43,16 @@ services:
         source: '/mnt/tank4/drive'
         target: '/drive'
         read_only: false
-    ports:
-      - target: 80
-        published: 3453
-        host_ip: '127.0.0.1'
-        protocol: 'tcp'
+    networks:
+      - 'default'
+      - 'proxy'
+    labels:
+      caddy: 'drive.wan.zanbaldwin.com, drive.lan.zanbaldwin.com, files.wan.zanbaldwin.com, files.lan.zanbaldwin.com'
+      caddy.import: 'app {{upstreams 80}}'
+
+networks:
+  proxy:
+    external: true
 
 secrets:
   client_id:

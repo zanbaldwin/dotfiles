@@ -24,6 +24,8 @@ services:
     depends_on: ['mongo']
     labels:
       komodo.skip: ''
+      caddy: 'deploy.wan.zanbaldwin.com, deploy.lan.zanbaldwin.com'
+      caddy.import: 'app {{upstreams 9120}}'
     environment:
       TZ: 'Europe/Amsterdam'
       KOMODO_HOST: 'https://deploy.wan.zanbaldwin.com'
@@ -44,6 +46,9 @@ services:
       KOMODO_OIDC_CLIENT_SECRET_FILE: '/run/secrets/client_secret'
       KOMODO_ENABLE_NEW_USERS: 'false'
     secrets: ['db_password', 'admin_password', 'webhook_secret', 'jwt_secret', 'client_id', 'client_secret']
+    networks:
+      - 'default'
+      - 'proxy'
     ports:
       - target: 9120
         published: 5666
@@ -91,6 +96,10 @@ services:
         source: '/mnt/fast/apps/komodo/periphery'
         target: '/mnt/fast/apps/komodo/periphery'
         read_only: false
+
+networks:
+  proxy:
+    external: true
 
 secrets:
   db_password:

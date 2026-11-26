@@ -61,6 +61,12 @@ services:
       timeout: '5s'
       retries: 3
       start_period: '5s'
+    networks:
+      - 'default'
+      - 'proxy'
+    labels:
+      caddy: 'stats.wan.zanbaldwin.com, stats.lan.zanbaldwin.com'
+      caddy.import: 'app {{upstreams 8090}}'
     ports:
       - target: 8090
         published: 2379
@@ -133,6 +139,10 @@ services:
         source: '/var/run/docker.sock'
         target: '/var/run/docker.sock'
         read_only: true
+
+networks:
+  proxy:
+    external: true
 
 secrets:
   agent_key:

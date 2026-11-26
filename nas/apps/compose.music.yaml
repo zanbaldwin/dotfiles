@@ -22,11 +22,12 @@ services:
         target: 'ND_LASTFM_SECRET'
     entrypoint: ['/bin/sh', '/secrets-exec.sh']
     command: ['navidrome', '--configfile', '/data/navidrome.toml']
-    ports:
-      - target: 4533
-        published: 4533
-        host_ip: '127.0.0.1'
-        protocol: 'tcp'
+    networks:
+      - 'default'
+      - 'proxy'
+    labels:
+      caddy: 'music.wan.zanbaldwin.com, music.lan.zanbaldwin.com'
+      caddy.import: 'app {{upstreams 4533}}'
     volumes:
       - type: 'bind'
         source: '/mnt/fast/apps/navidrome'
@@ -65,11 +66,12 @@ services:
         target: 'NAVIDROME_PASSWORD'
     entrypoint: ['/bin/sh', '/secrets-exec.sh']
     command: ['node', 'dist/server.js']
-    ports:
-      - target: 3590
-        published: 3590
-        host_ip: '127.0.0.1'
-        protocol: 'tcp'
+    networks:
+      - 'default'
+      - 'proxy'
+    labels:
+      caddy: 'scrobble.wan.zanbaldwin.com, scrobble.lan.zanbaldwin.com'
+      caddy.import: 'app {{upstreams 3590}}'
     volumes:
       - type: 'bind'
         source: '/mnt/fast/apps/spindle'
@@ -79,6 +81,10 @@ services:
         source: '/mnt/fast/apps/navidrome'
         target: '/nddata'
         read_only: true
+
+networks:
+  proxy:
+    external: true
 
 secrets:
   lastfm:

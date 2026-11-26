@@ -10,7 +10,7 @@ services:
   anchor:
     image: 'ghcr.io/zhfahim/anchor:0.18.1@sha256:83121433fcbc60f1491f1d5c761d2bac59519884ad31d0c464b7fce931d75d8e'
     restart: 'unless-stopped'
-    networks: ['default', 'database']
+    networks: ['default', 'database', 'proxy']
     cap_drop: ['ALL']
     entrypoint: ['/bin/sh', '/secrets-exec.sh']
     command: ['/app/docker-entrypoint.sh']
@@ -32,11 +32,9 @@ services:
       OIDC_ENABLED: 'true'
       OIDC_PROVIDER_NAME: 'PocketID'
       OIDC_ISSUER_URL: 'https://auth.wan.zanbaldwin.com'
-    ports:
-      - target: 3000
-        published: 4526
-        host_ip: '127.0.0.1'
-        protocol: 'tcp'
+    labels:
+      caddy: 'keep.wan.zanbaldwin.com, keep.lan.zanbaldwin.com, notes.wan.zanbaldwin.com, notes.lan.zanbaldwin.com'
+      caddy.import: 'app {{upstreams 3000}}'
     volumes:
       - type: 'bind'
         source: '/mnt/fast/apps/anchor'
@@ -46,6 +44,8 @@ services:
 networks:
   default: {}
   database:
+    external: true
+  proxy:
     external: true
 
 secrets:

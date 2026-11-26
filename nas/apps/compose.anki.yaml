@@ -37,11 +37,12 @@ services:
       interval: '30s'
       timeout: '5s'
       retries: 3
-    ports:
-      - target: 8080
-        published: 8770
-        host_ip: '127.0.0.1'
-        protocol: 'tcp'
+    networks:
+      - 'default'
+      - 'proxy'
+    labels:
+      caddy: 'anki.wan.zanbaldwin.com, anki.lan.zanbaldwin.com'
+      caddy.import: 'app {{upstreams 8080}}'
     volumes:
       - type: 'bind'
         source: '/mnt/tank4/anki'
@@ -49,6 +50,10 @@ services:
         read_only: false
     entrypoint: ['/bin/sh', '/secrets-exec.sh']
     command: ['python', '-m', 'anki.syncserver']
+
+networks:
+  proxy:
+    external: true
 
 secrets:
   anki_sync_user:

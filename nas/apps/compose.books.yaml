@@ -29,6 +29,7 @@ services:
     networks:
       - 'default'
       - 'database'
+      - 'proxy'
     environment:
       TZ: 'Europe/Amsterdam'
       PUID: '${PUID:-1000}'
@@ -53,11 +54,9 @@ services:
       - 'jwt_secret'
       - 'setup_token'
       - 'encryption_key'
-    ports:
-      - target: 3000
-        published: 2665
-        host_ip: '127.0.0.1'
-        protocol: 'tcp'
+    labels:
+      caddy: 'books.wan.zanbaldwin.com, books.lan.zanbaldwin.com'
+      caddy.import: 'app {{upstreams 3000}}'
     volumes:
       - type: 'bind'
         source: '/mnt/tank4/books/Calibre'
@@ -78,6 +77,8 @@ services:
 networks:
   default: {}
   database:
+    external: true
+  proxy:
     external: true
 
 secrets:

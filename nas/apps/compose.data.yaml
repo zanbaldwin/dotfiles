@@ -101,6 +101,7 @@ services:
     networks:
       s3:
         aliases: ['s3', 'garage']
+      proxy:
     secrets:
       - 'garage_rpc_secret'
       - 'garage_admin_token'
@@ -117,11 +118,9 @@ services:
         source: '/mnt/tank4/buckets'
         target: '/var/lib/garage/data'
         read_only: false
-    ports:
-      - target: 3900
-        published: 3900
-        host_ip: '127.0.0.1'
-        protocol: 'tcp'
+    labels:
+      caddy: 's3.wan.zanbaldwin.com, s3.lan.zanbaldwin.com, buckets.wan.zanbaldwin.com, buckets.lan.zanbaldwin.com'
+      caddy.import: 'app {{upstreams 3900}}'
     deploy:
       resources:
         limits:
@@ -144,7 +143,7 @@ services:
     depends_on:
       garage:
         condition: 'service_healthy'
-    networks: ['s3']
+    networks: ['s3', 'proxy']
     environment:
       GARAGE_UI_GARAGE_ENDPOINT: 'http://garage:3900'
       GARAGE_UI_GARAGE_ADMIN_ENDPOINT: 'http://garage:3903'
@@ -168,11 +167,9 @@ services:
       - 'garage_ui_password'
       - 'garage_ui_client_id'
       - 'garage_ui_client_secret'
-    ports:
-      - target: 8080
-        published: 3909
-        host_ip: '127.0.0.1'
-        protocol: 'tcp'
+    labels:
+      caddy: 'garage.wan.zanbaldwin.com, garage.lan.zanbaldwin.com'
+      caddy.import: 'app {{upstreams 8080}}'
     deploy:
       resources:
         limits:
@@ -191,6 +188,8 @@ networks:
     name: 's3'
     driver: 'bridge'
     attachable: true
+  proxy:
+    external: true
 
 secrets:
   dbpass:

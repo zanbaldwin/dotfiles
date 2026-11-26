@@ -19,12 +19,16 @@ services:
       TS_EXTRA_ARGS: '--advertise-exit-node'
       TS_USERSPACE: 'false'
       TS_NO_LOGS_NO_SUPPORT: 'true'
+      TS_SERVE_CONFIG: '/config/serve.json'
     healthcheck:
       test: ['CMD-SHELL', 'wget --spider -q "http://127.0.0.1:8575/healthz"']
       interval: '30s'
       timeout: '5s'
       retries: 5
       start_period: '30s'
+    configs:
+      - source: 'serve'
+        target: '/config/serve.json'
     secrets:
       - 'authkey'
     volumes:
@@ -133,3 +137,25 @@ secrets:
     file: '/mnt/tank4/secrets/pocketid/dsn'
   pocketid_encryption_key:
     file: '/mnt/tank4/secrets/pocketid/encryption_key'
+
+configs:
+  serve:
+    # Funnel only Komodo's webhook listener. Port 10000, not 443: NPM already
+    # listens on 443 on every interface. `$$` escapes Compose interpolation;
+    # containerboot replaces ${TS_CERT_DOMAIN} with the node's ts.net name.
+    content: |
+      {
+        "TCP": {
+          "10000": { "HTTPS": true }
+        },
+        "Web": {
+          "$${TS_CERT_DOMAIN}:10000": {
+            "Handlers": {
+              "/listener": { "Proxy": "http://127.0.0.1:5666/listener" }
+            }
+          }
+        },
+        "AllowFunnel": {
+          "$${TS_CERT_DOMAIN}:10000": true
+        }
+      }

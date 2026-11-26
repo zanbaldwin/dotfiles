@@ -2,10 +2,7 @@
 name = "data"
 [stack.config]
 server = "nas"
-git_provider = "github.com"
-git_account = "zanbaldwin"
-repo = "zanbaldwin/dotfiles"
-branch = "main"
+linked_repo = "dotfiles"
 file_paths = ["nas/apps/compose.data.yaml"]
 auto_pull = true
 
@@ -13,10 +10,7 @@ auto_pull = true
 name = "anki"
 [stack.config]
 server = "nas"
-git_provider = "github.com"
-git_account = "zanbaldwin"
-repo = "zanbaldwin/dotfiles"
-branch = "main"
+linked_repo = "dotfiles"
 file_paths = ["nas/apps/compose.anki.yaml"]
 auto_pull = true
 
@@ -24,10 +18,7 @@ auto_pull = true
 name = "backup"
 [stack.config]
 server = "nas"
-git_provider = "github.com"
-git_account = "zanbaldwin"
-repo = "zanbaldwin/dotfiles"
-branch = "main"
+linked_repo = "dotfiles"
 file_paths = ["nas/apps/compose.backup.yaml"]
 auto_pull = true
 
@@ -36,10 +27,7 @@ name = "books"
 after = ["data"]
 [stack.config]
 server = "nas"
-git_provider = "github.com"
-git_account = "zanbaldwin"
-repo = "zanbaldwin/dotfiles"
-branch = "main"
+linked_repo = "dotfiles"
 file_paths = ["nas/apps/compose.books.yaml"]
 auto_pull = true
 
@@ -47,10 +35,7 @@ auto_pull = true
 # name = "code"
 # [stack.config]
 # server = "nas"
-# git_provider = "github.com"
-# git_account = "zanbaldwin"
-# repo = "zanbaldwin/dotfiles"
-# branch = "main"
+# linked_repo = "dotfiles"
 # file_paths = ["nas/apps/compose.code.yaml"]
 # auto_pull = true
 
@@ -58,10 +43,7 @@ auto_pull = true
 name = "drive"
 [stack.config]
 server = "nas"
-git_provider = "github.com"
-git_account = "zanbaldwin"
-repo = "zanbaldwin/dotfiles"
-branch = "main"
+linked_repo = "dotfiles"
 file_paths = ["nas/apps/compose.drive.yaml"]
 auto_pull = true
 
@@ -70,10 +52,7 @@ name = "git"
 after = ["data"]
 [stack.config]
 server = "nas"
-git_provider = "github.com"
-git_account = "zanbaldwin"
-repo = "zanbaldwin/dotfiles"
-branch = "main"
+linked_repo = "dotfiles"
 file_paths = ["nas/apps/compose.git.yaml"]
 auto_pull = true
 
@@ -82,10 +61,7 @@ name = "location"
 after = ["data"]
 [stack.config]
 server = "nas"
-git_provider = "github.com"
-git_account = "zanbaldwin"
-repo = "zanbaldwin/dotfiles"
-branch = "main"
+linked_repo = "dotfiles"
 file_paths = ["nas/apps/compose.location.yaml"]
 auto_pull = true
 
@@ -93,10 +69,7 @@ auto_pull = true
 name = "mail"
 [stack.config]
 server = "nas"
-git_provider = "github.com"
-git_account = "zanbaldwin"
-repo = "zanbaldwin/dotfiles"
-branch = "main"
+linked_repo = "dotfiles"
 file_paths = ["nas/apps/compose.mail.yaml"]
 auto_pull = true
 
@@ -104,10 +77,7 @@ auto_pull = true
 name = "monitoring"
 [stack.config]
 server = "nas"
-git_provider = "github.com"
-git_account = "zanbaldwin"
-repo = "zanbaldwin/dotfiles"
-branch = "main"
+linked_repo = "dotfiles"
 file_paths = ["nas/apps/compose.monitoring.yaml"]
 auto_pull = true
 
@@ -115,10 +85,7 @@ auto_pull = true
 name = "music"
 [stack.config]
 server = "nas"
-git_provider = "github.com"
-git_account = "zanbaldwin"
-repo = "zanbaldwin/dotfiles"
-branch = "main"
+linked_repo = "dotfiles"
 file_paths = ["nas/apps/compose.music.yaml"]
 auto_pull = true
 
@@ -126,10 +93,7 @@ auto_pull = true
 name = "network"
 [stack.config]
 server = "nas"
-git_provider = "github.com"
-git_account = "zanbaldwin"
-repo = "zanbaldwin/dotfiles"
-branch = "main"
+linked_repo = "dotfiles"
 file_paths = ["nas/apps/compose.network.yaml"]
 auto_pull = true
 
@@ -138,10 +102,7 @@ name = "notes"
 after = ["data"]
 [stack.config]
 server = "nas"
-git_provider = "github.com"
-git_account = "zanbaldwin"
-repo = "zanbaldwin/dotfiles"
-branch = "main"
+linked_repo = "dotfiles"
 file_paths = ["nas/apps/compose.notes.yaml"]
 auto_pull = true
 
@@ -150,10 +111,7 @@ name = "photos"
 after = ["data"]
 [stack.config]
 server = "nas"
-git_provider = "github.com"
-git_account = "zanbaldwin"
-repo = "zanbaldwin/dotfiles"
-branch = "main"
+linked_repo = "dotfiles"
 file_paths = ["nas/apps/compose.photos.yaml"]
 auto_pull = true
 
@@ -161,10 +119,7 @@ auto_pull = true
 name = "rawr"
 [stack.config]
 server = "nas"
-git_provider = "github.com"
-git_account = "zanbaldwin"
-repo = "zanbaldwin/dotfiles"
-branch = "main"
+linked_repo = "dotfiles"
 file_paths = ["nas/apps/compose.rawr.yaml"]
 auto_pull = true
 
@@ -172,10 +127,7 @@ auto_pull = true
 name = "rotter"
 [stack.config]
 server = "nas"
-git_provider = "github.com"
-git_account = "zanbaldwin"
-repo = "zanbaldwin/dotfiles"
-branch = "main"
+linked_repo = "dotfiles"
 file_paths = ["nas/apps/compose.rotter.yaml"]
 auto_pull = true
 
@@ -183,9 +135,14 @@ auto_pull = true
 name = "sites"
 [stack.config]
 server = "nas"
-git_provider = "github.com"
-git_account = "zanbaldwin"
-repo = "zanbaldwin/dotfiles"
-branch = "main"
+linked_repo = "dotfiles"
 file_paths = ["nas/apps/compose.sites.yaml"]
 auto_pull = true
+
+# [[stack]]
+# name = "vault"
+# [stack.config]
+# server = "nas"
+# linked_repo = "dotfiles"
+# file_paths = ["nas/apps/compose.vault.yaml"]
+# auto_pull = true

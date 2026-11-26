@@ -4,7 +4,8 @@ name = "data"
 server = "nas"
 linked_repo = "dotfiles"
 file_paths = ["nas/apps/compose.data.yaml"]
-auto_pull = true
+auto_pull = false
+run_build = true
 
 [[stack]]
 name = "anki"

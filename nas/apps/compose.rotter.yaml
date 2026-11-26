@@ -8,7 +8,7 @@ services:
     deploy:
       resources:
         limits:
-          memory: '192M'
+          memory: '384M'
     stop_grace_period: '20m'
     command: ['/rotter/bin/rotter', 'process']
     secrets:

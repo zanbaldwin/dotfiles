@@ -13,6 +13,7 @@ services:
       RAWR__LIBRARY__TARGETS__IMPORT: 'nfs'
       RAWR__TARGETS__NFS__DIRECTORY: '/library'
       RAWR__LIBRARY__TARGETS__EXPORT: 'orbit'
+      RAWR__TARGETS__ORBIT__DRIVER: 'local'
       RAWR__TARGETS__ORBIT__DIRECTORY: '/opt/rawr/orbit'
       RAWR__LIBRARY__STYLES__EPUB: '["builtin:epub.css"]'
     volumes:

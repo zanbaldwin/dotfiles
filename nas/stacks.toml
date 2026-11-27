@@ -1,3 +1,13 @@
+[[repo]]
+name = "dotfiles"
+[repo.config]
+server = "nas"
+builder = "nas"
+git_account = "zanbaldwin"
+repo = "zanbaldwin/dotfiles"
+
+## Services
+
 [[stack]]
 name = "network"
 [stack.config]
@@ -53,15 +63,6 @@ server = "nas"
 linked_repo = "dotfiles"
 file_paths = ["nas/apps/compose.books.yaml"]
 auto_pull = true
-
-# [[stack]]
-# name = "code"
-# after = ["network"]
-# [stack.config]
-# server = "nas"
-# linked_repo = "dotfiles"
-# file_paths = ["nas/apps/compose.code.yaml"]
-# auto_pull = true
 
 [[stack]]
 name = "drive"
@@ -163,6 +164,15 @@ file_paths = ["nas/apps/compose.sites.yaml"]
 auto_pull = true
 
 # [[stack]]
+# name = "code"
+# after = ["network"]
+# [stack.config]
+# server = "nas"
+# linked_repo = "dotfiles"
+# file_paths = ["nas/apps/compose.code.yaml"]
+# auto_pull = true
+
+# [[stack]]
 # name = "vault"
 # after = ["network"]
 # [stack.config]
@@ -170,3 +180,61 @@ auto_pull = true
 # linked_repo = "dotfiles"
 # file_paths = ["nas/apps/compose.vault.yaml"]
 # auto_pull = true
+
+[[procedure]]
+name = "deploy-nas"
+config.schedule_format = "Cron"
+config.schedule = "0 0 11 1 * *"
+[[procedure.config.stage]]
+name = "Sync from GitHub"
+enabled = true
+executions = [
+    { execution.type = "RunSync", execution.params.sync = "nas-stacks", enabled = true },
+]
+[[procedure.config.stage]]
+name = "Deploy Network"
+enabled = true
+executions = [
+    { execution.type = "DeployStackIfChanged", execution.params.stack = "network", enabled = true },
+]
+[[procedure.config.stage]]
+name = "Deploy Data"
+enabled = true
+executions = [
+    { execution.type = "DeployStackIfChanged", execution.params.stack = "data", enabled = true },
+]
+[[procedure.config.stage]]
+name = "Deploy Remaining Services"
+enabled = true
+executions = [
+    { execution.type = "BatchDeployStackIfChanged", execution.params.pattern = '''
+# Match stacks by name, id, wildcard, or \regex\.
+*''', execution.params.tags = [
+    ], enabled = true },
+]
+
+[[procedure]]
+name = "rotter-stop"
+config.schedule_format = "Cron"
+config.schedule = "0 0 22 * * *"
+[[procedure.config.stage]]
+name = "Stop"
+enabled = true
+executions = [
+    { execution.type = "StopStack", execution.params.stack = "rotter", enabled = true },
+]
+
+[[action]]
+name = "rotter-start"
+config.schedule_format = "Cron"
+config.schedule = "0 30 8 * * MON-SAT"
+config.file_contents = '''
+if (Math.random() < 0.85) {
+    const delay = Math.floor(Math.random() * 5400);
+    console.log(`Starting in ${delay}s`);
+    await new Promise((resolve) => setTimeout(resolve, delay * 1000));
+    await komodo.execute_and_poll("StartStack", { stack: "rotter" });
+} else {
+    console.log("Skipping today");
+}
+'''

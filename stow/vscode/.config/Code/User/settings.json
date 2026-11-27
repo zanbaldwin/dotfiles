@@ -222,4 +222,5 @@
     "sqltools.formatLanguages": [],
     "sqltools.highlightQuery": false,
     "chat.disableAIFeatures": true,
+    "lldb.suppressUpdateNotifications": true,
 }

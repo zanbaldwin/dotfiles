@@ -68,7 +68,7 @@ services:
         target: '/data'
         read_only: false
       - type: 'bind'
-        source: '/mnt/fast/apps/rawr/exports'
+        source: '/mnt/fast/apps/rawr/orbit'
         target: '/fics'
         read_only: false
       - type: 'tmpfs'

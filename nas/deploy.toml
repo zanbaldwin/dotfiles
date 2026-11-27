@@ -1,0 +1,267 @@
+[[server]]
+name = 'nas'
+[server.config]
+enabled = true
+
+[[builder]]
+name = 'nas'
+[builder.config]
+type = 'Server'
+params.servers = ['nas']
+
+[[resource_sync]]
+name = 'nas-stacks'
+[resource_sync.config]
+linked_repo = 'dotfiles'
+resource_path = ['nas/deploy.toml']
+delete = true
+
+[[repo]]
+name = 'dotfiles'
+[repo.config]
+server = 'nas'
+builder = 'nas'
+git_account = 'zanbaldwin'
+repo = 'zanbaldwin/dotfiles'
+
+## Services
+
+[[stack]]
+name = 'anki'
+after = ['network']
+[stack.config]
+server = 'nas'
+auto_pull = false
+run_build = true
+linked_repo = 'dotfiles'
+file_paths = ['nas/apps/compose.anki.yaml']
+
+[[stack]]
+name = 'auth'
+after = ['network', 'data']
+[stack.config]
+server = 'nas'
+linked_repo = 'dotfiles'
+file_paths = ['nas/apps/compose.auth.yaml']
+auto_pull = true
+
+[[stack]]
+name = 'backup'
+after = ['network']
+[stack.config]
+server = 'nas'
+linked_repo = 'dotfiles'
+file_paths = ['nas/apps/compose.backup.yaml']
+auto_pull = true
+
+[[stack]]
+name = 'books'
+after = ['network', 'data']
+[stack.config]
+server = 'nas'
+linked_repo = 'dotfiles'
+file_paths = ['nas/apps/compose.books.yaml']
+
+[[stack]]
+name = 'data'
+[stack.config]
+server = 'nas'
+auto_pull = false
+run_build = true
+linked_repo = 'dotfiles'
+file_paths = ['nas/apps/compose.data.yaml']
+
+[[stack]]
+name = 'drive'
+after = ['network']
+[stack.config]
+server = 'nas'
+linked_repo = 'dotfiles'
+file_paths = ['nas/apps/compose.drive.yaml']
+
+[[stack]]
+name = 'git'
+after = ['network', 'data']
+[stack.config]
+server = 'nas'
+linked_repo = 'dotfiles'
+file_paths = ['nas/apps/compose.git.yaml']
+
+[[stack]]
+name = 'location'
+after = ['network', 'data']
+[stack.config]
+server = 'nas'
+linked_repo = 'dotfiles'
+file_paths = ['nas/apps/compose.location.yaml']
+
+[[stack]]
+name = 'mail'
+after = ['network']
+[stack.config]
+server = 'nas'
+linked_repo = 'dotfiles'
+file_paths = ['nas/apps/compose.mail.yaml']
+
+[[stack]]
+name = 'monitoring'
+after = ['network']
+[stack.config]
+server = 'nas'
+linked_repo = 'dotfiles'
+file_paths = ['nas/apps/compose.monitoring.yaml']
+
+[[stack]]
+name = 'music'
+after = ['network']
+[stack.config]
+server = 'nas'
+linked_repo = 'dotfiles'
+file_paths = ['nas/apps/compose.music.yaml']
+
+[[stack]]
+name = 'network'
+[stack.config]
+server = 'nas'
+auto_pull = false
+run_build = true
+linked_repo = 'dotfiles'
+file_paths = ['nas/apps/compose.network.yaml']
+
+[[stack]]
+name = 'notes'
+after = ['network', 'data']
+[stack.config]
+server = 'nas'
+linked_repo = 'dotfiles'
+file_paths = ['nas/apps/compose.notes.yaml']
+
+[[stack]]
+name = 'photos'
+after = ['network', 'data']
+[stack.config]
+server = 'nas'
+linked_repo = 'dotfiles'
+file_paths = ['nas/apps/compose.photos.yaml']
+
+[[stack]]
+name = 'rawr'
+after = ['network']
+[stack.config]
+server = 'nas'
+linked_repo = 'dotfiles'
+file_paths = ['nas/apps/compose.rawr.yaml']
+
+[[stack]]
+name = 'rotter'
+after = ['network']
+[stack.config]
+server = 'nas'
+linked_repo = 'dotfiles'
+file_paths = ['nas/apps/compose.rotter.yaml']
+
+[[stack]]
+name = 'sites'
+after = ['network']
+[stack.config]
+server = 'nas'
+linked_repo = 'dotfiles'
+file_paths = ['nas/apps/compose.sites.yaml']
+
+## System
+
+[[procedure]]
+name = 'Backup Core Database'
+description = 'Triggers the Core database backup at the scheduled time.'
+tags = ['system']
+config.schedule = 'Every day at 01:00'
+[[procedure.config.stage]]
+name = 'Stage 1'
+enabled = true
+executions = [
+    { execution.type = 'BackupCoreDatabase', execution.params = {}, enabled = true },
+]
+
+[[procedure]]
+name = 'Global Auto Update'
+description = "Pulls and auto updates Stacks and Deployments using 'poll_for_updates' or 'auto_update'."
+tags = ['system']
+config.schedule = 'Every day at 03:00'
+[[procedure.config.stage]]
+name = 'Stage 1'
+enabled = true
+executions = [
+    { execution.type = 'GlobalAutoUpdate', execution.params.skip_auto_update = false, enabled = true },
+]
+
+[[procedure]]
+name = 'Rotate Server Keys'
+description = 'Rotates all currently connected Server keys.'
+tags = ['system']
+config.schedule = 'Every day at 06:00'
+[[procedure.config.stage]]
+name = 'Stage 1'
+enabled = true
+executions = [
+    { execution.type = 'RotateAllServerKeys', execution.params = {}, enabled = true },
+]
+
+## Webhooks
+
+[[procedure]]
+name = 'deploy-nas'
+config.schedule_format = 'Cron'
+config.schedule = '0 0 11 1 * *'
+[[procedure.config.stage]]
+name = 'Sync from GitHub'
+enabled = true
+executions = [
+    { execution.type = 'RunSync', execution.params.sync = 'nas-stacks', enabled = true },
+]
+[[procedure.config.stage]]
+name = 'Deploy Network'
+enabled = true
+executions = [
+    { execution.type = 'DeployStackIfChanged', execution.params.stack = 'network', enabled = true },
+]
+[[procedure.config.stage]]
+name = 'Deploy Data'
+enabled = true
+executions = [
+    { execution.type = 'DeployStackIfChanged', execution.params.stack = 'data', enabled = true },
+]
+[[procedure.config.stage]]
+name = 'Deploy Remaining Services'
+enabled = true
+executions = [
+    { execution.type = 'BatchDeployStackIfChanged', execution.params.pattern = '*', enabled = true },
+]
+
+## Cron Jobs
+
+[[action]]
+name = 'rotter-start'
+[action.config]
+schedule_format = 'Cron'
+schedule = '0 30 8 * * MON-SAT'
+file_contents = '''
+if (Math.random() < 0.85) {
+    const delay = Math.floor(Math.random() * 7200);
+    console.log(`Starting in ${delay}s`);
+    await new Promise((resolve) => setTimeout(resolve, delay * 1000));
+    await komodo.execute_and_poll('StartStack', { stack: 'rotter' });
+} else {
+    console.log('Skipping today');
+}
+'''
+
+[[procedure]]
+name = 'rotter-stop'
+config.schedule = '0 0 22 * * *'
+config.schedule_format = 'Cron'
+[[procedure.config.stage]]
+name = 'Stop'
+enabled = true
+executions = [
+    { execution.type = 'StopStack', execution.params.stack = 'rotter', enabled = true },
+]
